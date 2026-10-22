@@ -313,12 +313,9 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
               </div>
 
               <div className="form-group">
-                <div className="form-label-with-tip">
-                  <label className="form-label" htmlFor="cat-new-examples">
-                    AI Semantic Keywords & Examples
-                  </label>
-                  <span className="form-tip-text">Tier 2 Embedding Engine</span>
-                </div>
+                <label className="form-label" htmlFor="cat-new-examples">
+                  AI Keywords & Examples
+                </label>
                 <textarea
                   id="cat-new-examples"
                   className="form-textarea"
@@ -328,7 +325,7 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
                   onChange={(e) => setExamplesInput(e.target.value)}
                 />
                 <span className="form-help-sub">
-                  Separate keywords or descriptions by commas. The AI uses these vectors to automatically categorize incoming transactions.
+                  Keywords and merchants used by AI to classify transactions into this category.
                 </span>
               </div>
 
@@ -515,12 +512,9 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
                     </div>
 
                     <div className="form-group">
-                      <div className="form-label-with-tip">
-                        <label className="form-label" htmlFor={`cat-examples-${cat.id}`}>
-                          AI Semantic Keywords & Examples
-                        </label>
-                        <span className="form-tip-text">Tier 2 Embedding Engine</span>
-                      </div>
+                      <label className="form-label" htmlFor={`cat-examples-${cat.id}`}>
+                        AI Keywords & Examples
+                      </label>
                       <textarea
                         id={`cat-examples-${cat.id}`}
                         className="form-textarea"
@@ -530,11 +524,11 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
                         onChange={(e) => setExamplesInput(e.target.value)}
                       />
                       <span className="form-help-sub">
-                        Keywords and merchants used by the AI to classify transactions into this category.
+                        Keywords and merchants used by AI to classify transactions into this category.
                       </span>
                     </div>
 
-                    {!cat.isSystem && (
+                    {!cat.isSystem && !cat.isActive && (
                       <div className="form-group-checkbox">
                         <label className="checkbox-label">
                           <input
@@ -542,7 +536,7 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
                             checked={isActiveInput}
                             onChange={(e) => setIsActiveInput(e.target.checked)}
                           />
-                          <span>Category is active (visible in suggestions and filters)</span>
+                          <span>Re-enable this category</span>
                         </label>
                       </div>
                     )}
