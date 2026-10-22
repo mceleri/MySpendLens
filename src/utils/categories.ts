@@ -72,18 +72,18 @@ export const AVAILABLE_CATEGORY_ICONS: Record<string, LucideIcon> = {
 };
 
 export const PRESET_CATEGORY_COLORS = [
-  '#10b981', // Emerald
-  '#f97316', // Orange
-  '#06b6d4', // Cyan
-  '#ef4444', // Red
+  '#3b82f6', // Royal Blue
+  '#10b981', // Emerald Green
+  '#f97316', // Tangerine Orange
+  '#ef4444', // Crimson Red
   '#a855f7', // Purple
-  '#eab308', // Amber/Yellow
-  '#22c55e', // Green
-  '#ec4899', // Pink
-  '#3b82f6', // Blue
-  '#8b5cf6', // Violet
-  '#14b8a6', // Teal
-  '#f43f5e', // Rose
+  '#eab308', // Amber Gold
+  '#06b6d4', // Cyan Sky
+  '#ec4899', // Hot Pink
+  '#b45309', // Terracotta Bronze
+  '#4338ca', // Deep Indigo
+  '#9f1239', // Wine Burgundy
+  '#64748b', // Slate Gray
 ];
 
 export function resolveCategoryIcon(iconName?: string): LucideIcon {
