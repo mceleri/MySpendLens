@@ -8,6 +8,7 @@
 
 import { env, pipeline, FeatureExtractionPipeline } from '@xenova/transformers';
 import { PredictionResult } from './tier1_browser_engine';
+import { CategoryDefinition } from '../utils/categories';
 
 export interface Tier2ProgressInfo {
   status: 'initiate' | 'download' | 'progress' | 'done' | 'ready';
@@ -230,7 +231,8 @@ export class MySpendLensTier2Engine {
    * Initializes the pipeline and calculates class centroids.
    */
   public async init(
-    onProgress?: (info: Tier2ProgressInfo) => void
+    onProgress?: (info: Tier2ProgressInfo) => void,
+    categories?: CategoryDefinition[]
   ): Promise<void> {
     configureTransformersCache();
 
@@ -251,12 +253,17 @@ export class MySpendLensTier2Engine {
     });
 
     // Compute class centroid embedding vectors
-    await this.computeClassCentroids();
+    await this.computeClassCentroids(categories);
     this.isReady = true;
   }
 
-  private async computeClassCentroids(): Promise<void> {
+  private async computeClassCentroids(categories?: CategoryDefinition[]): Promise<void> {
     if (!this.extractor) throw new Error('Extractor not initialized');
+
+    if (categories && categories.length > 0) {
+      await this.syncDynamicCategories(categories);
+      return;
+    }
 
     for (const [category, passages] of Object.entries(
       MySpendLensTier2Engine.CATEGORY_PASSAGES
@@ -289,6 +296,61 @@ export class MySpendLensTier2Engine {
         this.classCentroids[category] = centroid.map((v) => v * invNorm);
       }
     }
+  }
+
+  /**
+   * Synchronizes active categories with Tier 2 class centroids.
+   * Calculates embedding centroids for any dynamic / custom category.
+   */
+  public async syncDynamicCategories(categories: CategoryDefinition[]): Promise<void> {
+    if (!this.extractor) return;
+
+    const newCentroids: Record<string, number[]> = {};
+    const activeExpenseCategories = categories.filter((c) => c.isActive && c.name !== 'Income');
+
+    for (const cat of activeExpenseCategories) {
+      // If centroid already exists and was cached, reuse it
+      if (this.classCentroids[cat.name]) {
+        newCentroids[cat.name] = this.classCentroids[cat.name];
+        continue;
+      }
+
+      // Check standard passages fallback
+      const standardPassages = MySpendLensTier2Engine.CATEGORY_PASSAGES[cat.name];
+      const passages = standardPassages || (
+        cat.examples
+          ? cat.examples.split(/[,;\n]+/).map((s) => `passage: ${s.trim()}`).filter((s) => s.length > 10)
+          : [`passage: ${cat.name}`]
+      );
+
+      let centroid: number[] | null = null;
+      for (const text of passages) {
+        const out = await this.extractor(text, {
+          pooling: 'mean',
+          normalize: true,
+        });
+        const arr = Array.from(out.data as Float32Array);
+
+        if (!centroid) {
+          centroid = arr;
+        } else {
+          for (let i = 0; i < arr.length; i++) {
+            centroid[i] += arr[i];
+          }
+        }
+      }
+
+      if (centroid) {
+        let sumSq = 0;
+        for (let i = 0; i < centroid.length; i++) {
+          sumSq += centroid[i] * centroid[i];
+        }
+        const invNorm = 1 / Math.sqrt(sumSq || 1);
+        newCentroids[cat.name] = centroid.map((v) => v * invNorm);
+      }
+    }
+
+    this.classCentroids = newCentroids;
   }
 
   private static dotProduct(a: number[], b: number[]): number {

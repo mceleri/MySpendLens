@@ -17,6 +17,7 @@ import { ProcessedTransaction } from '../types';
 import {
   CATEGORIES_META,
   ALL_CATEGORIES,
+  CategoryDefinition,
   getCategoryMeta,
   getConfidenceBadgeClass,
 } from '../utils/categories';
@@ -24,6 +25,7 @@ import { parseTransactionDate } from '../utils/financialCalculations';
 
 interface TransactionsTableProps {
   transactions: ProcessedTransaction[];
+  categories?: CategoryDefinition[];
   fileName: string | null;
   initialCategory?: string;
   onDeleteTransaction: (id: string) => Promise<void>;
@@ -43,6 +45,7 @@ function getSystemCategory(tx: ProcessedTransaction): string {
 
 export const TransactionsTable: React.FC<TransactionsTableProps> = ({
   transactions,
+  categories,
   fileName,
   initialCategory,
   onDeleteTransaction,
@@ -181,9 +184,14 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
 
   // Categories sorted by usage (most used to least used)
   const sortedCategories = useMemo(() => {
+    const knownKeys =
+      categories && categories.length > 0
+        ? categories.filter((c) => c.isActive).map((c) => c.name)
+        : Object.keys(CATEGORIES_META);
+
     const allKeys = Array.from(
       new Set([
-        ...Object.keys(CATEGORIES_META),
+        ...knownKeys,
         ...Object.keys(categoryCounts).filter((k) => k !== 'ALL'),
       ])
     );
@@ -196,7 +204,15 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
       }
       return a.localeCompare(b);
     });
-  }, [categoryCounts]);
+  }, [categoryCounts, categories]);
+
+  // Active categories available for manual classification
+  const activeCategoryKeys = useMemo(() => {
+    if (categories && categories.length > 0) {
+      return categories.filter((c) => c.isActive).map((c) => c.name);
+    }
+    return ALL_CATEGORIES as readonly string[];
+  }, [categories]);
 
   const hasDates = transactions.some((tx) => !!tx.date);
   const hasAmounts = transactions.some((tx) => !!tx.amount);
@@ -720,7 +736,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
             </div>
 
             <div className="manual-classify-categories-grid">
-              {ALL_CATEGORIES.map((catKey) => {
+              {activeCategoryKeys.map((catKey) => {
                 const meta = getCategoryMeta(catKey);
                 const Icon = meta.icon;
                 const isSelected = editingTx.category === catKey;

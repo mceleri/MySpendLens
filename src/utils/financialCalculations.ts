@@ -1,5 +1,5 @@
 import { ProcessedTransaction } from '../types';
-import { CATEGORIES_META } from './categories';
+import { getCategoryMeta } from './categories';
 
 export interface CategorySpendSegment {
   category: string;
@@ -189,7 +189,7 @@ export function computeFinancialOverview(
   // 3. Build color-coded segments for the OUT segmented bar
   const spendSegments: CategorySpendSegment[] = Object.entries(categoryOutMap)
     .map(([cat, amount]) => {
-      const meta = CATEGORIES_META[cat];
+      const meta = getCategoryMeta(cat);
       const percentage = totalOut > 0 ? (amount / totalOut) * 100 : 0;
       const label = meta ? meta.label : cat;
       return {

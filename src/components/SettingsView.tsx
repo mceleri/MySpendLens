@@ -9,6 +9,7 @@ import {
   ShieldCheck,
   Database,
   Trash2,
+  Tag,
 } from 'lucide-react';
 import { ModelStats, Tier2LoadingState } from '../types';
 
@@ -24,6 +25,7 @@ interface SettingsViewProps {
   hasTransactions: boolean;
   totalTransactions?: number;
   onClearDatabase?: () => void;
+  onOpenCategories?: () => void;
   onBack?: () => void;
 }
 
@@ -39,6 +41,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   hasTransactions,
   totalTransactions = 0,
   onClearDatabase,
+  onOpenCategories,
 }) => {
   return (
     <div className="view-container">
@@ -210,6 +213,24 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             </div>
           </div>
         </div>
+
+        {/* Manage Categories Card */}
+        {onOpenCategories && (
+          <div className="settings-card">
+            <h3 className="settings-card-title">Category Customization</h3>
+            <p className="settings-card-desc">
+              Add new expense categories, rename existing ones, or configure custom semantic keywords for the Tier 2 embedding engine.
+            </p>
+            <button
+              type="button"
+              className="btn-settings-action"
+              onClick={onOpenCategories}
+            >
+              <Tag size={16} />
+              <span>Manage Categories</span>
+            </button>
+          </div>
+        )}
 
         {/* Card 3: Privacy Guarantee */}
         <div className="settings-card privacy-card">

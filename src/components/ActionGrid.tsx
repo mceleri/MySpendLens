@@ -1,12 +1,14 @@
 import React from 'react';
-import { UploadCloud, Search, TableProperties, Settings, ChevronRight } from 'lucide-react';
+import { UploadCloud, Search, TableProperties, Settings, Tags, ChevronRight } from 'lucide-react';
 
 interface ActionGridProps {
   onOpenUpload: () => void;
   onOpenDistribution: () => void;
   onOpenTransactions: () => void;
+  onOpenCategories: () => void;
   onOpenSettings: () => void;
   totalTransactions: number;
+  categoriesCount: number;
   useTier1: boolean;
   tier2Ready: boolean;
 }
@@ -15,8 +17,10 @@ export const ActionGrid: React.FC<ActionGridProps> = ({
   onOpenUpload,
   onOpenDistribution,
   onOpenTransactions,
+  onOpenCategories,
   onOpenSettings,
   totalTransactions,
+  categoriesCount,
   useTier1,
   tier2Ready,
 }) => {
@@ -81,7 +85,27 @@ export const ActionGrid: React.FC<ActionGridProps> = ({
           </div>
         </button>
 
-        {/* 4. Settings */}
+        {/* 4. Categories (Tags Icon) */}
+        <button
+          type="button"
+          className="action-card action-categories"
+          onClick={onOpenCategories}
+        >
+          <div className="action-card-top">
+            <div className="action-icon-wrap icon-categories">
+              <Tags size={22} />
+            </div>
+            {categoriesCount > 0 && (
+              <span className="action-counter-badge font-mono">{categoriesCount}</span>
+            )}
+            <ChevronRight size={16} className="action-arrow" />
+          </div>
+          <div className="action-card-text">
+            <h4 className="action-title">Categories</h4>
+          </div>
+        </button>
+
+        {/* 5. Settings */}
         <button
           type="button"
           className="action-card action-settings"

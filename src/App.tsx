@@ -6,6 +6,7 @@ import { ExpensesDistributionView } from './components/ExpensesDistributionView'
 import { SettingsView } from './components/SettingsView';
 import { UploadView } from './components/UploadView';
 import { TransactionsTable } from './components/TransactionsTable';
+import { CategoriesView } from './components/CategoriesView';
 import {
   MySpendLensTier1Engine,
   Tier1ModelArtifact,
@@ -30,11 +31,20 @@ import {
   clearAllTransactionsInDB,
   migrateFromLocalStorageIfNeeded,
   generateTransactionFingerprint,
+  getAllCategoriesFromDB,
+  saveCategoryToDB,
+  deleteCategoryFromDB,
+  renameCategoryInDB,
+  reassignCategoryInDB,
 } from './db/transactionDb';
+import {
+  CategoryDefinition,
+  registerDynamicCategories,
+} from './utils/categories';
 import { computeFinancialOverview, parseTransactionAmount } from './utils/financialCalculations';
 import { Loader2 } from 'lucide-react';
 
-type ActiveView = 'home' | 'distribution' | 'transactions' | 'settings' | 'upload';
+type ActiveView = 'home' | 'distribution' | 'transactions' | 'settings' | 'upload' | 'categories';
 
 export const App: React.FC = () => {
   // Navigation & View State
@@ -61,16 +71,23 @@ export const App: React.FC = () => {
   const [processingProgress, setProcessingProgress] = useState<string>('');
   const [loadedFileName, setLoadedFileName] = useState<string | null>(null);
   const [transactions, setTransactions] = useState<ProcessedTransaction[]>([]);
+  const [categories, setCategories] = useState<CategoryDefinition[]>([]);
   const [, setSummary] = useState<BatchProcessingSummary | null>(null);
 
   const engineTier1Ref = useRef<MySpendLensTier1Engine | null>(null);
   const engineTier2Ref = useRef<MySpendLensTier2Engine | null>(null);
 
-  // 1. Initial Mount: Load existing transactions from IndexedDB (Zero model downloads)
+  // 1. Initial Mount: Load existing transactions and categories from IndexedDB (Zero model downloads)
   useEffect(() => {
     const initDb = async () => {
       try {
         await migrateFromLocalStorageIfNeeded();
+
+        // Load categories
+        const storedCats = await getAllCategoriesFromDB();
+        setCategories(storedCats);
+        registerDynamicCategories(storedCats);
+
         const stored = await getAllTransactionsFromDB();
         if (stored.length > 0) {
           // Normalize existing positive movements to 'Income' (incomes should not be classified as expenses)
@@ -221,7 +238,7 @@ export const App: React.FC = () => {
             file: p.file,
           }));
         }
-      });
+      }, categories);
 
       setTier2LoadingState({
         status: 'ready',
@@ -546,6 +563,77 @@ export const App: React.FC = () => {
     [transactions]
   );
 
+  // Category management handlers
+  const handleSaveCategory = useCallback(async (cat: CategoryDefinition) => {
+    try {
+      await saveCategoryToDB(cat);
+      const updatedCats = await getAllCategoriesFromDB();
+      setCategories(updatedCats);
+      registerDynamicCategories(updatedCats);
+      if (engineTier2Ref.current?.isReady) {
+        await engineTier2Ref.current.syncDynamicCategories(updatedCats);
+      }
+    } catch (err) {
+      console.error('Failed to save category:', err);
+      alert(`Error saving category: ${(err as Error).message}`);
+    }
+  }, []);
+
+  const handleRenameCategory = useCallback(
+    async (oldName: string, updatedCategory: CategoryDefinition) => {
+      try {
+        await renameCategoryInDB(oldName, updatedCategory);
+        const updatedCats = await getAllCategoriesFromDB();
+        const updatedTxs = await getAllTransactionsFromDB();
+        setCategories(updatedCats);
+        setTransactions(updatedTxs);
+        registerDynamicCategories(updatedCats);
+        if (engineTier2Ref.current?.isReady) {
+          await engineTier2Ref.current.syncDynamicCategories(updatedCats);
+        }
+      } catch (err) {
+        console.error('Failed to rename category:', err);
+        alert(`Error renaming category: ${(err as Error).message}`);
+      }
+    },
+    []
+  );
+
+  const handleDeleteCategory = useCallback(async (id: string) => {
+    try {
+      await deleteCategoryFromDB(id);
+      const updatedCats = await getAllCategoriesFromDB();
+      setCategories(updatedCats);
+      registerDynamicCategories(updatedCats);
+      if (engineTier2Ref.current?.isReady) {
+        await engineTier2Ref.current.syncDynamicCategories(updatedCats);
+      }
+    } catch (err) {
+      console.error('Failed to delete category:', err);
+      alert(`Error deleting category: ${(err as Error).message}`);
+    }
+  }, []);
+
+  const handleReassignCategory = useCallback(
+    async (oldCategory: string, newCategory: string, categoryIdToDelete?: string) => {
+      try {
+        await reassignCategoryInDB(oldCategory, newCategory, categoryIdToDelete);
+        const updatedCats = await getAllCategoriesFromDB();
+        const updatedTxs = await getAllTransactionsFromDB();
+        setCategories(updatedCats);
+        setTransactions(updatedTxs);
+        registerDynamicCategories(updatedCats);
+        if (engineTier2Ref.current?.isReady) {
+          await engineTier2Ref.current.syncDynamicCategories(updatedCats);
+        }
+      } catch (err) {
+        console.error('Failed to reassign category:', err);
+        alert(`Error reassigning category: ${(err as Error).message}`);
+      }
+    },
+    []
+  );
+
   return (
     <div className="mobile-app-layout">
       {/* Sleek Mobile Header */}
@@ -568,13 +656,15 @@ export const App: React.FC = () => {
               onOpenDistribution={() => navigateToView('distribution')}
             />
 
-            {/* Griglia Azioni: Upload, Distribuzione, Movimenti, Settings */}
+            {/* Griglia Azioni: Upload, Distribuzione, Movimenti, Categories, Settings */}
             <ActionGrid
               onOpenUpload={() => navigateToView('upload')}
               onOpenDistribution={() => navigateToView('distribution')}
               onOpenTransactions={() => navigateToView('transactions')}
+              onOpenCategories={() => navigateToView('categories')}
               onOpenSettings={() => navigateToView('settings')}
               totalTransactions={transactions.length}
+              categoriesCount={categories.filter((c) => c.isActive).length}
               useTier1={useTier1}
               tier2Ready={tier2LoadingState.status === 'ready'}
             />
@@ -602,10 +692,22 @@ export const App: React.FC = () => {
         {activeView === 'transactions' && (
           <TransactionsTable
             transactions={transactions}
+            categories={categories}
             fileName={loadedFileName}
             initialCategory={categoryFilterForTransactions}
             onDeleteTransaction={handleDeleteTransaction}
             onUpdateTransactionCategory={handleUpdateTransactionCategory}
+          />
+        )}
+
+        {activeView === 'categories' && (
+          <CategoriesView
+            categories={categories}
+            transactions={transactions}
+            onSaveCategory={handleSaveCategory}
+            onRenameCategory={handleRenameCategory}
+            onDeleteCategory={handleDeleteCategory}
+            onReassignCategory={handleReassignCategory}
           />
         )}
 
@@ -622,6 +724,7 @@ export const App: React.FC = () => {
             hasTransactions={transactions.length > 0}
             totalTransactions={transactions.length}
             onClearDatabase={handleClearDatabase}
+            onOpenCategories={() => navigateToView('categories')}
           />
         )}
 

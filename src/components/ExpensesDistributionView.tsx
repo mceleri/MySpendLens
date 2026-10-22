@@ -1,17 +1,8 @@
 import React from 'react';
-import {
-  ShoppingCart,
-  UtensilsCrossed,
-  Car,
-  HeartPulse,
-  ShoppingBag,
-  Zap,
-  PieChart,
-  HelpCircle,
-  LucideIcon,
-} from 'lucide-react';
+import { PieChart, HelpCircle } from 'lucide-react';
 import { FinancialOverviewData, formatCurrency } from '../utils/financialCalculations';
 import { ProcessedTransaction } from '../types';
+import { getCategoryMeta } from '../utils/categories';
 
 interface ExpensesDistributionViewProps {
   overview: FinancialOverviewData;
@@ -19,15 +10,6 @@ interface ExpensesDistributionViewProps {
   onBack?: () => void;
   onFilterByCategory: (category: string) => void;
 }
-
-const CATEGORY_ICON_MAP: Record<string, LucideIcon> = {
-  Groceries: ShoppingCart,
-  'Dining Out': UtensilsCrossed,
-  'Transport & Auto': Car,
-  Healthcare: HeartPulse,
-  Shopping: ShoppingBag,
-  Utilities: Zap,
-};
 
 export const ExpensesDistributionView: React.FC<ExpensesDistributionViewProps> = ({
   overview,
@@ -98,7 +80,8 @@ export const ExpensesDistributionView: React.FC<ExpensesDistributionViewProps> =
             </div>
           ) : (
             overview.spendSegments.map((segment) => {
-              const IconComp = CATEGORY_ICON_MAP[segment.category] || HelpCircle;
+              const catMeta = getCategoryMeta(segment.category);
+              const IconComp = catMeta.icon || HelpCircle;
               const count = txCounts[segment.category] || 0;
 
             return (

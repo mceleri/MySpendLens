@@ -8,6 +8,19 @@ import {
   Zap,
   HelpCircle,
   ArrowDownLeft,
+  Coffee,
+  Plane,
+  Dumbbell,
+  PawPrint,
+  Film,
+  BookOpen,
+  Smartphone,
+  Home,
+  Gift,
+  Tag,
+  GraduationCap,
+  Music,
+  ShieldCheck,
 } from 'lucide-react';
 
 export interface CategoryMeta {
@@ -21,6 +34,129 @@ export interface CategoryMeta {
   icon: LucideIcon;
   examples: string;
 }
+
+export interface CategoryDefinition {
+  id: string;
+  name: string;
+  color: string;
+  iconName: string;
+  examples: string;
+  isSystem?: boolean;
+  isActive: boolean;
+  createdAt: number;
+  updatedAt?: number;
+}
+
+export const AVAILABLE_CATEGORY_ICONS: Record<string, LucideIcon> = {
+  ShoppingCart,
+  UtensilsCrossed,
+  Car,
+  HeartPulse,
+  ShoppingBag,
+  Zap,
+  ArrowDownLeft,
+  Coffee,
+  Plane,
+  Dumbbell,
+  PawPrint,
+  Film,
+  BookOpen,
+  Smartphone,
+  Home,
+  Gift,
+  Tag,
+  GraduationCap,
+  Music,
+  ShieldCheck,
+  HelpCircle,
+};
+
+export const PRESET_CATEGORY_COLORS = [
+  '#10b981', // Emerald
+  '#f97316', // Orange
+  '#06b6d4', // Cyan
+  '#ef4444', // Red
+  '#a855f7', // Purple
+  '#eab308', // Amber/Yellow
+  '#22c55e', // Green
+  '#ec4899', // Pink
+  '#3b82f6', // Blue
+  '#8b5cf6', // Violet
+  '#14b8a6', // Teal
+  '#f43f5e', // Rose
+];
+
+export function resolveCategoryIcon(iconName?: string): LucideIcon {
+  if (!iconName) return HelpCircle;
+  return AVAILABLE_CATEGORY_ICONS[iconName] || HelpCircle;
+}
+
+export const DEFAULT_CATEGORY_DEFINITIONS: CategoryDefinition[] = [
+  {
+    id: 'groceries',
+    name: 'Groceries',
+    color: '#10b981',
+    iconName: 'ShoppingCart',
+    examples: 'spesa alimentare al supermercato, ipermercato, prodotti alimentari, market, cibo, Esselunga, Mercadona, Conad, Carrefour, Coop, Lidl, alimentari',
+    isActive: true,
+    createdAt: 1,
+  },
+  {
+    id: 'dining-out',
+    name: 'Dining Out',
+    color: '#f97316',
+    iconName: 'UtensilsCrossed',
+    examples: 'ristorante, cena fuori, pranzo al ristorante, pizzeria, trattoria, bar, caffetteria, McDonald, Burger King, 100 Montaditos, fast food, aperitivo, pub',
+    isActive: true,
+    createdAt: 2,
+  },
+  {
+    id: 'transport-auto',
+    name: 'Transport & Auto',
+    color: '#06b6d4',
+    iconName: 'Car',
+    examples: 'rifornimento carburante, benzina, diesel, stazione di servizio, Repsol, Eni Station, Q8, IP, biglietto treno Trenitalia, Renfe, metro, pedaggio Telepass, taxi',
+    isActive: true,
+    createdAt: 3,
+  },
+  {
+    id: 'healthcare',
+    name: 'Healthcare',
+    color: '#ef4444',
+    iconName: 'HeartPulse',
+    examples: 'farmacia, acquisto medicinali, farmaci, prodotti sanitari, parafarmacia, dottore, clinica medica, esami del sangue, dentista, salute, ottica',
+    isActive: true,
+    createdAt: 4,
+  },
+  {
+    id: 'shopping',
+    name: 'Shopping',
+    color: '#a855f7',
+    iconName: 'ShoppingBag',
+    examples: 'shopping abbigliamento, vestiti, scarpe, Zara, Mango, Decathlon abbigliamento sportivo, Sephora profumeria make up, acquisti moda, elettronica, MediaWorld, Amazon',
+    isActive: true,
+    createdAt: 5,
+  },
+  {
+    id: 'utilities',
+    name: 'Utilities',
+    color: '#eab308',
+    iconName: 'Zap',
+    examples: 'bolletta utenze domestiche, fornitura energia elettrica e gas, Enel Energia, Iberdrola, A2A, Naturgy, Edison, canone telefono fibra TIM Vodafone',
+    isActive: true,
+    createdAt: 6,
+  },
+  {
+    id: 'income',
+    name: 'Income',
+    color: '#22c55e',
+    iconName: 'ArrowDownLeft',
+    examples: 'stipendio, accredito bonifico in entrata, rimborso, dividendi, accredito contanti',
+    isSystem: true,
+    isActive: true,
+    createdAt: 7,
+  },
+];
 
 export const CATEGORIES_META: Record<string, CategoryMeta> = {
   Groceries: {
@@ -116,20 +252,45 @@ export const ALL_CATEGORIES = [
   'Income',
 ] as const;
 
+let dynamicCategoryRegistry: Record<string, CategoryMeta> = { ...CATEGORIES_META };
+
+export function registerDynamicCategories(defs: CategoryDefinition[]): void {
+  const map: Record<string, CategoryMeta> = {};
+  for (const def of defs) {
+    const icon = resolveCategoryIcon(def.iconName);
+    map[def.name] = {
+      name: def.name,
+      label: def.name,
+      labelIt: def.name,
+      color: def.color,
+      bgLight: `${def.color}1f`,
+      borderLight: `${def.color}4d`,
+      badgeClass: `category-${def.id.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
+      icon,
+      examples: def.examples || '',
+    };
+  }
+  dynamicCategoryRegistry = map;
+}
+
 export function getCategoryMeta(categoryName: string): CategoryMeta {
-  return (
-    CATEGORIES_META[categoryName] || {
-      name: categoryName,
-      label: categoryName,
-      labelIt: categoryName,
-      color: '#64748b',
-      bgLight: 'rgba(100, 116, 139, 0.12)',
-      borderLight: 'rgba(100, 116, 139, 0.3)',
-      badgeClass: 'category-other',
-      icon: HelpCircle,
-      examples: 'Unmapped category',
-    }
-  );
+  if (dynamicCategoryRegistry[categoryName]) {
+    return dynamicCategoryRegistry[categoryName];
+  }
+  if (CATEGORIES_META[categoryName]) {
+    return CATEGORIES_META[categoryName];
+  }
+  return {
+    name: categoryName,
+    label: categoryName,
+    labelIt: categoryName,
+    color: '#64748b',
+    bgLight: 'rgba(100, 116, 139, 0.12)',
+    borderLight: 'rgba(100, 116, 139, 0.3)',
+    badgeClass: 'category-other',
+    icon: HelpCircle,
+    examples: 'Custom category',
+  };
 }
 
 export function getConfidenceBadgeClass(confidence: number): {

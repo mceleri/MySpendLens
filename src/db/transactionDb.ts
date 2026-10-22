@@ -3,9 +3,11 @@
  *
  * Stores all historical transactions across multiple file uploads.
  * Provides deduplication based on transaction fingerprint: (date + causale/description + amount).
+ * Also manages custom and default category definitions and reassignments.
  */
 
 import { ProcessedTransaction } from '../types';
+import { CategoryDefinition, DEFAULT_CATEGORY_DEFINITIONS } from '../utils/categories';
 
 export interface StoredTransaction extends ProcessedTransaction {
   fingerprint: string;
@@ -14,8 +16,9 @@ export interface StoredTransaction extends ProcessedTransaction {
 }
 
 const DB_NAME = 'myspendlens_db';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_NAME = 'transactions';
+const CATEGORIES_STORE = 'categories';
 
 /**
  * Generates a deterministic normalized fingerprint for deduplication.
@@ -77,6 +80,9 @@ function getDb(): Promise<IDBDatabase> {
           store.createIndex('by_date', 'date', { unique: false });
           store.createIndex('by_imported', 'importedAt', { unique: false });
         }
+        if (!db.objectStoreNames.contains(CATEGORIES_STORE)) {
+          db.createObjectStore(CATEGORIES_STORE, { keyPath: 'id' });
+        }
       };
 
       request.onsuccess = () => {
@@ -124,7 +130,7 @@ export async function getAllTransactionsFromDB(): Promise<StoredTransaction[]> {
 
 /**
  * Returns a Set of all existing transaction fingerprints in the database.
- * Used for fast $O(1)$ duplicate checking during merge.
+ * Used for fast duplicate checking during merge.
  */
 export async function getExistingFingerprintsSet(): Promise<Set<string>> {
   const all = await getAllTransactionsFromDB();
@@ -258,4 +264,145 @@ export async function migrateFromLocalStorageIfNeeded(): Promise<void> {
   } catch (err) {
     console.warn('Migration from localStorage check skipped:', err);
   }
+}
+
+// -------------------------------------------------------------
+// Categories Store Operations
+// -------------------------------------------------------------
+
+/**
+ * Retrieves all categories from IndexedDB. If empty, seeds with default categories.
+ */
+export async function getAllCategoriesFromDB(): Promise<CategoryDefinition[]> {
+  const db = await getDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(CATEGORIES_STORE, 'readwrite');
+    const store = tx.objectStore(CATEGORIES_STORE);
+    const req = store.getAll();
+
+    req.onsuccess = () => {
+      let items = (req.result as CategoryDefinition[]) || [];
+      if (items.length === 0) {
+        // Seed default categories
+        for (const def of DEFAULT_CATEGORY_DEFINITIONS) {
+          store.put(def);
+        }
+        items = [...DEFAULT_CATEGORY_DEFINITIONS];
+      }
+      // Sort by creation time
+      items.sort((a, b) => a.createdAt - b.createdAt);
+      resolve(items);
+    };
+
+    req.onerror = () => reject(req.error || new Error('Failed to load categories'));
+  });
+}
+
+/**
+ * Saves or updates a category definition in IndexedDB.
+ */
+export async function saveCategoryToDB(category: CategoryDefinition): Promise<void> {
+  const db = await getDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(CATEGORIES_STORE, 'readwrite');
+    const store = tx.objectStore(CATEGORIES_STORE);
+    store.put(category);
+
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error);
+  });
+}
+
+/**
+ * Deletes a category definition from IndexedDB.
+ */
+export async function deleteCategoryFromDB(id: string): Promise<void> {
+  const db = await getDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(CATEGORIES_STORE, 'readwrite');
+    const store = tx.objectStore(CATEGORIES_STORE);
+    store.delete(id);
+
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error);
+  });
+}
+
+/**
+ * Renames a category:
+ * 1. Updates the category record in the categories store.
+ * 2. Scans all transactions and replaces category = newName where category === oldName.
+ */
+export async function renameCategoryInDB(
+  oldName: string,
+  updatedCategory: CategoryDefinition
+): Promise<void> {
+  const db = await getDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction([CATEGORIES_STORE, STORE_NAME], 'readwrite');
+    const catStore = tx.objectStore(CATEGORIES_STORE);
+    const txStore = tx.objectStore(STORE_NAME);
+
+    // 1. Put updated category definition
+    catStore.put(updatedCategory);
+
+    // 2. Cursor over transactions to rename occurrences
+    const req = txStore.openCursor();
+    req.onsuccess = () => {
+      const cursor = req.result;
+      if (cursor) {
+        const item = cursor.value as StoredTransaction;
+        if (item.category === oldName) {
+          item.category = updatedCategory.name;
+          cursor.update(item);
+        }
+        cursor.continue();
+      }
+    };
+
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error);
+  });
+}
+
+/**
+ * Reassigns all transactions from oldCategory to newCategory, and optionally deletes the old category.
+ */
+export async function reassignCategoryInDB(
+  oldCategory: string,
+  newCategory: string,
+  categoryIdToDelete?: string
+): Promise<void> {
+  const db = await getDb();
+  return new Promise((resolve, reject) => {
+    const stores = categoryIdToDelete ? [CATEGORIES_STORE, STORE_NAME] : [STORE_NAME];
+    const tx = db.transaction(stores, 'readwrite');
+    const txStore = tx.objectStore(STORE_NAME);
+
+    if (categoryIdToDelete) {
+      const catStore = tx.objectStore(CATEGORIES_STORE);
+      catStore.delete(categoryIdToDelete);
+    }
+
+    const req = txStore.openCursor();
+    req.onsuccess = () => {
+      const cursor = req.result;
+      if (cursor) {
+        const item = cursor.value as StoredTransaction;
+        if (item.category === oldCategory) {
+          item.category = newCategory;
+          item.sourceTier = 'Manual';
+          cursor.update(item);
+        }
+        cursor.continue();
+      }
+    };
+
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error);
+  });
 }
