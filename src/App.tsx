@@ -1,0 +1,640 @@
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { Header } from './components/Header';
+import { HomeHeroOverview } from './components/HomeHeroOverview';
+import { ActionGrid } from './components/ActionGrid';
+import { ExpensesDistributionView } from './components/ExpensesDistributionView';
+import { SettingsView } from './components/SettingsView';
+import { UploadView } from './components/UploadView';
+import { TransactionsTable } from './components/TransactionsTable';
+import {
+  MySpendLensTier1Engine,
+  Tier1ModelArtifact,
+} from './engine/tier1_browser_engine';
+import {
+  MySpendLensTier2Engine,
+  Tier2ProgressInfo,
+} from './engine/tier2_embedding_engine';
+import {
+  ProcessedTransaction,
+  ModelStats,
+  BatchProcessingSummary,
+  Tier2LoadingState,
+} from './types';
+import { RawRow } from './utils/csvParser';
+import {
+  getAllTransactionsFromDB,
+  addTransactionsToDB,
+  updateTransactionsInDB,
+  updateSingleTransactionInDB,
+  deleteTransactionFromDB,
+  clearAllTransactionsInDB,
+  migrateFromLocalStorageIfNeeded,
+  generateTransactionFingerprint,
+} from './db/transactionDb';
+import { computeFinancialOverview, parseTransactionAmount } from './utils/financialCalculations';
+import { Loader2 } from 'lucide-react';
+
+type ActiveView = 'home' | 'distribution' | 'transactions' | 'settings' | 'upload';
+
+export const App: React.FC = () => {
+  // Navigation & View State
+  const [activeView, setActiveView] = useState<ActiveView>('home');
+  const [categoryFilterForTransactions, setCategoryFilterForTransactions] = useState<string | undefined>(undefined);
+
+  // Tier 1 State (loaded on demand)
+  const [isLoadingModel, setIsLoadingModel] = useState<boolean>(false);
+  const [modelStats, setModelStats] = useState<ModelStats | null>(null);
+  const [modelError, setModelError] = useState<string | null>(null);
+
+  // Tier 2 State (loaded on demand)
+  const [tier2LoadingState, setTier2LoadingState] = useState<Tier2LoadingState>({
+    status: 'idle',
+    progress: 0,
+  });
+
+  // Classification Strategy Controls
+  const [useTier1, setUseTier1] = useState<boolean>(true);
+  const [tier1Threshold, setTier1Threshold] = useState<number>(0.85);
+
+  // Data & Processing State
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [processingProgress, setProcessingProgress] = useState<string>('');
+  const [loadedFileName, setLoadedFileName] = useState<string | null>(null);
+  const [transactions, setTransactions] = useState<ProcessedTransaction[]>([]);
+  const [, setSummary] = useState<BatchProcessingSummary | null>(null);
+
+  const engineTier1Ref = useRef<MySpendLensTier1Engine | null>(null);
+  const engineTier2Ref = useRef<MySpendLensTier2Engine | null>(null);
+
+  // 1. Initial Mount: Load existing transactions from IndexedDB (Zero model downloads)
+  useEffect(() => {
+    const initDb = async () => {
+      try {
+        await migrateFromLocalStorageIfNeeded();
+        const stored = await getAllTransactionsFromDB();
+        if (stored.length > 0) {
+          // Normalize existing positive movements to 'Income' (incomes should not be classified as expenses)
+          let hasIncomeFix = false;
+          const normalized = stored.map((t) => {
+            if (parseTransactionAmount(t.amount) > 0 && t.category !== 'Income') {
+              hasIncomeFix = true;
+              return {
+                ...t,
+                category: 'Income',
+                sourceTier: 'Income' as const,
+                confidence: 1.0,
+                probabilities: { Income: 1.0 },
+              };
+            }
+            return t;
+          });
+          if (hasIncomeFix) {
+            await updateTransactionsInDB(normalized);
+          }
+          setTransactions(normalized);
+        }
+      } catch (e) {
+        console.warn('Could not read from IndexedDB:', e);
+      }
+    };
+    initDb();
+  }, []);
+
+  // Set of fingerprints for fast duplicate check during multi-file upload
+  const existingFingerprints = useMemo(() => {
+    const set = new Set<string>();
+    for (const t of transactions) {
+      set.add(generateTransactionFingerprint(t.date, t.rawDescription, t.amount));
+    }
+    return set;
+  }, [transactions]);
+
+  // 2. Android Hardware Back Button & Browser History Interception
+  useEffect(() => {
+    // Initialize base history state on first mount
+    if (!window.history.state || !window.history.state.myspendlens) {
+      window.history.replaceState({ myspendlens: true, view: 'home' }, '');
+    }
+
+    const handlePopState = (event: PopStateEvent) => {
+      const state = event.state;
+      if (state && state.myspendlens) {
+        setActiveView(state.view || 'home');
+        if (state.categoryFilter !== undefined) {
+          setCategoryFilterForTransactions(state.categoryFilter);
+        }
+      } else {
+        setActiveView('home');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
+
+  // Safe navigation handlers that push history
+  const navigateToView = useCallback((targetView: ActiveView, categoryFilter?: string) => {
+    setActiveView(targetView);
+    setCategoryFilterForTransactions(categoryFilter);
+    window.history.pushState(
+      { myspendlens: true, view: targetView, categoryFilter },
+      ''
+    );
+  }, []);
+
+  const handleNavigateBack = useCallback(() => {
+    if (window.history.state && window.history.state.myspendlens && window.history.state.view !== 'home') {
+      window.history.back();
+    } else {
+      setActiveView('home');
+    }
+  }, []);
+
+  // Computed Financial Overview (IN, OUT, last movement date, segmented bar)
+  const financialOverview = useMemo(() => {
+    return computeFinancialOverview(transactions, 60);
+  }, [transactions]);
+
+  // Lazy loaders for ML engines (only invoked when an actual file is processed or re-classified)
+  const ensureTier1Engine = useCallback(async (): Promise<MySpendLensTier1Engine> => {
+    if (engineTier1Ref.current) return engineTier1Ref.current;
+
+    setIsLoadingModel(true);
+    setProcessingProgress('Loading Tier 1 base model...');
+    try {
+      const res = await fetch('/myspendlens_tier1_base_model.json');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const artifact: Tier1ModelArtifact = await res.json();
+      const engine = new MySpendLensTier1Engine(artifact);
+      engineTier1Ref.current = engine;
+
+      setModelStats({
+        version: artifact.version,
+        featuresCount: artifact.metrics.num_features,
+        classesCount: artifact.metrics.num_classes,
+        validationAccuracy: artifact.metrics.validation_accuracy,
+        countries: artifact.config.countries,
+      });
+      setIsLoadingModel(false);
+      return engine;
+    } catch (err) {
+      console.error('Tier 1 load error:', err);
+      setModelError((err as Error).message);
+      setIsLoadingModel(false);
+      throw err;
+    }
+  }, []);
+
+  const ensureTier2Engine = useCallback(async (): Promise<MySpendLensTier2Engine> => {
+    if (engineTier2Ref.current && engineTier2Ref.current.isReady) {
+      return engineTier2Ref.current;
+    }
+
+    setTier2LoadingState({
+      status: 'downloading',
+      progress: 5,
+      message: 'Initializing Transformers.js...',
+    });
+    setProcessingProgress('Loading multilingual embedding engine...');
+
+    try {
+      const t2Engine = engineTier2Ref.current || new MySpendLensTier2Engine();
+      engineTier2Ref.current = t2Engine;
+
+      await t2Engine.init((p: Tier2ProgressInfo) => {
+        if (p.status === 'progress' && p.progress !== undefined) {
+          setTier2LoadingState({
+            status: 'downloading',
+            file: p.file,
+            progress: p.progress,
+            loadedBytes: p.loaded,
+            totalBytes: p.total,
+          });
+          setProcessingProgress(`Loading Tier 2: ${Math.round(p.progress)}%`);
+        } else if (p.status === 'done') {
+          setTier2LoadingState((prev) => ({
+            ...prev,
+            status: 'downloading',
+            progress: 98,
+            file: p.file,
+          }));
+        }
+      });
+
+      setTier2LoadingState({
+        status: 'ready',
+        progress: 100,
+        message: 'Model loaded in memory.',
+      });
+      return t2Engine;
+    } catch (err) {
+      console.error('Tier 2 load error:', err);
+      setTier2LoadingState({
+        status: 'error',
+        progress: 0,
+        message: (err as Error).message,
+      });
+      throw err;
+    }
+  }, []);
+
+  // Core batch classification engine: evaluates rows through Tier 1 and Tier 2 fallback
+  const classifyRows = useCallback(
+    async (
+      rows: RawRow[],
+      tier1Active: boolean,
+      threshold: number
+    ): Promise<ProcessedTransaction[]> => {
+      if (rows.length === 0) return [];
+
+      const tStartBatch = performance.now();
+      let totalConfidence = 0;
+      let tier1Count = 0;
+      let tier2Count = 0;
+      const categoryCounts: Record<string, number> = {};
+
+      let t1Engine: MySpendLensTier1Engine | null = null;
+      let t2Engine: MySpendLensTier2Engine | null = null;
+
+      if (tier1Active) {
+        t1Engine = await ensureTier1Engine();
+      } else {
+        t2Engine = await ensureTier2Engine();
+      }
+
+      const processed: ProcessedTransaction[] = [];
+
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+
+        // Positive movements (incomes) must NOT be classified (app is for tracking expenses)
+        const parsedAmount = parseTransactionAmount(row.amount);
+        if (parsedAmount > 0) {
+          processed.push({
+            id: `tx-${Date.now()}-${i}-${Math.random().toString(36).slice(2, 7)}`,
+            originalIndex: i,
+            date: row.date,
+            amount: row.amount,
+            rawDescription: row.description,
+            category: 'Income',
+            systemCategory: 'Income',
+            confidence: 1.0,
+            probabilities: { Income: 1.0 },
+            inferenceTimeMs: 0,
+            sourceTier: 'Income',
+            tier1Result: undefined,
+            tier2Result: undefined,
+          });
+          categoryCounts['Income'] = (categoryCounts['Income'] || 0) + 1;
+          continue;
+        }
+
+        setProcessingProgress(`Classifying ${i + 1} of ${rows.length}...`);
+
+        let chosenCategory = '';
+        let chosenConfidence = 0;
+        let chosenProbabilities: Record<string, number> = {};
+        let chosenSourceTier: 'Tier 1' | 'Tier 2 (Fallback)' | 'Tier 2 (Solo)' = 'Tier 1';
+        let txInferenceTime = 0;
+
+        let t1Result: ProcessedTransaction['tier1Result'] = undefined;
+        let t2Result: ProcessedTransaction['tier2Result'] = undefined;
+
+        // Run Tier 1 if enabled
+        if (tier1Active && t1Engine) {
+          const pred1 = t1Engine.predict(row.description);
+          t1Result = {
+            category: pred1.category,
+            confidence: pred1.confidence,
+            probabilities: pred1.probabilities,
+            inferenceTimeMs: pred1.inferenceTimeMs,
+          };
+
+          if (pred1.confidence >= threshold) {
+            chosenCategory = pred1.category;
+            chosenConfidence = pred1.confidence;
+            chosenProbabilities = pred1.probabilities;
+            chosenSourceTier = 'Tier 1';
+            txInferenceTime = pred1.inferenceTimeMs;
+            tier1Count++;
+          } else {
+            // On-demand escalation to Tier 2 (Fallback)
+            if (!t2Engine) {
+              setProcessingProgress(`Loading Tier 2 for low-confidence description...`);
+              t2Engine = await ensureTier2Engine();
+            }
+            const pred2 = await t2Engine.predict(row.description);
+            t2Result = {
+              category: pred2.category,
+              confidence: pred2.confidence,
+              probabilities: pred2.probabilities,
+              cosineSimilarities: pred2.cosineSimilarities,
+              inferenceTimeMs: pred2.inferenceTimeMs,
+            };
+
+            chosenCategory = pred2.category;
+            chosenConfidence = pred2.confidence;
+            chosenProbabilities = pred2.probabilities;
+            chosenSourceTier = 'Tier 2 (Fallback)';
+            txInferenceTime = pred1.inferenceTimeMs + pred2.inferenceTimeMs;
+            tier2Count++;
+          }
+        } else if (t2Engine && t2Engine.isReady) {
+          // Tier 1 is disabled -> Baseline only Tier 2
+          const pred2 = await t2Engine.predict(row.description);
+          t2Result = {
+            category: pred2.category,
+            confidence: pred2.confidence,
+            probabilities: pred2.probabilities,
+            cosineSimilarities: pred2.cosineSimilarities,
+            inferenceTimeMs: pred2.inferenceTimeMs,
+          };
+
+          if (t1Engine) {
+            const pred1 = t1Engine.predict(row.description);
+            t1Result = {
+              category: pred1.category,
+              confidence: pred1.confidence,
+              probabilities: pred1.probabilities,
+              inferenceTimeMs: pred1.inferenceTimeMs,
+            };
+          }
+
+          chosenCategory = pred2.category;
+          chosenConfidence = pred2.confidence;
+          chosenProbabilities = pred2.probabilities;
+          chosenSourceTier = 'Tier 2 (Solo)';
+          txInferenceTime = pred2.inferenceTimeMs;
+          tier2Count++;
+        } else if (t1Engine) {
+          const pred1 = t1Engine.predict(row.description);
+          chosenCategory = pred1.category;
+          chosenConfidence = pred1.confidence;
+          chosenProbabilities = pred1.probabilities;
+          chosenSourceTier = 'Tier 1';
+          txInferenceTime = pred1.inferenceTimeMs;
+          tier1Count++;
+        }
+
+        totalConfidence += chosenConfidence;
+        categoryCounts[chosenCategory] = (categoryCounts[chosenCategory] || 0) + 1;
+
+        processed.push({
+          id: `tx-${Date.now()}-${i}-${Math.random().toString(36).slice(2, 7)}`,
+          originalIndex: i,
+          date: row.date,
+          amount: row.amount,
+          rawDescription: row.description,
+          cleanedDescription: t2Engine ? t2Engine.cleanDescription(row.description) : undefined,
+          category: chosenCategory,
+          systemCategory: chosenCategory,
+          confidence: chosenConfidence,
+          probabilities: chosenProbabilities,
+          inferenceTimeMs: txInferenceTime,
+          sourceTier: chosenSourceTier,
+          tier1Result: t1Result,
+          tier2Result: t2Result,
+        });
+      }
+
+      const totalTimeMs = performance.now() - tStartBatch;
+      setSummary({
+        totalProcessed: processed.length,
+        totalTimeMs,
+        avgTimeMs: totalTimeMs / processed.length,
+        avgConfidence: totalConfidence / processed.length,
+        tier1Count,
+        tier2Count,
+        categoryCounts,
+      });
+
+      return processed;
+    },
+    [ensureTier1Engine, ensureTier2Engine]
+  );
+
+  // Confirms import of mapped CSV rows, classifies new items, and persists into IndexedDB
+  const handleConfirmImport = async (
+    newRows: RawRow[],
+    fileName: string,
+    totalInFile: number,
+    _skippedDuplicates: number
+  ) => {
+    if (newRows.length === 0) {
+      alert(`All ${totalInFile} movements in "${fileName}" are already stored in your local database (duplicates skipped).`);
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      setProcessingProgress(`Classifying ${newRows.length} new movements...`);
+      const classified = await classifyRows(newRows, useTier1, tier1Threshold);
+      await addTransactionsToDB(classified, fileName);
+
+      // Refresh transactions state directly from IndexedDB
+      const allUpdated = await getAllTransactionsFromDB();
+      setTransactions(allUpdated);
+      setLoadedFileName(fileName);
+      console.info(`Imported ${classified.length} transactions (${_skippedDuplicates} duplicates skipped).`);
+      navigateToView('transactions');
+    } catch (err) {
+      console.error('Import error:', err);
+      alert(`Error importing transactions: ${(err as Error).message}`);
+    } finally {
+      setIsProcessing(false);
+      setProcessingProgress('');
+    }
+  };
+
+  // Re-classifies all current transactions stored in IndexedDB with current strategy settings
+  const handleReclassify = async () => {
+    if (transactions.length === 0) return;
+    setIsProcessing(true);
+    try {
+      const rowsToReclassify: RawRow[] = transactions.map((t) => ({
+        date: t.date,
+        description: t.rawDescription,
+        amount: t.amount,
+      }));
+
+      const reclassified = await classifyRows(rowsToReclassify, useTier1, tier1Threshold);
+
+      // Preserve existing IDs and update IndexedDB
+      const updatedWithIds: ProcessedTransaction[] = reclassified.map((item, idx) => ({
+        ...item,
+        id: transactions[idx]?.id || item.id,
+      }));
+
+      await updateTransactionsInDB(updatedWithIds);
+      const allUpdated = await getAllTransactionsFromDB();
+      setTransactions(allUpdated);
+    } catch (err) {
+      console.error('Reclassification error:', err);
+      alert(`Error re-classifying: ${(err as Error).message}`);
+    } finally {
+      setIsProcessing(false);
+      setProcessingProgress('');
+    }
+  };
+
+  const handleToggleTier1 = async (enabled: boolean) => {
+    setUseTier1(enabled);
+  };
+
+  const handleChangeThreshold = async (threshold: number) => {
+    setTier1Threshold(threshold);
+  };
+
+  // Clears all records from IndexedDB
+  const handleClearDatabase = async () => {
+    setIsProcessing(true);
+    try {
+      await clearAllTransactionsInDB();
+      setTransactions([]);
+      setLoadedFileName(null);
+      setActiveView('home');
+    } catch (err) {
+      console.error('Failed to clear database:', err);
+      alert(`Error clearing database: ${(err as Error).message}`);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // Deletes a single transaction from database and state
+  const handleDeleteTransaction = useCallback(async (id: string) => {
+    try {
+      await deleteTransactionFromDB(id);
+      setTransactions((prev) => prev.filter((t) => t.id !== id));
+    } catch (err) {
+      console.error('Failed to delete transaction:', err);
+      alert(`Error deleting transaction: ${(err as Error).message}`);
+    }
+  }, []);
+
+  // Manually sets/updates category for a transaction
+  const handleUpdateTransactionCategory = useCallback(
+    async (id: string, newCategory: string) => {
+      try {
+        const tx = transactions.find((t) => t.id === id);
+        if (!tx) return;
+
+        const systemCategory =
+          tx.systemCategory ||
+          tx.tier2Result?.category ||
+          tx.tier1Result?.category ||
+          (tx.sourceTier === 'Income' ? 'Income' : tx.category);
+
+        const updatedTx: ProcessedTransaction = {
+          ...tx,
+          category: newCategory,
+          systemCategory,
+          sourceTier: 'Manual',
+          confidence: 1.0,
+          probabilities: { [newCategory]: 1.0 },
+        };
+
+        await updateSingleTransactionInDB(updatedTx);
+        setTransactions((prev) => prev.map((t) => (t.id === id ? updatedTx : t)));
+      } catch (err) {
+        console.error('Failed to update category:', err);
+        alert(`Error updating category: ${(err as Error).message}`);
+      }
+    },
+    [transactions]
+  );
+
+  return (
+    <div className="mobile-app-layout">
+      {/* Sleek Mobile Header */}
+      <Header
+        isLoadingModel={isLoadingModel}
+        modelError={modelError}
+        tier2LoadingState={tier2LoadingState}
+        isProcessing={isProcessing}
+        onGoHome={handleNavigateBack}
+      />
+
+      {/* Main Mobile Viewport */}
+      <main className="mobile-main-viewport">
+        {/* View Routing */}
+        {activeView === 'home' && (
+          <div className="mobile-home-content">
+            {/* Metà schermo con dati di base: Ultimo movimento, IN/OUT 60gg, barra multicolor */}
+            <HomeHeroOverview
+              overview={financialOverview}
+              onOpenDistribution={() => navigateToView('distribution')}
+            />
+
+            {/* Griglia Azioni: Upload, Distribuzione, Movimenti, Settings */}
+            <ActionGrid
+              onOpenUpload={() => navigateToView('upload')}
+              onOpenDistribution={() => navigateToView('distribution')}
+              onOpenTransactions={() => navigateToView('transactions')}
+              onOpenSettings={() => navigateToView('settings')}
+              totalTransactions={transactions.length}
+              useTier1={useTier1}
+              tier2Ready={tier2LoadingState.status === 'ready'}
+            />
+          </div>
+        )}
+
+        {activeView === 'upload' && (
+          <UploadView
+            onConfirmImport={handleConfirmImport}
+            existingFingerprints={existingFingerprints}
+            disabled={isProcessing}
+            totalLoaded={transactions.length}
+            onCancel={handleNavigateBack}
+          />
+        )}
+
+        {activeView === 'distribution' && (
+          <ExpensesDistributionView
+            overview={financialOverview}
+            transactions={transactions}
+            onFilterByCategory={(cat) => navigateToView('transactions', cat)}
+          />
+        )}
+
+        {activeView === 'transactions' && (
+          <TransactionsTable
+            transactions={transactions}
+            fileName={loadedFileName}
+            initialCategory={categoryFilterForTransactions}
+            onDeleteTransaction={handleDeleteTransaction}
+            onUpdateTransactionCategory={handleUpdateTransactionCategory}
+          />
+        )}
+
+        {activeView === 'settings' && (
+          <SettingsView
+            useTier1={useTier1}
+            onToggleTier1={handleToggleTier1}
+            tier1Threshold={tier1Threshold}
+            onChangeThreshold={handleChangeThreshold}
+            tier1Stats={modelStats}
+            tier2State={tier2LoadingState}
+            isProcessing={isProcessing}
+            onReclassify={handleReclassify}
+            hasTransactions={transactions.length > 0}
+            totalTransactions={transactions.length}
+            onClearDatabase={handleClearDatabase}
+          />
+        )}
+
+        {/* Processing Indicator Modal / Overlay */}
+        {isProcessing && (
+          <div className="mobile-processing-overlay">
+            <div className="mobile-processing-card">
+              <Loader2 size={24} className="spinner text-primary" />
+              <span>{processingProgress || 'Classifying transactions...'}</span>
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+};
