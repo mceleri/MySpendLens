@@ -75,6 +75,17 @@ export const App: React.FC = () => {
   const [isTrainingModalOpen, setIsTrainingModalOpen] = useState<boolean>(false);
   const [hasPendingTraining, setHasPendingTraining] = useState<boolean>(false);
 
+  // Persists hasPendingTraining flag to IndexedDB app_settings so state survives page reloads
+  const updatePendingTraining = useCallback(async (pending: boolean) => {
+    setHasPendingTraining(pending);
+    try {
+      const current = (await getAppSettingsFromDB()) || {};
+      await saveAppSettingsToDB({ ...current, hasPendingTraining: pending });
+    } catch (e) {
+      console.warn('Could not persist pending training flag:', e);
+    }
+  }, []);
+
   // Tier 2 State (loaded on demand)
   const [tier2LoadingState, setTier2LoadingState] = useState<Tier2LoadingState>({
     status: 'idle',
@@ -107,7 +118,7 @@ export const App: React.FC = () => {
         setCategories(storedCats);
         registerDynamicCategories(storedCats);
 
-        // Load app settings (Tier 1 strategy & threshold)
+        // Load app settings (Tier 1 strategy & threshold & pending training)
         const savedSettings = await getAppSettingsFromDB();
         if (savedSettings) {
           if (typeof savedSettings.useTier1 === 'boolean') {
@@ -115,6 +126,9 @@ export const App: React.FC = () => {
           }
           if (typeof savedSettings.tier1Threshold === 'number') {
             setTier1Threshold(savedSettings.tier1Threshold);
+          }
+          if (typeof savedSettings.hasPendingTraining === 'boolean') {
+            setHasPendingTraining(savedSettings.hasPendingTraining);
           }
         }
 
@@ -139,7 +153,6 @@ export const App: React.FC = () => {
             await updateTransactionsInDB(normalized);
           }
           setTransactions(normalized);
-          setHasPendingTraining(true);
         }
       } catch (e) {
         console.warn('Could not read from IndexedDB:', e);
@@ -500,7 +513,7 @@ export const App: React.FC = () => {
       const allUpdated = await getAllTransactionsFromDB();
       setTransactions(allUpdated);
       setLoadedFileName(fileName);
-      setHasPendingTraining(true);
+      updatePendingTraining(true);
       console.info(`Imported ${classified.length} transactions (${_skippedDuplicates} duplicates skipped).`);
       navigateToView('transactions');
     } catch (err) {
@@ -568,7 +581,7 @@ export const App: React.FC = () => {
       await clearAllTransactionsInDB();
       setTransactions([]);
       setLoadedFileName(null);
-      setHasPendingTraining(false);
+      updatePendingTraining(false);
       setActiveView('home');
     } catch (err) {
       console.error('Failed to clear database:', err);
@@ -589,7 +602,7 @@ export const App: React.FC = () => {
       registerDynamicCategories(DEFAULT_CATEGORY_DEFINITIONS);
       setUseTier1(true);
       setTier1Threshold(0.85);
-      setHasPendingTraining(false);
+      updatePendingTraining(false);
 
       // Reset Tier 1 in memory
       try {
@@ -657,13 +670,13 @@ export const App: React.FC = () => {
 
         await updateSingleTransactionInDB(updatedTx);
         setTransactions((prev) => prev.map((t) => (t.id === id ? updatedTx : t)));
-        setHasPendingTraining(true);
+        updatePendingTraining(true);
       } catch (err) {
         console.error('Failed to update category:', err);
         alert(`Error updating category: ${(err as Error).message}`);
       }
     },
-    [transactions]
+    [transactions, updatePendingTraining]
   );
 
   // Category management handlers
@@ -673,7 +686,7 @@ export const App: React.FC = () => {
       const updatedCats = await getAllCategoriesFromDB();
       setCategories(updatedCats);
       registerDynamicCategories(updatedCats);
-      setHasPendingTraining(true);
+      updatePendingTraining(true);
       if (engineTier2Ref.current?.isReady) {
         await engineTier2Ref.current.syncDynamicCategories(updatedCats);
       }
@@ -681,7 +694,7 @@ export const App: React.FC = () => {
       console.error('Failed to save category:', err);
       alert(`Error saving category: ${(err as Error).message}`);
     }
-  }, []);
+  }, [updatePendingTraining]);
 
   const handleRenameCategory = useCallback(
     async (oldName: string, updatedCategory: CategoryDefinition) => {
@@ -692,7 +705,7 @@ export const App: React.FC = () => {
         setCategories(updatedCats);
         setTransactions(updatedTxs);
         registerDynamicCategories(updatedCats);
-        setHasPendingTraining(true);
+        updatePendingTraining(true);
         if (engineTier2Ref.current?.isReady) {
           await engineTier2Ref.current.syncDynamicCategories(updatedCats);
         }
@@ -701,7 +714,7 @@ export const App: React.FC = () => {
         alert(`Error renaming category: ${(err as Error).message}`);
       }
     },
-    []
+    [updatePendingTraining]
   );
 
   const handleDeleteCategory = useCallback(async (id: string) => {
@@ -710,7 +723,7 @@ export const App: React.FC = () => {
       const updatedCats = await getAllCategoriesFromDB();
       setCategories(updatedCats);
       registerDynamicCategories(updatedCats);
-      setHasPendingTraining(true);
+      updatePendingTraining(true);
       if (engineTier2Ref.current?.isReady) {
         await engineTier2Ref.current.syncDynamicCategories(updatedCats);
       }
@@ -718,7 +731,7 @@ export const App: React.FC = () => {
       console.error('Failed to delete category:', err);
       alert(`Error deleting category: ${(err as Error).message}`);
     }
-  }, []);
+  }, [updatePendingTraining]);
 
   const handleReassignCategory = useCallback(
     async (oldCategory: string, newCategory: string, categoryIdToDelete?: string) => {
@@ -729,7 +742,7 @@ export const App: React.FC = () => {
         setCategories(updatedCats);
         setTransactions(updatedTxs);
         registerDynamicCategories(updatedCats);
-        setHasPendingTraining(true);
+        updatePendingTraining(true);
         if (engineTier2Ref.current?.isReady) {
           await engineTier2Ref.current.syncDynamicCategories(updatedCats);
         }
@@ -738,7 +751,7 @@ export const App: React.FC = () => {
         alert(`Error reassigning category: ${(err as Error).message}`);
       }
     },
-    []
+    [updatePendingTraining]
   );
 
   // Backup & Restore handler
@@ -806,10 +819,10 @@ export const App: React.FC = () => {
         });
       }
 
-      setHasPendingTraining(true);
+      await updatePendingTraining(true);
       return { transactionsAdded: txCount, categoriesSaved: catCount };
     },
-    []
+    [updatePendingTraining]
   );
 
   const handleTrainingComplete = useCallback(async () => {
@@ -823,8 +836,8 @@ export const App: React.FC = () => {
         countries: engineTier1Ref.current.getArtifact().config.countries,
       });
     }
-    setHasPendingTraining(false);
-  }, []);
+    await updatePendingTraining(false);
+  }, [updatePendingTraining]);
 
   return (
     <div className="mobile-app-layout">

@@ -19,6 +19,7 @@ export interface StoredTransaction extends ProcessedTransaction {
 export interface AppStoredSettings {
   useTier1?: boolean;
   tier1Threshold?: number;
+  hasPendingTraining?: boolean;
   [key: string]: unknown;
 }
 

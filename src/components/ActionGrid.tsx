@@ -18,8 +18,8 @@ interface ActionGridProps {
   onOpenExportImport: () => void;
   totalTransactions: number;
   categoriesCount: number;
-  useTier1: boolean;
-  tier2Ready: boolean;
+  useTier1?: boolean;
+  tier2Ready?: boolean;
 }
 
 export const ActionGrid: React.FC<ActionGridProps> = ({
@@ -31,8 +31,6 @@ export const ActionGrid: React.FC<ActionGridProps> = ({
   onOpenExportImport,
   totalTransactions,
   categoriesCount,
-  useTier1,
-  tier2Ready,
 }) => {
   return (
     <section className="action-grid-section">
@@ -124,10 +122,6 @@ export const ActionGrid: React.FC<ActionGridProps> = ({
           <div className="action-card-top">
             <div className="action-icon-wrap icon-settings">
               <Settings size={22} />
-            </div>
-            <div className="engine-status-micro-dot" title="Engines status">
-              <span className={`micro-dot ${useTier1 ? 'dot-blue' : 'dot-off'}`} />
-              <span className={`micro-dot ${tier2Ready ? 'dot-purple' : 'dot-amber'}`} />
             </div>
             <ChevronRight size={16} className="action-arrow" />
           </div>
