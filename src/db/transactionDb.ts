@@ -241,11 +241,11 @@ export async function deleteTransactionFromDB(id: string): Promise<void> {
 }
 
 /**
- * Deletes all transactions from the database.
+ * Deletes all transactions from the database and purges legacy localStorage to prevent resurrection.
  */
 export async function clearAllTransactionsInDB(): Promise<void> {
   const db = await getDb();
-  return new Promise((resolve, reject) => {
+  await new Promise<void>((resolve, reject) => {
     const tx = db.transaction(STORE_NAME, 'readwrite');
     const store = tx.objectStore(STORE_NAME);
     const req = store.clear();
@@ -253,6 +253,15 @@ export async function clearAllTransactionsInDB(): Promise<void> {
     req.onsuccess = () => resolve();
     req.onerror = () => reject(req.error);
   });
+
+  // Purge any legacy localStorage items completely
+  try {
+    localStorage.removeItem('myspendlens_transactions');
+    localStorage.removeItem('myspendlens_filename');
+    localStorage.setItem('myspendlens_migrated', 'true');
+  } catch {
+    // Ignore restricted storage contexts
+  }
 }
 
 /**
@@ -260,20 +269,65 @@ export async function clearAllTransactionsInDB(): Promise<void> {
  */
 export async function migrateFromLocalStorageIfNeeded(): Promise<void> {
   try {
-    const existing = await getAllTransactionsFromDB();
-    if (existing.length === 0) {
-      const legacyJson = localStorage.getItem('myspendlens_transactions');
-      const legacyFileName = localStorage.getItem('myspendlens_filename') || undefined;
-      if (legacyJson) {
+    if (localStorage.getItem('myspendlens_migrated') === 'true') {
+      return;
+    }
+    const legacyJson = localStorage.getItem('myspendlens_transactions');
+    const legacyFileName = localStorage.getItem('myspendlens_filename') || undefined;
+    if (legacyJson) {
+      const existing = await getAllTransactionsFromDB();
+      if (existing.length === 0) {
         const legacyItems = JSON.parse(legacyJson);
         if (Array.isArray(legacyItems) && legacyItems.length > 0) {
           await addTransactionsToDB(legacyItems, legacyFileName);
           console.info(`Migrated ${legacyItems.length} transactions from localStorage to IndexedDB.`);
         }
       }
+      localStorage.removeItem('myspendlens_transactions');
+      localStorage.removeItem('myspendlens_filename');
     }
+    localStorage.setItem('myspendlens_migrated', 'true');
   } catch (err) {
     console.warn('Migration from localStorage check skipped:', err);
+  }
+}
+
+/**
+ * Factory reset: wipes all transactions, resets categories to defaults,
+ * deletes any custom Tier 1 model, clears all app settings and legacy localStorage.
+ */
+export async function factoryResetAppInDB(): Promise<void> {
+  const db = await getDb();
+  await new Promise<void>((resolve, reject) => {
+    const tx = db.transaction([STORE_NAME, CATEGORIES_STORE, APP_SETTINGS_STORE], 'readwrite');
+
+    // 1. Clear all transactions
+    const txStore = tx.objectStore(STORE_NAME);
+    txStore.clear();
+
+    // 2. Reset categories to fresh default definitions
+    const catStore = tx.objectStore(CATEGORIES_STORE);
+    catStore.clear();
+    for (const def of DEFAULT_CATEGORY_DEFINITIONS) {
+      catStore.put(def);
+    }
+
+    // 3. Clear custom model & custom app settings
+    const settingsStore = tx.objectStore(APP_SETTINGS_STORE);
+    settingsStore.clear();
+
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error);
+  });
+
+  // Purge any localStorage items
+  try {
+    localStorage.removeItem('myspendlens_transactions');
+    localStorage.removeItem('myspendlens_filename');
+    localStorage.setItem('myspendlens_migrated', 'true');
+  } catch {
+    // Ignore restricted storage contexts
   }
 }
 

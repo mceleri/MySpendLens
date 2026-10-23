@@ -44,9 +44,11 @@ import {
   getAppSettingsFromDB,
   saveCustomTier1ModelToDB,
   getCustomTier1ModelFromDB,
+  factoryResetAppInDB,
 } from './db/transactionDb';
 import {
   CategoryDefinition,
+  DEFAULT_CATEGORY_DEFINITIONS,
   registerDynamicCategories,
 } from './utils/categories';
 import { computeFinancialOverview, parseTransactionAmount } from './utils/financialCalculations';
@@ -196,6 +198,15 @@ export const App: React.FC = () => {
     } else {
       setActiveView('home');
     }
+  }, []);
+
+  const handleGoHome = useCallback(() => {
+    setActiveView('home');
+    setCategoryFilterForTransactions(undefined);
+    window.history.pushState(
+      { myspendlens: true, view: 'home' },
+      ''
+    );
   }, []);
 
   // Computed Financial Overview (IN, OUT, last movement date, segmented bar)
@@ -550,17 +561,62 @@ export const App: React.FC = () => {
     }
   };
 
-  // Clears all records from IndexedDB
+  // Clears all records from IndexedDB and storage
   const handleClearDatabase = async () => {
     setIsProcessing(true);
     try {
       await clearAllTransactionsInDB();
       setTransactions([]);
       setLoadedFileName(null);
+      setHasPendingTraining(false);
       setActiveView('home');
     } catch (err) {
       console.error('Failed to clear database:', err);
       alert(`Error clearing database: ${(err as Error).message}`);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // Factory reset: resets transactions, categories, models and configurations
+  const handleFactoryReset = async () => {
+    setIsProcessing(true);
+    try {
+      await factoryResetAppInDB();
+      setTransactions([]);
+      setLoadedFileName(null);
+      setCategories(DEFAULT_CATEGORY_DEFINITIONS);
+      registerDynamicCategories(DEFAULT_CATEGORY_DEFINITIONS);
+      setUseTier1(true);
+      setTier1Threshold(0.85);
+      setHasPendingTraining(false);
+
+      // Reset Tier 1 in memory
+      try {
+        const res = await fetch('/myspendlens_tier1_base_model.json');
+        if (res.ok) {
+          const artifact: Tier1ModelArtifact = await res.json();
+          engineTier1Ref.current = new MySpendLensTier1Engine(artifact);
+          setModelStats({
+            version: artifact.version,
+            featuresCount: artifact.metrics.num_features,
+            classesCount: artifact.metrics.num_classes,
+            validationAccuracy: artifact.metrics.validation_accuracy,
+            countries: artifact.config.countries,
+          });
+        }
+      } catch (e) {
+        console.warn('Could not reload base tier 1 model JSON:', e);
+      }
+
+      if (engineTier2Ref.current?.isReady) {
+        await engineTier2Ref.current.syncDynamicCategories(DEFAULT_CATEGORY_DEFINITIONS);
+      }
+
+      setActiveView('home');
+    } catch (err) {
+      console.error('Failed to factory reset app:', err);
+      alert(`Error during reset: ${(err as Error).message}`);
     } finally {
       setIsProcessing(false);
     }
@@ -778,7 +834,7 @@ export const App: React.FC = () => {
         modelError={modelError}
         tier2LoadingState={tier2LoadingState}
         isProcessing={isProcessing}
-        onGoHome={handleNavigateBack}
+        onGoHome={handleGoHome}
         hasPendingTraining={hasPendingTraining}
         onOpenTrainingModal={() => setIsTrainingModalOpen(true)}
       />
@@ -874,6 +930,7 @@ export const App: React.FC = () => {
             hasTransactions={transactions.length > 0}
             totalTransactions={transactions.length}
             onClearDatabase={handleClearDatabase}
+            onFactoryReset={handleFactoryReset}
             onOpenCategories={() => navigateToView('categories')}
           />
         )}

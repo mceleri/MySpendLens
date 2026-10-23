@@ -10,6 +10,7 @@ import {
   Database,
   Trash2,
   Tag,
+  RotateCcw,
 } from 'lucide-react';
 import { ModelStats, Tier2LoadingState } from '../types';
 
@@ -25,6 +26,7 @@ interface SettingsViewProps {
   hasTransactions: boolean;
   totalTransactions?: number;
   onClearDatabase?: () => void;
+  onFactoryReset?: () => void;
   onOpenCategories?: () => void;
   onBack?: () => void;
 }
@@ -41,6 +43,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   hasTransactions,
   totalTransactions = 0,
   onClearDatabase,
+  onFactoryReset,
   onOpenCategories,
 }) => {
   return (
@@ -124,36 +127,67 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           )}
         </div>
 
-        {/* Card 2: Local IndexedDB Database */}
+        {/* Card 2: Local Storage & Reset */}
         <div className="settings-card">
           <div className="settings-card-header-flex">
             <div className="flex items-center gap-2">
               <Database size={18} className="text-primary" />
-              <h3 className="settings-card-title mb-0">Local Storage (IndexedDB)</h3>
+              <h3 className="settings-card-title mb-0">Local Storage & Reset</h3>
             </div>
             <span className="badge-pill badge-primary font-mono">
               {totalTransactions} {totalTransactions === 1 ? 'record' : 'records'}
             </span>
           </div>
           <p className="settings-card-desc mt-2">
-            Statements are saved locally in your browser's IndexedDB. As you upload new monthly or quarterly files over time, duplicates are automatically detected and filtered out.
+            Statements and custom categories are saved locally in your browser's IndexedDB. As you upload new files, duplicates are automatically filtered out.
           </p>
 
-          {totalTransactions > 0 && onClearDatabase && (
-            <button
-              type="button"
-              className="btn-settings-danger mt-3"
-              onClick={() => {
-                if (window.confirm(`Are you sure you want to delete all ${totalTransactions} stored transactions? This cannot be undone.`)) {
-                  onClearDatabase();
-                }
-              }}
-              disabled={isProcessing}
-            >
-              <Trash2 size={15} />
-              <span>Clear all database transactions</span>
-            </button>
-          )}
+          <div className="settings-danger-actions-stack mt-3">
+            {totalTransactions > 0 && onClearDatabase && (
+              <button
+                type="button"
+                className="btn-settings-danger"
+                onClick={() => {
+                  if (
+                    window.confirm(
+                      `Sei sicuro di voler eliminare tutte le ${totalTransactions} transazioni salvate? L'operazione non può essere annullata.`
+                    )
+                  ) {
+                    onClearDatabase();
+                  }
+                }}
+                disabled={isProcessing}
+              >
+                <Trash2 size={15} />
+                <span>Cancella tutti i movimenti dal database</span>
+              </button>
+            )}
+
+            {onFactoryReset && (
+              <button
+                type="button"
+                className="btn-settings-factory-reset"
+                onClick={() => {
+                  if (
+                    window.confirm(
+                      'ATTENZIONE: Sei sicuro di voler resettare completamente l\'app?\n\n' +
+                      '• Verranno eliminati TUTTI i movimenti memorizzati\n' +
+                      '• Verranno cancellati i modelli Tier 1 personalizzati e ripristinati i pesi base\n' +
+                      '• Verranno ripristinate le categorie e i colori predefiniti\n' +
+                      '• Verranno resettate le impostazioni di classificazione\n\n' +
+                      'L\'app ripartirà come nuova e pulita al 100%.'
+                    )
+                  ) {
+                    onFactoryReset();
+                  }
+                }}
+                disabled={isProcessing}
+              >
+                <RotateCcw size={15} />
+                <span>Riparti da app pulita (Factory Reset)</span>
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Card 3: In-Browser Engines Status */}
