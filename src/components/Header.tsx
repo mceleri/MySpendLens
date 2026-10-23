@@ -85,10 +85,10 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={onOpenTrainingModal}
               title={
                 hasPendingTraining
-                  ? 'Nuovi dati o modifiche pronte per il training locale'
-                  : 'Modello Tier 1 locale'
+                  ? 'New data or category changes ready for local training'
+                  : 'Local Tier 1 model'
               }
-              aria-label="Training Tier 1"
+              aria-label="Tier 1 Training"
             >
               <div className="brain-icon-wrap">
                 <Brain
@@ -96,7 +96,7 @@ export const Header: React.FC<HeaderProps> = ({
                   className={hasPendingTraining ? 'text-cyan' : 'text-dim'}
                 />
                 {hasPendingTraining && (
-                  <span className="brain-badge-exclamation" title="Aggiornamento disponibile">
+                  <span className="brain-badge-exclamation" title="Model update available">
                     !
                   </span>
                 )}

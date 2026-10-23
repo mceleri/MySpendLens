@@ -109,42 +109,42 @@ export const Tier1TrainingModal: React.FC<Tier1TrainingModalProps> = ({
     const initialSteps: ExecutionStep[] = [
       {
         id: 'anchors_download',
-        label: '1. Download Ancore Base',
-        description: 'Carica 1.000 POI commerciali certificati (IT & ES)',
+        label: '1. Download Base Anchors',
+        description: 'Load 1,000 certified merchant POIs (IT & ES)',
         status: 'idle',
       },
       {
         id: 'tier2_load',
-        label: '2. Inizializzazione Tier 2 ONNX',
+        label: '2. Initialize Tier 2 ONNX',
         description: hasCustomTaxonomy
-          ? 'Carica il transformer multilingue per riallineare le classi rimosse'
-          : 'Verifica prontezza modello semantico',
+          ? 'Load multilingual transformer to remap deleted classes'
+          : 'Verify semantic model readiness',
         status: 'idle',
       },
       {
         id: 'distillation',
-        label: '3. Distillazione & Ri-etichettatura',
+        label: '3. Distillation & Re-labeling',
         description: hasCustomTaxonomy
-          ? `Ri-etichetta con Tier 2 i merchant di [${missingBaseCategories.join(', ')}] verso le nuove classi`
-          : 'Tutte le ancore corrispondono alle classi attive',
+          ? `Re-label merchant anchors of [${missingBaseCategories.join(', ')}] with Tier 2 toward active classes`
+          : 'All base anchors match active classes',
         status: 'idle',
       },
       {
         id: 'assemble',
-        label: '4. Assemblaggio Training Set',
-        description: 'Unione di movimenti reali utente, ancore base e keywords',
+        label: '4. Assemble Training Set',
+        description: 'Merge personal transactions, base anchors, and category keywords',
         status: 'idle',
       },
       {
         id: 'training',
-        label: '5. Training Loop Tier 1',
-        description: '10 Epoche SGD multinomiale con regolarizzazione L2',
+        label: '5. Tier 1 Training Loop',
+        description: '10 Epochs of multinomial SGD with L2 regularization',
         status: 'idle',
       },
       {
         id: 'save',
-        label: '6. Persistenza IndexedDB',
-        description: 'Salva i pesi aggiornati nello storage locale privato',
+        label: '6. Persist to IndexedDB',
+        description: 'Save updated weights into private local browser storage',
         status: 'idle',
       },
     ];
@@ -152,31 +152,31 @@ export const Tier1TrainingModal: React.FC<Tier1TrainingModalProps> = ({
     setSteps(initialSteps);
 
     try {
-      // STEP 1: Download & Carica myspendlens_clean_anchors.json
-      updateStep('anchors_download', { status: 'running', detail: 'Download da /myspendlens_clean_anchors.json...' });
+      // STEP 1: Download & Load myspendlens_clean_anchors.json
+      updateStep('anchors_download', { status: 'running', detail: 'Downloading from /myspendlens_clean_anchors.json...' });
       const anchorsRes = await fetch('/myspendlens_clean_anchors.json');
       if (!anchorsRes.ok) {
-        throw new Error(`Impossibile scaricare le ancore base (HTTP ${anchorsRes.status})`);
+        throw new Error(`Unable to download base anchors (HTTP ${anchorsRes.status})`);
       }
       const rawAnchors: CleanAnchor[] = await anchorsRes.json();
       updateStep('anchors_download', {
         status: 'success',
-        detail: `1.000 ancore base caricate in memoria (${rawAnchors.length} POI).`,
+        detail: `1,000 base anchors loaded in memory (${rawAnchors.length} POIs).`,
       });
 
-      // STEP 2 & 3: Check se serve ri-etichettatura con Tier 2
+      // STEP 2 & 3: Check if re-labeling with Tier 2 is needed
       const anchorsNeedingRelabel = rawAnchors.filter((a) => !activeCategoryNames.has(a.category));
       let processedAnchors = [...rawAnchors];
 
       if (anchorsNeedingRelabel.length > 0) {
-        updateStep('tier2_load', { status: 'running', detail: 'Caricamento pesi ONNX in RAM...' });
+        updateStep('tier2_load', { status: 'running', detail: 'Loading ONNX weights into RAM...' });
         const t2 = tier2Engine || (await ensureTier2Engine());
-        updateStep('tier2_load', { status: 'success', detail: 'Tier 2 ONNX pronto in memoria.' });
+        updateStep('tier2_load', { status: 'success', detail: 'Tier 2 ONNX ready in memory.' });
 
-        // STEP 3: Distillazione & Ri-etichettatura semantica con Tier 2
+        // STEP 3: Distillation & semantic re-labeling with Tier 2
         updateStep('distillation', {
           status: 'running',
-          detail: `Ri-etichettatura di ${anchorsNeedingRelabel.length} ancore orfane...`,
+          detail: `Re-labeling ${anchorsNeedingRelabel.length} orphan anchors...`,
         });
 
         let relabeledCount = 0;
@@ -190,14 +190,14 @@ export const Tier1TrainingModal: React.FC<Tier1TrainingModalProps> = ({
 
           if (i % 10 === 0 || i === anchorsNeedingRelabel.length - 1) {
             updateStep('distillation', {
-              detail: `Ri-etichettate ${relabeledCount}/${anchorsNeedingRelabel.length} ancore (${item.name} ➔ ${pred.category})`,
+              detail: `Re-labeled ${relabeledCount}/${anchorsNeedingRelabel.length} anchors (${item.name} ➔ ${pred.category})`,
             });
-            // Yield per fluidità UI
+            // Yield for smooth UI
             await new Promise((r) => setTimeout(r, 10));
           }
         }
 
-        // Applica le nuove etichette alle ancore
+        // Apply new labels to anchors
         processedAnchors = rawAnchors.map((a) => {
           if (relabeledMap.has(a.name)) {
             return { ...a, category: relabeledMap.get(a.name)! };
@@ -207,19 +207,19 @@ export const Tier1TrainingModal: React.FC<Tier1TrainingModalProps> = ({
 
         updateStep('distillation', {
           status: 'success',
-          detail: `${relabeledCount} ancore riallineate con successo sulle classi attive!`,
+          detail: `${relabeledCount} anchors successfully re-aligned with active classes!`,
         });
       } else {
-        updateStep('tier2_load', { status: 'skipped', detail: 'Non necessario (classi base allineate)' });
-        updateStep('distillation', { status: 'skipped', detail: 'Nessun merchant da ri-etichettare' });
+        updateStep('tier2_load', { status: 'skipped', detail: 'Not needed (base classes aligned)' });
+        updateStep('distillation', { status: 'skipped', detail: 'No merchant anchors to re-label' });
       }
 
-      // STEP 4: Assemblaggio Dataset Unificato
-      updateStep('assemble', { status: 'running', detail: 'Fusione campioni utente, ancore e keywords...' });
+      // STEP 4: Assemble Unified Training Set
+      updateStep('assemble', { status: 'running', detail: 'Merging user samples, base anchors and keywords...' });
 
       const fullDataset: Array<{ description: string; category: string; weight?: number }> = [];
 
-      // 4a. Movimenti storici dell'utente dal DB (Ground truth prioritario: peso 15x)
+      // 4a. User historical transactions from DB (Highest priority ground truth: weight 15x)
       let userCount = 0;
       for (const t of validTransactions) {
         if (activeCategoryNames.has(t.category)) {
@@ -232,7 +232,7 @@ export const Tier1TrainingModal: React.FC<Tier1TrainingModalProps> = ({
         }
       }
 
-      // 4b. Ancore base (1.000 merchant per prevenire catastrophic forgetting: peso 1x)
+      // 4b. Base anchors (1,000 merchants to prevent catastrophic forgetting: weight 1x)
       let anchorsCount = 0;
       for (const a of processedAnchors) {
         if (activeCategoryNames.has(a.category)) {
@@ -245,7 +245,7 @@ export const Tier1TrainingModal: React.FC<Tier1TrainingModalProps> = ({
         }
       }
 
-      // 4c. Keywords / Esempi delle categorie (peso 5x)
+      // 4c. Category keywords & examples (weight 5x)
       let keywordsCount = 0;
       for (const cat of activeCategories) {
         if (cat.examples) {
@@ -265,14 +265,14 @@ export const Tier1TrainingModal: React.FC<Tier1TrainingModalProps> = ({
 
       updateStep('assemble', {
         status: 'success',
-        detail: `Dataset completato: ${fullDataset.length} campioni totali (${userCount} tuoi movimenti [priorità alta 15x] + ${anchorsCount} ancore base + ${keywordsCount} esempi categorie).`,
+        detail: `Dataset completed: ${fullDataset.length} total samples (${userCount} personal transactions [high priority 15x] + ${anchorsCount} base anchors + ${keywordsCount} category keywords).`,
       });
 
-      // STEP 5: Training Loop Tier 1
-      updateStep('training', { status: 'running', detail: 'Inizializzazione matrici pesi...' });
+      // STEP 5: Tier 1 Training Loop
+      updateStep('training', { status: 'running', detail: 'Initializing weight matrices...' });
       const t1 = tier1Engine || (await ensureTier1Engine());
 
-      // Sincronizza tutte le classi attive
+      // Synchronize all active classes
       t1.syncClassesWithCategories(activeCategories.map((c) => c.name));
 
       const trainSummary = await t1.trainDataset(fullDataset, {
@@ -283,26 +283,26 @@ export const Tier1TrainingModal: React.FC<Tier1TrainingModalProps> = ({
         onProgress: (p) => {
           setProgress(p);
           updateStep('training', {
-            detail: `Epoca ${p.epoch}/10 | Loss: ${p.loss.toFixed(3)} | Acc: ${p.accuracy.toFixed(1)}%`,
+            detail: `Epoch ${p.epoch}/10 | Loss: ${p.loss.toFixed(3)} | Acc: ${p.accuracy.toFixed(1)}%`,
           });
         },
       });
 
       updateStep('training', {
         status: 'success',
-        detail: `10 Epoche completate | Loss: ${trainSummary.initialLoss.toFixed(3)} ➔ ${trainSummary.finalLoss.toFixed(3)} | Accuracy: ${trainSummary.finalAccuracy.toFixed(1)}%`,
+        detail: `10 Epochs completed | Loss: ${trainSummary.initialLoss.toFixed(3)} ➔ ${trainSummary.finalLoss.toFixed(3)} | Accuracy: ${trainSummary.finalAccuracy.toFixed(1)}%`,
       });
 
-      // STEP 6: Persistenza IndexedDB
-      updateStep('save', { status: 'running', detail: 'Salvataggio pesi in IndexedDB...' });
+      // STEP 6: Persistence to IndexedDB
+      updateStep('save', { status: 'running', detail: 'Saving weights in IndexedDB...' });
       await onTrainingComplete();
-      updateStep('save', { status: 'success', detail: 'Pesi salvati e persistiti con successo!' });
+      updateStep('save', { status: 'success', detail: 'Weights saved and persisted successfully!' });
 
       setSummary(trainSummary);
       setPhase('success');
     } catch (err) {
       console.error('Training Pipeline Error:', err);
-      setErrorMsg((err as Error).message || 'Si è verificato un errore durante la pipeline di training.');
+      setErrorMsg((err as Error).message || 'An error occurred during the training pipeline.');
       setPhase('error');
     }
   };
@@ -322,7 +322,7 @@ export const Tier1TrainingModal: React.FC<Tier1TrainingModalProps> = ({
             </div>
             <div>
               <h3 className="training-modal-title">Personal Tier 1 Training</h3>
-              <span className="training-modal-subtitle">Pipeline di Distillazione & Fine-Tuning Locale</span>
+              <span className="training-modal-subtitle">Local Distillation & Fine-Tuning Pipeline</span>
             </div>
           </div>
           {phase !== 'running' && (
@@ -330,7 +330,7 @@ export const Tier1TrainingModal: React.FC<Tier1TrainingModalProps> = ({
               type="button"
               className="btn-modal-close"
               onClick={onClose}
-              aria-label="Chiudi"
+              aria-label="Close"
             >
               <X size={18} />
             </button>
@@ -351,48 +351,48 @@ export const Tier1TrainingModal: React.FC<Tier1TrainingModalProps> = ({
           {phase === 'confirm' && (
             <div className="training-confirm-container">
               <p className="training-info-text">
-                Questa procedura addestra il tuo classificatore locale (<strong>Tier 1 da 0.2ms</strong>) integrando i tuoi movimenti reali con le <strong>1.000 ancore commerciali certificate</strong> di MySpendLens.
+                This process trains your local classifier (<strong>0.2ms Tier 1</strong>) by combining your verified transactions with MySpendLens's <strong>1,000 certified merchant anchors</strong>.
               </p>
 
-              {/* Informative Taxomomy Notice */}
+              {/* Informative Taxonomy Notice */}
               {hasCustomTaxonomy && (
                 <div className="taxonomy-alert-notice">
                   <div className="taxonomy-alert-header">
                     <GitMerge size={16} className="text-cyan shrink-0" />
-                    <strong>Tassonomia Personalizzata Rilevata</strong>
+                    <strong>Custom Category Taxonomy Detected</strong>
                   </div>
                   <p className="taxonomy-alert-body">
-                    Hai rimosso o rinominato <strong>{missingBaseCategories.join(', ')}</strong>.
-                    Durante la procedura, il modello semantico <strong>Tier 2</strong> ri-etichetterà automaticamente le relative ancore storiche sulle tue nuove classi (es. <em>Luce</em> e <em>Gas</em>), così il Tier 1 imparerà centinaia di brand sin da subito!
+                    You modified or deleted <strong>{missingBaseCategories.join(', ')}</strong>.
+                    During this procedure, the <strong>Tier 2</strong> semantic model will automatically re-label affected merchant anchors onto your active categories, ensuring your Tier 1 model recognizes hundreds of merchants right away!
                   </p>
                 </div>
               )}
 
               {/* Pipeline Overview Card */}
               <div className="pipeline-preview-card">
-                <h4 className="pipeline-preview-title">Fasi di esecuzione previste:</h4>
+                <h4 className="pipeline-preview-title">Planned execution steps:</h4>
                 <div className="pipeline-steps-preview">
                   <div className="preview-step">
                     <DownloadCloud size={15} className="text-cyan" />
-                    <span>Download e caricamento 1.000 ancore base (~89 KB)</span>
+                    <span>Download and load 1,000 base anchors (~89 KB)</span>
                   </div>
                   {hasCustomTaxonomy && (
                     <div className="preview-step">
                       <Cpu size={15} className="text-purple" />
-                      <span>Inizializzazione Tier 2 ONNX & Distillazione semantica per classi personalizzate</span>
+                      <span>Initialize Tier 2 ONNX & Semantic distillation for custom categories</span>
                     </div>
                   )}
                   <div className="preview-step">
                     <Database size={15} className="text-emerald" />
-                    <span>Fusione con <strong>{validTransactions.length}</strong> movimenti storici e parole chiave</span>
+                    <span>Merge with <strong>{validTransactions.length}</strong> personal transactions and keywords</span>
                   </div>
                   <div className="preview-step">
                     <Zap size={15} className="text-amber" />
-                    <span>Training Loop di 10 epoche con L2 Weight Decay</span>
+                    <span>10-Epoch Training Loop with L2 Weight Decay</span>
                   </div>
                   <div className="preview-step">
                     <ShieldCheck size={15} className="text-emerald" />
-                    <span>Salvataggio definitivo dei pesi in IndexedDB (100% privato)</span>
+                    <span>Persist updated model weights to IndexedDB (100% private)</span>
                   </div>
                 </div>
               </div>
@@ -400,7 +400,7 @@ export const Tier1TrainingModal: React.FC<Tier1TrainingModalProps> = ({
               <div className="privacy-micro-note mt-2">
                 <ShieldCheck size={16} className="text-emerald shrink-0" />
                 <span>
-                  Nessun download viene effettuato prima della tua conferma. Tutti i calcoli avverranno interamente nel tuo browser.
+                  No downloads occur before your confirmation. All computations execute 100% locally inside your browser.
                 </span>
               </div>
             </div>
@@ -412,7 +412,7 @@ export const Tier1TrainingModal: React.FC<Tier1TrainingModalProps> = ({
               {/* Progress Bar & Epoch Indicator */}
               <div className="training-progress-header">
                 <span className="font-mono text-sm font-bold text-cyan">
-                  {currentEpoch > 0 ? `Epoca ${currentEpoch} / 10` : 'Preparazione dataset...'}
+                  {currentEpoch > 0 ? `Epoch ${currentEpoch} / 10` : 'Preparing dataset...'}
                 </span>
                 <span className="font-mono text-sm text-dim">{progressPercent}%</span>
               </div>
@@ -475,37 +475,37 @@ export const Tier1TrainingModal: React.FC<Tier1TrainingModalProps> = ({
             <div className="training-success-box">
               <div className="success-badge-top">
                 <CheckCircle2 size={36} className="text-emerald" />
-                <h4 className="success-heading">Training Completato con Successo!</h4>
+                <h4 className="success-heading">Training Completed Successfully!</h4>
               </div>
 
               <p className="success-subtext">
-                Il tuo classificatore Tier 1 personale è stato calibrato su <strong>{summary.sampleCount} campioni</strong> e salvato nel database locale.
-                Le categorie personalizzate (incluse quelle ri-etichettate) verranno riconosciute a freddo in <strong>0.2 ms</strong>!
+                Your personal Tier 1 classifier has been trained on <strong>{summary.sampleCount} samples</strong> and saved to your local database.
+                Custom categories (including re-mapped ones) will now be predicted in <strong>0.2 ms</strong>!
               </p>
 
               <div className="success-stats-table">
                 <div className="stat-row">
-                  <span className="stat-name">Campioni Addestrati</span>
+                  <span className="stat-name">Trained Samples</span>
                   <span className="stat-val font-mono font-bold">{summary.sampleCount}</span>
                 </div>
                 <div className="stat-row">
-                  <span className="stat-name">Classi Attive Coperte</span>
-                  <span className="stat-val font-mono font-bold">{summary.classes.length} classi</span>
+                  <span className="stat-name">Active Classes Covered</span>
+                  <span className="stat-val font-mono font-bold">{summary.classes.length} classes</span>
                 </div>
                 <div className="stat-row">
-                  <span className="stat-name">Calo della Loss</span>
+                  <span className="stat-name">Loss Reduction</span>
                   <span className="stat-val font-mono text-cyan">
                     {summary.initialLoss.toFixed(3)} ➔ {summary.finalLoss.toFixed(3)}
                   </span>
                 </div>
                 <div className="stat-row">
-                  <span className="stat-name">Accuratezza Finale</span>
+                  <span className="stat-name">Final Accuracy</span>
                   <span className="stat-val font-mono text-emerald font-bold">
                     {summary.finalAccuracy.toFixed(1)}%
                   </span>
                 </div>
                 <div className="stat-row">
-                  <span className="stat-name">Tempo Totale Esecuzione</span>
+                  <span className="stat-name">Total Execution Time</span>
                   <span className="stat-val font-mono">{Math.round(summary.totalTimeMs)} ms</span>
                 </div>
               </div>
@@ -522,7 +522,7 @@ export const Tier1TrainingModal: React.FC<Tier1TrainingModalProps> = ({
                 className="btn-secondary"
                 onClick={onClose}
               >
-                Annulla
+                Cancel
               </button>
               <button
                 type="button"
@@ -530,7 +530,7 @@ export const Tier1TrainingModal: React.FC<Tier1TrainingModalProps> = ({
                 onClick={handleStartPipeline}
               >
                 <Zap size={16} />
-                <span>Conferma & Avvia Training</span>
+                <span>Confirm & Start Training</span>
               </button>
             </>
           )}
@@ -542,7 +542,7 @@ export const Tier1TrainingModal: React.FC<Tier1TrainingModalProps> = ({
               disabled
             >
               <RefreshCw size={16} className="spinner" />
-              <span>Esecuzione Pipeline in Corso...</span>
+              <span>Pipeline Running...</span>
             </button>
           )}
 
@@ -552,7 +552,7 @@ export const Tier1TrainingModal: React.FC<Tier1TrainingModalProps> = ({
               className="btn-primary w-full"
               onClick={onClose}
             >
-              <span>Fatto</span>
+              <span>Done</span>
             </button>
           )}
 
@@ -563,7 +563,7 @@ export const Tier1TrainingModal: React.FC<Tier1TrainingModalProps> = ({
                 className="btn-secondary"
                 onClick={onClose}
               >
-                Chiudi
+                Close
               </button>
               <button
                 type="button"
@@ -571,7 +571,7 @@ export const Tier1TrainingModal: React.FC<Tier1TrainingModalProps> = ({
                 onClick={handleStartPipeline}
               >
                 <RefreshCw size={16} />
-                <span>Riprova</span>
+                <span>Retry</span>
               </button>
             </>
           )}

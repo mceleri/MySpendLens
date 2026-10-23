@@ -844,7 +844,7 @@ export const App: React.FC = () => {
         {/* View Routing */}
         {activeView === 'home' && (
           <div className="mobile-home-content">
-            {/* Metà schermo con dati di base: Ultimo movimento, IN/OUT 60gg, barra multicolor */}
+            {/* Top section: Latest movement, 60-day IN/OUT, multi-colored breakdown bar */}
             <HomeHeroOverview
               overview={financialOverview}
               onOpenDistribution={() => navigateToView('distribution')}
@@ -931,7 +931,6 @@ export const App: React.FC = () => {
             totalTransactions={transactions.length}
             onClearDatabase={handleClearDatabase}
             onFactoryReset={handleFactoryReset}
-            onOpenCategories={() => navigateToView('categories')}
           />
         )}
 

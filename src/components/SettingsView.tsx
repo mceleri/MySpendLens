@@ -9,7 +9,6 @@ import {
   ShieldCheck,
   Database,
   Trash2,
-  Tag,
   RotateCcw,
 } from 'lucide-react';
 import { ModelStats, Tier2LoadingState } from '../types';
@@ -27,7 +26,6 @@ interface SettingsViewProps {
   totalTransactions?: number;
   onClearDatabase?: () => void;
   onFactoryReset?: () => void;
-  onOpenCategories?: () => void;
   onBack?: () => void;
 }
 
@@ -44,7 +42,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   totalTransactions = 0,
   onClearDatabase,
   onFactoryReset,
-  onOpenCategories,
 }) => {
   return (
     <div className="view-container">
@@ -150,7 +147,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 onClick={() => {
                   if (
                     window.confirm(
-                      `Sei sicuro di voler eliminare tutte le ${totalTransactions} transazioni salvate? L'operazione non può essere annullata.`
+                      `Are you sure you want to delete all ${totalTransactions} saved transactions? This action cannot be undone.`
                     )
                   ) {
                     onClearDatabase();
@@ -159,7 +156,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 disabled={isProcessing}
               >
                 <Trash2 size={15} />
-                <span>Cancella tutti i movimenti dal database</span>
+                <span>Delete all transactions from database</span>
               </button>
             )}
 
@@ -170,12 +167,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 onClick={() => {
                   if (
                     window.confirm(
-                      'ATTENZIONE: Sei sicuro di voler resettare completamente l\'app?\n\n' +
-                      '• Verranno eliminati TUTTI i movimenti memorizzati\n' +
-                      '• Verranno cancellati i modelli Tier 1 personalizzati e ripristinati i pesi base\n' +
-                      '• Verranno ripristinate le categorie e i colori predefiniti\n' +
-                      '• Verranno resettate le impostazioni di classificazione\n\n' +
-                      'L\'app ripartirà come nuova e pulita al 100%.'
+                      'WARNING: Are you sure you want to completely reset the app?\n\n' +
+                      '• ALL stored transactions will be deleted\n' +
+                      '• Custom Tier 1 models will be cleared and restored to default weights\n' +
+                      '• Categories and colors will be reset to defaults\n' +
+                      '• Classification settings will be reset\n\n' +
+                      'The app will restart 100% clean as new.'
                     )
                   ) {
                     onFactoryReset();
@@ -184,7 +181,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 disabled={isProcessing}
               >
                 <RotateCcw size={15} />
-                <span>Riparti da app pulita (Factory Reset)</span>
+                <span>Reset to clean app (Factory Reset)</span>
               </button>
             )}
           </div>
@@ -248,25 +245,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           </div>
         </div>
 
-        {/* Manage Categories Card */}
-        {onOpenCategories && (
-          <div className="settings-card">
-            <h3 className="settings-card-title">Category Customization</h3>
-            <p className="settings-card-desc">
-              Add new expense categories, rename existing ones, or configure custom semantic keywords for the Tier 2 embedding engine.
-            </p>
-            <button
-              type="button"
-              className="btn-settings-action"
-              onClick={onOpenCategories}
-            >
-              <Tag size={16} />
-              <span>Manage Categories</span>
-            </button>
-          </div>
-        )}
-
-        {/* Card 3: Privacy Guarantee */}
+        {/* Card 4: Privacy Guarantee */}
         <div className="settings-card privacy-card">
           <div className="privacy-header">
             <ShieldCheck size={20} className="text-emerald" />

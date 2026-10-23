@@ -570,8 +570,8 @@ export const ExportImportView: React.FC<ExportImportViewProps> = ({
               <div className="drop-zone-icon-wrap">
                 <FolderDown size={30} className="text-cyan" />
               </div>
-              <h4 className="drop-zone-title">Click o trascina qui il file di backup</h4>
-              <p className="drop-zone-subtitle">Supporta pacchetti .zip di backup completo o file .json</p>
+              <h4 className="drop-zone-title">Click or drag & drop backup file</h4>
+              <p className="drop-zone-subtitle">Supports MySpendLens full .zip backup packages or .json export files</p>
               <button
                 type="button"
                 className="btn-secondary btn-drop-browse"
@@ -581,7 +581,7 @@ export const ExportImportView: React.FC<ExportImportViewProps> = ({
                 }}
               >
                 <FolderDown size={15} />
-                <span>Sfoglia file dal dispositivo</span>
+                <span>Browse file from device</span>
               </button>
             </div>
           )}
@@ -722,7 +722,7 @@ export const ExportImportView: React.FC<ExportImportViewProps> = ({
                   onClick={() => setStagedBackup(null)}
                   disabled={isImporting}
                 >
-                  Annulla
+                  Cancel
                 </button>
 
                 <button
@@ -737,12 +737,12 @@ export const ExportImportView: React.FC<ExportImportViewProps> = ({
                   {isImporting ? (
                     <>
                       <RefreshCw size={16} className="spinner" />
-                      <span>Ripristino in corso...</span>
+                      <span>Restoring...</span>
                     </>
                   ) : (
                     <>
                       <Check size={16} />
-                      <span>Ripristina Dati Selezionati</span>
+                      <span>Restore Selected Data</span>
                     </>
                   )}
                 </button>
