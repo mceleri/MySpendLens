@@ -70,6 +70,12 @@ export interface TrainingSummary {
   classes: string[];
 }
 
+export interface TrainingSample {
+  description: string;
+  category: string;
+  weight?: number;
+}
+
 export interface TrainingOptions {
   epochs?: number;
   learningRate?: number;
@@ -263,12 +269,12 @@ export class MySpendLensTier1Engine {
    * and yields between epochs to maintain smooth UI animation.
    */
   public async trainDataset(
-    samples: Array<{ description: string; category: string }>,
+    samples: TrainingSample[],
     options: TrainingOptions = {}
   ): Promise<TrainingSummary> {
     const t0 = performance.now();
     const epochs = options.epochs ?? 10;
-    const baseLr = options.learningRate ?? 0.25;
+    const baseLr = options.learningRate ?? 0.35;
     const l2Reg = options.l2Reg ?? 0.0001;
     const yieldMs = options.yieldIntervalMs ?? 50;
 
@@ -279,10 +285,11 @@ export class MySpendLensTier1Engine {
       }
     }
 
-    // 2. Pre-vectorize dataset once (fast cache of sparse feature vectors)
+    // 2. Pre-vectorize dataset once (fast cache of sparse feature vectors and sample weights)
     const vectorizedDataset: Array<{
       xVec: Map<number, number>;
       targetIdx: number;
+      weight: number;
     }> = [];
 
     for (const s of samples) {
@@ -291,7 +298,8 @@ export class MySpendLensTier1Engine {
       if (targetIdx === -1) continue;
       const xVec = this.vectorize(s.description);
       if (xVec.size === 0) continue;
-      vectorizedDataset.push({ xVec, targetIdx });
+      const weight = typeof s.weight === 'number' && s.weight > 0 ? s.weight : 1.0;
+      vectorizedDataset.push({ xVec, targetIdx, weight });
     }
 
     if (vectorizedDataset.length === 0) {
@@ -300,6 +308,17 @@ export class MySpendLensTier1Engine {
 
     const { classes, weights } = this.artifact;
     const numClasses = classes.length;
+
+    // Calculate balanced class weights to prevent synthetic anchor classes from overwhelming user classes
+    const classWeightsSum = new Array(numClasses).fill(0);
+    let totalSampleWeight = 0;
+    for (const item of vectorizedDataset) {
+      classWeightsSum[item.targetIdx] += item.weight;
+      totalSampleWeight += item.weight;
+    }
+    const classBalanceMultiplier = classWeightsSum.map((w) =>
+      w > 0 ? Math.min(5.0, Math.max(0.5, totalSampleWeight / (numClasses * w))) : 1.0
+    );
 
     // Helper: evaluate current cross-entropy loss and accuracy over the dataset
     const evaluate = (): { loss: number; accuracy: number } => {
@@ -372,9 +391,11 @@ export class MySpendLensTier1Engine {
         const sumExps = exps.reduce((a, b) => a + b, 0);
         const probs = exps.map((e) => e / sumExps);
 
+        const effWeight = item.weight * classBalanceMultiplier[item.targetIdx];
+
         for (let c = 0; c < numClasses; c++) {
-          const grad = probs[c] - (c === item.targetIdx ? 1.0 : 0.0);
-          weights.intercept[c] -= currentLr * 0.1 * grad;
+          const grad = (probs[c] - (c === item.targetIdx ? 1.0 : 0.0)) * effWeight;
+          weights.intercept[c] -= currentLr * 0.05 * grad;
 
           const row = weights.coef[c];
           for (const [featIdx, featVal] of item.xVec.entries()) {

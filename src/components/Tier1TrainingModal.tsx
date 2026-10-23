@@ -217,29 +217,47 @@ export const Tier1TrainingModal: React.FC<Tier1TrainingModalProps> = ({
       // STEP 4: Assemblaggio Dataset Unificato
       updateStep('assemble', { status: 'running', detail: 'Fusione campioni utente, ancore e keywords...' });
 
-      const fullDataset: Array<{ description: string; category: string }> = [];
+      const fullDataset: Array<{ description: string; category: string; weight?: number }> = [];
 
-      // 4a. Movimenti storici dell'utente dal DB
+      // 4a. Movimenti storici dell'utente dal DB (Ground truth prioritario: peso 15x)
+      let userCount = 0;
       for (const t of validTransactions) {
         if (activeCategoryNames.has(t.category)) {
-          fullDataset.push({ description: t.rawDescription, category: t.category });
+          fullDataset.push({
+            description: t.rawDescription,
+            category: t.category,
+            weight: 15.0,
+          });
+          userCount++;
         }
       }
 
-      // 4b. Ancore base (1.000 merchant)
+      // 4b. Ancore base (1.000 merchant per prevenire catastrophic forgetting: peso 1x)
+      let anchorsCount = 0;
       for (const a of processedAnchors) {
         if (activeCategoryNames.has(a.category)) {
-          fullDataset.push({ description: a.name, category: a.category });
+          fullDataset.push({
+            description: a.name,
+            category: a.category,
+            weight: 1.0,
+          });
+          anchorsCount++;
         }
       }
 
-      // 4c. Keywords / Esempi delle categorie
+      // 4c. Keywords / Esempi delle categorie (peso 5x)
+      let keywordsCount = 0;
       for (const cat of activeCategories) {
         if (cat.examples) {
           const parts = cat.examples.split(/[,;\n]/).map((p) => p.trim());
           for (const p of parts) {
             if (p.length >= 2) {
-              fullDataset.push({ description: p, category: cat.name });
+              fullDataset.push({
+                description: p,
+                category: cat.name,
+                weight: 5.0,
+              });
+              keywordsCount++;
             }
           }
         }
@@ -247,7 +265,7 @@ export const Tier1TrainingModal: React.FC<Tier1TrainingModalProps> = ({
 
       updateStep('assemble', {
         status: 'success',
-        detail: `Dataset completato: ${fullDataset.length} campioni totali (${validTransactions.length} tuoi movimenti + ${processedAnchors.length} ancore base riallineate).`,
+        detail: `Dataset completato: ${fullDataset.length} campioni totali (${userCount} tuoi movimenti [priorità alta 15x] + ${anchorsCount} ancore base + ${keywordsCount} esempi categorie).`,
       });
 
       // STEP 5: Training Loop Tier 1
@@ -259,7 +277,7 @@ export const Tier1TrainingModal: React.FC<Tier1TrainingModalProps> = ({
 
       const trainSummary = await t1.trainDataset(fullDataset, {
         epochs: 10,
-        learningRate: 0.25,
+        learningRate: 0.35,
         l2Reg: 0.0001,
         yieldIntervalMs: 60,
         onProgress: (p) => {
