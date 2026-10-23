@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, Loader2, AlertCircle, Home } from 'lucide-react';
+import { ShieldCheck, Loader2, AlertCircle, Home, Brain } from 'lucide-react';
 import { Tier2LoadingState } from '../types';
 
 interface HeaderProps {
@@ -8,6 +8,8 @@ interface HeaderProps {
   tier2LoadingState: Tier2LoadingState;
   isProcessing?: boolean;
   onGoHome: () => void;
+  hasPendingTraining?: boolean;
+  onOpenTrainingModal?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -16,6 +18,8 @@ export const Header: React.FC<HeaderProps> = ({
   tier2LoadingState,
   isProcessing = false,
   onGoHome,
+  hasPendingTraining = false,
+  onOpenTrainingModal,
 }) => {
   return (
     <header className="mobile-app-header">
@@ -71,6 +75,33 @@ export const Header: React.FC<HeaderProps> = ({
               <AlertCircle size={13} />
               <span>Error</span>
             </div>
+          )}
+
+          {/* Tier 1 Personal Training Icon */}
+          {onOpenTrainingModal && (
+            <button
+              type="button"
+              className={`btn-header-brain ${hasPendingTraining ? 'has-pending' : ''}`}
+              onClick={onOpenTrainingModal}
+              title={
+                hasPendingTraining
+                  ? 'Nuovi dati o modifiche pronte per il training locale'
+                  : 'Modello Tier 1 locale'
+              }
+              aria-label="Training Tier 1"
+            >
+              <div className="brain-icon-wrap">
+                <Brain
+                  size={19}
+                  className={hasPendingTraining ? 'text-cyan' : 'text-dim'}
+                />
+                {hasPendingTraining && (
+                  <span className="brain-badge-exclamation" title="Aggiornamento disponibile">
+                    !
+                  </span>
+                )}
+              </div>
+            </button>
           )}
         </div>
       </div>

@@ -50,6 +50,34 @@ export interface PredictionResult {
   inferenceTimeMs: number;
 }
 
+export interface TrainingProgress {
+  epoch: number;
+  totalEpochs: number;
+  loss: number;
+  accuracy: number;
+  sampleCount: number;
+  stepTimeMs: number;
+}
+
+export interface TrainingSummary {
+  epochs: number;
+  initialLoss: number;
+  finalLoss: number;
+  initialAccuracy: number;
+  finalAccuracy: number;
+  sampleCount: number;
+  totalTimeMs: number;
+  classes: string[];
+}
+
+export interface TrainingOptions {
+  epochs?: number;
+  learningRate?: number;
+  l2Reg?: number;
+  onProgress?: (progress: TrainingProgress) => void;
+  yieldIntervalMs?: number;
+}
+
 export class MySpendLensTier1Engine {
   private artifact: Tier1ModelArtifact;
 
@@ -158,6 +186,34 @@ export class MySpendLensTier1Engine {
   }
 
   /**
+   * Ensures that a given class name exists in the model's classes and weight matrix.
+   * If it doesn't exist, dynamically expands weights.coef with a new row and weights.intercept with 0.
+   */
+  public ensureClass(className: string): number {
+    const trimmed = className.trim();
+    if (!trimmed) return -1;
+    const existingIdx = this.artifact.classes.indexOf(trimmed);
+    if (existingIdx !== -1) return existingIdx;
+
+    // Dynamically append new class
+    this.artifact.classes.push(trimmed);
+    const numFeatures = this.artifact.metrics.num_features;
+    this.artifact.weights.coef.push(new Array(numFeatures).fill(0));
+    this.artifact.weights.intercept.push(0);
+    this.artifact.metrics.num_classes = this.artifact.classes.length;
+    return this.artifact.classes.length - 1;
+  }
+
+  /**
+   * Synchronizes model classes with a list of active category names.
+   */
+  public syncClassesWithCategories(categoryNames: string[]): void {
+    for (const name of categoryNames) {
+      this.ensureClass(name);
+    }
+  }
+
+  /**
    * Continuous Local Learning: updates the weight matrix in-place using a single step
    * of multinomial logistic regression SGD when the user corrects a transaction category,
    * ready to be persisted to IndexedDB or Origin Private File System (OPFS).
@@ -167,10 +223,8 @@ export class MySpendLensTier1Engine {
     trueCategory: string,
     learningRate = this.artifact.incremental_learning.default_learning_rate
   ): void {
-    const targetIdx = this.artifact.classes.indexOf(trueCategory);
-    if (targetIdx === -1) {
-      throw new Error(`Unknown category: ${trueCategory}`);
-    }
+    const targetIdx = this.ensureClass(trueCategory);
+    if (targetIdx === -1) return;
 
     const xVec = this.vectorize(rawDescription);
     if (xVec.size === 0) return;
@@ -200,6 +254,172 @@ export class MySpendLensTier1Engine {
     }
 
     this.artifact.incremental_learning.user_feedback_count += 1;
+  }
+
+  /**
+   * Multi-Epoch In-Browser Training Loop:
+   * Trains or fine-tunes the Tier 1 Multinomial Logistic Regression model on all provided samples.
+   * Includes L2 weight regularization, dynamic learning rate schedule, Fisher-Yates shuffling,
+   * and yields between epochs to maintain smooth UI animation.
+   */
+  public async trainDataset(
+    samples: Array<{ description: string; category: string }>,
+    options: TrainingOptions = {}
+  ): Promise<TrainingSummary> {
+    const t0 = performance.now();
+    const epochs = options.epochs ?? 10;
+    const baseLr = options.learningRate ?? 0.25;
+    const l2Reg = options.l2Reg ?? 0.0001;
+    const yieldMs = options.yieldIntervalMs ?? 50;
+
+    // 1. Ensure all classes from samples exist in the weight matrix
+    for (const s of samples) {
+      if (s.category) {
+        this.ensureClass(s.category);
+      }
+    }
+
+    // 2. Pre-vectorize dataset once (fast cache of sparse feature vectors)
+    const vectorizedDataset: Array<{
+      xVec: Map<number, number>;
+      targetIdx: number;
+    }> = [];
+
+    for (const s of samples) {
+      if (!s.description || !s.category) continue;
+      const targetIdx = this.artifact.classes.indexOf(s.category.trim());
+      if (targetIdx === -1) continue;
+      const xVec = this.vectorize(s.description);
+      if (xVec.size === 0) continue;
+      vectorizedDataset.push({ xVec, targetIdx });
+    }
+
+    if (vectorizedDataset.length === 0) {
+      throw new Error('No valid vectorized samples available for training.');
+    }
+
+    const { classes, weights } = this.artifact;
+    const numClasses = classes.length;
+
+    // Helper: evaluate current cross-entropy loss and accuracy over the dataset
+    const evaluate = (): { loss: number; accuracy: number } => {
+      let totalLoss = 0;
+      let correct = 0;
+
+      for (const item of vectorizedDataset) {
+        const logits = weights.intercept.slice();
+        for (const [featIdx, featVal] of item.xVec.entries()) {
+          for (let c = 0; c < numClasses; c++) {
+            logits[c] += weights.coef[c][featIdx] * featVal;
+          }
+        }
+        const maxLogit = Math.max(...logits);
+        const exps = logits.map((l) => Math.exp(l - maxLogit));
+        const sumExps = exps.reduce((a, b) => a + b, 0);
+
+        let bestClass = 0;
+        let maxP = -1;
+        for (let c = 0; c < numClasses; c++) {
+          const p = exps[c] / sumExps;
+          if (p > maxP) {
+            maxP = p;
+            bestClass = c;
+          }
+        }
+
+        const targetP = Math.max(1e-12, exps[item.targetIdx] / sumExps);
+        totalLoss += -Math.log(targetP);
+        if (bestClass === item.targetIdx) {
+          correct++;
+        }
+      }
+
+      return {
+        loss: totalLoss / vectorizedDataset.length,
+        accuracy: (correct / vectorizedDataset.length) * 100,
+      };
+    };
+
+    const initialMetrics = evaluate();
+    let finalLoss = initialMetrics.loss;
+    let finalAccuracy = initialMetrics.accuracy;
+
+    // 3. Epoch Training Loop
+    for (let epoch = 1; epoch <= epochs; epoch++) {
+      const stepStart = performance.now();
+      // Decay learning rate gradually per epoch
+      const currentLr = baseLr / (1 + 0.05 * (epoch - 1));
+
+      // In-place Fisher-Yates shuffle for stochastic gradient descent
+      for (let i = vectorizedDataset.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const temp = vectorizedDataset[i];
+        vectorizedDataset[i] = vectorizedDataset[j];
+        vectorizedDataset[j] = temp;
+      }
+
+      // Single pass over shuffled dataset with L2 weight regularization
+      for (const item of vectorizedDataset) {
+        const logits = weights.intercept.slice();
+        for (const [featIdx, featVal] of item.xVec.entries()) {
+          for (let c = 0; c < numClasses; c++) {
+            logits[c] += weights.coef[c][featIdx] * featVal;
+          }
+        }
+
+        const maxLogit = Math.max(...logits);
+        const exps = logits.map((l) => Math.exp(l - maxLogit));
+        const sumExps = exps.reduce((a, b) => a + b, 0);
+        const probs = exps.map((e) => e / sumExps);
+
+        for (let c = 0; c < numClasses; c++) {
+          const grad = probs[c] - (c === item.targetIdx ? 1.0 : 0.0);
+          weights.intercept[c] -= currentLr * 0.1 * grad;
+
+          const row = weights.coef[c];
+          for (const [featIdx, featVal] of item.xVec.entries()) {
+            const regTerm = l2Reg * row[featIdx];
+            row[featIdx] -= currentLr * (grad * featVal + regTerm);
+          }
+        }
+      }
+
+      // Evaluate after epoch
+      const epochMetrics = evaluate();
+      finalLoss = epochMetrics.loss;
+      finalAccuracy = epochMetrics.accuracy;
+
+      if (options.onProgress) {
+        options.onProgress({
+          epoch,
+          totalEpochs: epochs,
+          loss: finalLoss,
+          accuracy: finalAccuracy,
+          sampleCount: vectorizedDataset.length,
+          stepTimeMs: performance.now() - stepStart,
+        });
+      }
+
+      // Yield control to browser event loop so animation updates smoothly
+      if (yieldMs > 0) {
+        await new Promise((resolve) => setTimeout(resolve, yieldMs));
+      }
+    }
+
+    // 4. Update artifact metadata
+    this.artifact.incremental_learning.user_feedback_count += vectorizedDataset.length;
+    this.artifact.metrics.training_accuracy = finalAccuracy / 100;
+
+    return {
+      epochs,
+      initialLoss: initialMetrics.loss,
+      finalLoss,
+      initialAccuracy: initialMetrics.accuracy,
+      finalAccuracy,
+      sampleCount: vectorizedDataset.length,
+      totalTimeMs: performance.now() - t0,
+      classes: [...this.artifact.classes],
+    };
   }
 
   public serialize(): string {

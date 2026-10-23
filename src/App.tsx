@@ -8,6 +8,7 @@ import { UploadView } from './components/UploadView';
 import { TransactionsTable } from './components/TransactionsTable';
 import { CategoriesView } from './components/CategoriesView';
 import { ExportImportView } from './components/ExportImportView';
+import { Tier1TrainingModal } from './components/Tier1TrainingModal';
 import {
   MySpendLensTier1Engine,
   Tier1ModelArtifact,
@@ -69,6 +70,8 @@ export const App: React.FC = () => {
   const [isLoadingModel, setIsLoadingModel] = useState<boolean>(false);
   const [modelStats, setModelStats] = useState<ModelStats | null>(null);
   const [modelError, setModelError] = useState<string | null>(null);
+  const [isTrainingModalOpen, setIsTrainingModalOpen] = useState<boolean>(false);
+  const [hasPendingTraining, setHasPendingTraining] = useState<boolean>(false);
 
   // Tier 2 State (loaded on demand)
   const [tier2LoadingState, setTier2LoadingState] = useState<Tier2LoadingState>({
@@ -134,6 +137,7 @@ export const App: React.FC = () => {
             await updateTransactionsInDB(normalized);
           }
           setTransactions(normalized);
+          setHasPendingTraining(true);
         }
       } catch (e) {
         console.warn('Could not read from IndexedDB:', e);
@@ -485,6 +489,7 @@ export const App: React.FC = () => {
       const allUpdated = await getAllTransactionsFromDB();
       setTransactions(allUpdated);
       setLoadedFileName(fileName);
+      setHasPendingTraining(true);
       console.info(`Imported ${classified.length} transactions (${_skippedDuplicates} duplicates skipped).`);
       navigateToView('transactions');
     } catch (err) {
@@ -596,16 +601,7 @@ export const App: React.FC = () => {
 
         await updateSingleTransactionInDB(updatedTx);
         setTransactions((prev) => prev.map((t) => (t.id === id ? updatedTx : t)));
-
-        // Continuously adapt Tier 1 local SGD weights & persist to IndexedDB
-        if (engineTier1Ref.current && tx.rawDescription) {
-          try {
-            engineTier1Ref.current.learnFromUserFeedback(tx.rawDescription, newCategory);
-            await saveCustomTier1ModelToDB(engineTier1Ref.current.getArtifact());
-          } catch {
-            // Category might not be part of the base model vocabulary/classes
-          }
-        }
+        setHasPendingTraining(true);
       } catch (err) {
         console.error('Failed to update category:', err);
         alert(`Error updating category: ${(err as Error).message}`);
@@ -621,6 +617,7 @@ export const App: React.FC = () => {
       const updatedCats = await getAllCategoriesFromDB();
       setCategories(updatedCats);
       registerDynamicCategories(updatedCats);
+      setHasPendingTraining(true);
       if (engineTier2Ref.current?.isReady) {
         await engineTier2Ref.current.syncDynamicCategories(updatedCats);
       }
@@ -639,6 +636,7 @@ export const App: React.FC = () => {
         setCategories(updatedCats);
         setTransactions(updatedTxs);
         registerDynamicCategories(updatedCats);
+        setHasPendingTraining(true);
         if (engineTier2Ref.current?.isReady) {
           await engineTier2Ref.current.syncDynamicCategories(updatedCats);
         }
@@ -656,6 +654,7 @@ export const App: React.FC = () => {
       const updatedCats = await getAllCategoriesFromDB();
       setCategories(updatedCats);
       registerDynamicCategories(updatedCats);
+      setHasPendingTraining(true);
       if (engineTier2Ref.current?.isReady) {
         await engineTier2Ref.current.syncDynamicCategories(updatedCats);
       }
@@ -674,6 +673,7 @@ export const App: React.FC = () => {
         setCategories(updatedCats);
         setTransactions(updatedTxs);
         registerDynamicCategories(updatedCats);
+        setHasPendingTraining(true);
         if (engineTier2Ref.current?.isReady) {
           await engineTier2Ref.current.syncDynamicCategories(updatedCats);
         }
@@ -750,10 +750,25 @@ export const App: React.FC = () => {
         });
       }
 
+      setHasPendingTraining(true);
       return { transactionsAdded: txCount, categoriesSaved: catCount };
     },
     []
   );
+
+  const handleTrainingComplete = useCallback(async () => {
+    if (engineTier1Ref.current) {
+      await saveCustomTier1ModelToDB(engineTier1Ref.current.getArtifact());
+      setModelStats({
+        version: engineTier1Ref.current.getArtifact().version,
+        featuresCount: engineTier1Ref.current.getArtifact().metrics.num_features,
+        classesCount: engineTier1Ref.current.getArtifact().metrics.num_classes,
+        validationAccuracy: engineTier1Ref.current.getArtifact().metrics.validation_accuracy,
+        countries: engineTier1Ref.current.getArtifact().config.countries,
+      });
+    }
+    setHasPendingTraining(false);
+  }, []);
 
   return (
     <div className="mobile-app-layout">
@@ -764,6 +779,8 @@ export const App: React.FC = () => {
         tier2LoadingState={tier2LoadingState}
         isProcessing={isProcessing}
         onGoHome={handleNavigateBack}
+        hasPendingTraining={hasPendingTraining}
+        onOpenTrainingModal={() => setIsTrainingModalOpen(true)}
       />
 
       {/* Main Mobile Viewport */}
@@ -871,6 +888,17 @@ export const App: React.FC = () => {
           </div>
         )}
       </main>
+
+      {/* Tier 1 Personal Training Modal */}
+      <Tier1TrainingModal
+        isOpen={isTrainingModalOpen}
+        onClose={() => setIsTrainingModalOpen(false)}
+        transactions={transactions}
+        categories={categories}
+        tier1Engine={engineTier1Ref.current}
+        ensureTier1Engine={ensureTier1Engine}
+        onTrainingComplete={handleTrainingComplete}
+      />
     </div>
   );
 };

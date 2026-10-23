@@ -3355,3 +3355,360 @@ body {
   border: 1px solid rgba(16, 185, 129, 0.3);
   color: #6ee7b7;
 }
+
+/* ==========================================================================
+   Header Brain Training Button & Badge
+   ========================================================================== */
+
+.btn-header-brain {
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 0.35rem;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text-muted);
+}
+
+.btn-header-brain:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-color);
+}
+
+.btn-header-brain.has-pending {
+  background: rgba(6, 182, 212, 0.12);
+  border: 1px solid rgba(6, 182, 212, 0.4);
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.25);
+}
+
+.brain-icon-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brain-badge-exclamation {
+  position: absolute;
+  top: -7px;
+  right: -8px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #f59e0b;
+  color: #0f172a;
+  font-size: 0.65rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #090d16;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.9);
+  animation: brain-pulse-glow 2s infinite ease-in-out;
+}
+
+@keyframes brain-pulse-glow {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 6px rgba(245, 158, 11, 0.8);
+  }
+  50% {
+    transform: scale(1.18);
+    box-shadow: 0 0 12px rgba(245, 158, 11, 1);
+  }
+}
+
+/* ==========================================================================
+   Tier 1 Personal Training Modal
+   ========================================================================== */
+
+.training-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.training-modal-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  width: 100%;
+  max-width: 490px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: training-modal-enter 0.22s ease-out;
+}
+
+@keyframes training-modal-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.training-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 1.25rem 0.9rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.training-modal-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.training-modal-icon-wrap {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md);
+  background: rgba(6, 182, 212, 0.12);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sparkle-accent {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+}
+
+.training-modal-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.training-modal-subtitle {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+}
+
+.training-modal-body {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: 72vh;
+  overflow-y: auto;
+}
+
+.training-info-box {
+  background: var(--bg-card-hover);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 0.9rem 1rem;
+}
+
+.training-info-text {
+  margin: 0 0 0.75rem;
+  font-size: 0.82rem;
+  color: var(--text-main);
+  line-height: 1.45;
+}
+
+.training-specs-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.spec-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.6rem;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 0.74rem;
+  color: var(--text-main);
+}
+
+/* Running state */
+.training-live-box {
+  background: rgba(6, 182, 212, 0.05);
+  border: 1px solid rgba(6, 182, 212, 0.35);
+  border-radius: var(--radius-lg);
+  padding: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.training-progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.training-progress-bar-track {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-dark);
+  border-radius: 9999px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.training-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #06b6d4, #10b981);
+  border-radius: 9999px;
+  transition: width 0.15s ease-out;
+}
+
+.training-metrics-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+}
+
+.training-metric-card {
+  background: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.65rem 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.metric-label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+}
+
+.metric-value {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.training-live-pulse-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  padding-top: 0.2rem;
+}
+
+/* Success state */
+.training-success-box {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.5rem 0.25rem;
+}
+
+.success-badge-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.success-heading {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #f0fdf4;
+}
+
+.success-subtext {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  line-height: 1.4;
+}
+
+.success-stats-table {
+  width: 100%;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  margin-top: 0.5rem;
+  overflow: hidden;
+}
+
+.stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.85rem;
+  font-size: 0.78rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.stat-row:last-child {
+  border-bottom: none;
+}
+
+.stat-name {
+  color: var(--text-dim);
+}
+
+.stat-val {
+  color: var(--text-main);
+}
+
+/* Idle state */
+.privacy-micro-note {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.74rem;
+  color: var(--text-dim);
+  line-height: 1.35;
+}
+
+/* Modal Footer */
+.training-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 0.9rem 1.25rem 1.1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.btn-start-training {
+  background: linear-gradient(135deg, #06b6d4, #0284c7);
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+}
+
+.btn-start-training:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(6, 182, 212, 0.45);
+}
+
+.cursor-wait {
+  cursor: wait !important;
+}
