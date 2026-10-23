@@ -7,10 +7,12 @@ import {
   Tags,
   FolderArchive,
   ChevronRight,
+  PieChart,
 } from 'lucide-react';
 
 interface ActionGridProps {
   onOpenUpload: () => void;
+  onOpenCharts: () => void;
   onOpenDistribution: () => void;
   onOpenTransactions: () => void;
   onOpenCategories: () => void;
@@ -24,6 +26,7 @@ interface ActionGridProps {
 
 export const ActionGrid: React.FC<ActionGridProps> = ({
   onOpenUpload,
+  onOpenCharts,
   onOpenDistribution,
   onOpenTransactions,
   onOpenCategories,
@@ -56,7 +59,24 @@ export const ActionGrid: React.FC<ActionGridProps> = ({
           </div>
         </button>
 
-        {/* 2. Visualizza Distribuzione Spese (Lens Icon) */}
+        {/* 2. Charts */}
+        <button
+          type="button"
+          className="action-card action-charts"
+          onClick={onOpenCharts}
+        >
+          <div className="action-card-top">
+            <div className="action-icon-wrap icon-charts">
+              <PieChart size={22} />
+            </div>
+            <ChevronRight size={16} className="action-arrow" />
+          </div>
+          <div className="action-card-text">
+            <h4 className="action-title">Charts</h4>
+          </div>
+        </button>
+
+        {/* 3. Visualizza Distribuzione Spese (Lens Icon) */}
         <button
           type="button"
           className="action-card action-distribution"

@@ -8,6 +8,7 @@ import { UploadView } from './components/UploadView';
 import { TransactionsTable } from './components/TransactionsTable';
 import { CategoriesView } from './components/CategoriesView';
 import { ExportImportView } from './components/ExportImportView';
+import { ChartsView } from './components/ChartsView';
 import { Tier1TrainingModal } from './components/Tier1TrainingModal';
 import {
   MySpendLensTier1Engine,
@@ -56,6 +57,7 @@ import { Loader2 } from 'lucide-react';
 
 type ActiveView =
   | 'home'
+  | 'charts'
   | 'distribution'
   | 'transactions'
   | 'settings'
@@ -863,9 +865,10 @@ export const App: React.FC = () => {
               onOpenDistribution={() => navigateToView('distribution')}
             />
 
-            {/* Griglia Azioni: Upload, Distribuzione, Movimenti, Categories, Settings, Export/Import */}
+            {/* Quick Actions Grid: Upload, Charts, Distribution, Transactions, Categories, Settings, Export/Import */}
             <ActionGrid
               onOpenUpload={() => navigateToView('upload')}
+              onOpenCharts={() => navigateToView('charts')}
               onOpenDistribution={() => navigateToView('distribution')}
               onOpenTransactions={() => navigateToView('transactions')}
               onOpenCategories={() => navigateToView('categories')}
@@ -873,8 +876,6 @@ export const App: React.FC = () => {
               onOpenExportImport={() => navigateToView('export_import')}
               totalTransactions={transactions.length}
               categoriesCount={categories.filter((c) => c.isActive).length}
-              useTier1={useTier1}
-              tier2Ready={tier2LoadingState.status === 'ready'}
             />
           </div>
         )}
@@ -886,6 +887,17 @@ export const App: React.FC = () => {
             disabled={isProcessing}
             totalLoaded={transactions.length}
             onCancel={handleNavigateBack}
+          />
+        )}
+
+        {activeView === 'charts' && (
+          <ChartsView
+            transactions={transactions}
+            onOpenUpload={() => navigateToView('upload')}
+            onFilterByCategory={(cat) => {
+              setCategoryFilterForTransactions(cat);
+              navigateToView('transactions', cat);
+            }}
           />
         )}
 
