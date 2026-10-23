@@ -1,0 +1,5002 @@
+[
+  {
+    "name": "ESSELUNGA",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "LA ESSE ESSELUNGA",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "CONAD",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "SPAZIO CONAD",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "CONAD CITY",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "CONAD SUPERSTORE",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "SAPORI E DINTORNI CONAD",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "MARGHERITA CONAD",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "TODIS",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "COOP ALLEANZA",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "UNICOOP FIRENZE",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "UNICOOP TIRRENO",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "NOVACOOP",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "COOP LOMBARDIA",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "COOP LIGURIA",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "IPERCOOP",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "INCOOP",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "CARREFOUR ITALIA",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "CARREFOUR MARKET",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "CARREFOUR EXPRESS",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "CARREFOUR IPER",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "EUROSPIN",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "LIDL ITALIA",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "MD DISCOUNT",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "PENNY MARKET",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "ALDI ITALIA",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "INS MERCATO",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "ARD DISCOUNT",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "PRIX QUALITY",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "DIPIU DISCOUNT",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "TUODI DISCOUNT",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "DORO SUPERMERCATI",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "PAM PANORAMA",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "PAM LOCAL",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "IPER LA GRANDE I",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "UNES SUPERMERCATI",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "U2 SUPERMERCATO",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "IL VIAGGIATOR GOLOSO",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "TIGROS",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "IPERAL",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "BENNET",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "IL GIGANTE",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "FAMILA",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "FAMILA SUPERSTORE",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "IPERFAMILA",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "MEGA SUPERMERCATI",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "A E O SUPERMERCATI",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "SICONTE SUPERMERCATI",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "DOK SUPERMERCATI",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "SOLE 365",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "DESPAR",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "EUROSPAR",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "INTERSPAR",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "ALTASFERA CASH CARRY",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "CRAI SUPERMERCATI",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "SIGMA SUPERMERCATI",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "SISA SUPERMERCATI",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "DECO SUPERMERCATI",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "CONTE SUPERMERCATI",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "BASKO",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "EKOM DISCOUNT",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "GULLIVER SUPERMERCATI",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "MIGROSS",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "ALI SUPERMERCATI",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "ALIPER",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "IPERLANDO",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "ROSSETTO SUPERMERCATI",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "POLI SUPERMERCATI",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "ORVEA SUPERMERCATI",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "OASI GABRIELLI",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "TIGRE SUPERMERCATI",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "TIGRE AMICO",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "EMI SUPERMERCATI",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "GALA SUPERMERCATI",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "CTS SUPERMERCATI",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "PEWEX SUPERMERCATI",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "ELITE SUPERMERCATI",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "PIM SUPERMERCATI",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "AGORA SUPERMERCATI",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "DEM SUPERMERCATI",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "MA SUPERMERCATI",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "GROS CIDAC",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "IPER TOSANO",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "NATURASI",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "EATALY",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "BOFROST ITALIA",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "PICARD SURGELATI",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "METRO ITALIA CASH CARRY",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "CORTILIA",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "EVERLI SPESA ONLINE",
+    "category": "Groceries",
+    "country": "IT"
+  },
+  {
+    "name": "MCDONALDS ITALIA",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "MCCAFE ITALIA",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "BURGER KING ITALIA",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "KFC ITALIA",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "STARBUCKS ITALY",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "AUTOGRILL",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "CHEF EXPRESS",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "SARNI RISTORAZIONE",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "MYCHEF RISTORAZIONE",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "AREAS ITALIA",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "LA PIADINERIA",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "OLD WILD WEST",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "ROADHOUSE RESTAURANT",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "CALAVERA FRESH MEX",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "WIENER HAUS",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "PIZZIKOTTO",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "AMERICA GRAFFITI",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "ROSSOPOMODORO",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "ALICE PIZZA",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "SPONTINI",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "PIZZIUM",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "BERBERE PIZZERIA",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "FRA DIAVOLO PIZZERIA",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "SORBILLO PIZZERIA",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "ANTICA PIZZERIA DA MICHELE",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "FRATELLI LA BUFALA",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "ROMANTICA PIZZA",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "LIEVITO MADRE AL DUOMO",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "COCCIUTO",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "GIOLINA PIZZERIA",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "STARITA PIZZERIA",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "PEPE IN GRANI",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "TRAPIZZINO",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "PANINO GIUSTO",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "ALL ANTICO VINAIO",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "PESCARIA",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "MISCUSI",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "MACCHERONI EXPRESS",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "BOTTEGA PORTICI",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "CAPATOAST",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "TOAST IT",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "POKE HOUSE",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "I LOVE POKE",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "AMI POKE",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "MAUI POKE",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "WAIKIKI POKE",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "PACIFIK POKE",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "NIMA SUSHI",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "TEMAKINHO",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "ZUSHI JAPANESE RESTAURANTS",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "DARUMA SUSHI",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "BOMAKI",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "THIS IS NOT A SUSHI BAR",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "WOK TO WALK ITALIA",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "FIVE GUYS ITALY",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "HAM HOLY BURGER",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "BUN BURGERS",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "FLOWER BURGER",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "DISPENSA EMILIA",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "DOPPIO MALTO",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "LOWENGRUBE",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "BEFED BREW PUB",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "SUBWAY ITALIA",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "DOMINOS PIZZA ITALIA",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "TACO BELL ITALIA",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "POPEYES ITALIA",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "PRINCI BAKERY",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "PANIFICIO DAVIDE LONGONI",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "PAVE MILANO",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "PANARELLO PASTICCERIA",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "IGINIO MASSARI PASTICCERIA",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "MARCHESI 1824",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "COVA MONTENAPOLEONE",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "CAFFE VERGNANO 1882",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "CAFFE PASCUCCI",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "LAVAZZA FLAGSHIP",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "ILLY CAFFE",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "SEGAFREDO ZANETTI",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "12 OZ COFFEE JOINT",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "TUTTOCAPSULE",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "NESPRESSO ITALIA",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "VENCHI CIOCCOLATO GELATO",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "GROM GELATO",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "LA ROMANA GELATERIA",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "CIOCCOLATITALIANI",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "LA YOGURTERIA",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "RIVARENO GELATO",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "DELIVEROO ITALIA",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "GLOVO ITALIA",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "JUST EAT ITALIA",
+    "category": "Dining Out",
+    "country": "IT"
+  },
+  {
+    "name": "ENILIVE STAZIONE",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "ENI STATION AGIP",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "IP GRUPPO API",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "IP MATIC",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "Q8 KUWAIT PETROLEUM",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "Q8EASY",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "TAMOIL ITALIA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "ESSO ITALIANA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "SHELL ITALIA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "TOTALENERGIES STAZIONE",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "REPSOL ITALIA CARBURANTI",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "BEYFIN CARBURANTI",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "KEROPETROL",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "COSTANTINI CARBURANTI",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "AQUILA ENERGIA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "VEGA CARBURANTI",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "LENERGIA CARBURANTI",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "ENERCOOP CARBURANTI",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "CONAD SELF 24 CARBURANTI",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "CARREFOUR CARBURANTI",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "IPER STATION CARBURANTI",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "ENEL X WAY RICARICA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "PLENITUDE ON THE ROAD",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "BE CHARGE",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "A2A EMOVING",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "IONITY ITALIA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "TESLA SUPERCHARGER ITALIA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "FREE TO X",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "ELECTRA RICARICA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "TELEPASS SPA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "UNIPOLMOVE",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "MOONEYGO",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "AUTOSTRADE PER LITALIA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "MILANO SERRAVALLE TANGENZIALI",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "AUTOSTRADA DEL BRENNERO A22",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "BREBEMI A35",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "PEDEMONTANA LOMBARDA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "AUTOSTRADA DEI FIORI",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "SALT AUTOSTRADA LIGURE TOSCANA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "CAV AUTOSTRADE VENETE",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "AUTOSTRADE MERIDIONALI",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "TRENITALIA SPA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "FRECCIAROSSA TRENITALIA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "ITALO NTV",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "TRENORD",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "FERROVIE DEL SUD EST",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "EAV ENTE AUTONOMO VOLTURNO",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "FERROVIA CIRCUMVESUVIANA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "ATM MILANO TRASPORTI",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "ATAC ROMA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "COTRAL LAZIO",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "GTT TORINO TRASPORTI",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "ANM NAPOLI MOBILITA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "TPER BOLOGNA TRASPORTI",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "AUTOLINEE TOSCANE ATAF",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "ACTV VENEZIA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "AMT GENOVA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "AMTAB BARI",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "AMAT PALERMO",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "ARST SARDEGNA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "FLIXBUS ITALIA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "ITABUS",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "MARINO BUS",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "ITA AIRWAYS",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "RYANAIR ITALIA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "EASYJET ITALIA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "WIZZ AIR ITALIA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "NEOS AIR",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "AEROITALIA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "AEROPORTI DI ROMA ADR",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "SEA AEROPORTI MILANO",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "ENJOY ENI CAR SHARING",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "SHARE NOW ITALIA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "FREE NOW TAXI ITALIA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "UBER ITALY",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "WETAXI",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "LIME MICROMOBILITY ITALIA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "APCOA PARKING ITALIA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "QUICK NO PROBLEM PARKING",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "NORAUTO ITALIA",
+    "category": "Transport & Auto",
+    "country": "IT"
+  },
+  {
+    "name": "FARMACIA LLOYDS",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "BENU FARMACIA",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "DR MAX FARMACIA",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "LAFARMACIA HIPPOCRATES",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "BOOTS FARMACIA ITALIA",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "CEF FARMACIE",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "FARMACIE ITALIANE",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "APOTECA NATURA",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "NEO APOTEK FARMACIE",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "FARMACIE COMUNALI MILANO AFM",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "FARMACAP ROMA",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "FARMACIE COMUNALI FIRENZE AFAM",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "FARMACIE COMUNALI TORINO",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "FARMACIE COMUNALI BOLOGNA",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "VALORE SALUTE FARMACIE",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "PIU MEDICAL FARMACIE",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "FARMACIA SAN RAFFAELE",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "FARMACIA INTERNAZIONALE",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "PARAFARMACIA CONAD",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "PARAFARMACIA COOP SALUTE",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "PARAFARMACIA ESSELUNGA",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "REDMIND FARMACIA ONLINE",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "EFARMA",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "FARMAE",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "TOP FARMACIA",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "AMICA FARMACIA",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "SEMPREINSALUTE FARMACIA",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "ATIDA EFIKIA",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "CENTRO MEDICO SANTAGOSTINO",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "SYNLAB ITALIA",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "CDI CENTRO DIAGNOSTICO ITALIANO",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "CERBA HEALTHCARE ITALIA",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "BIANALISI LABORATORIO",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "LIFEBRAIN LABORATORI",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "FLEMING RESEARCH",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "HUMANITAS MEDICAL CARE",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "ISTITUTO CLINICO HUMANITAS",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "OSPEDALE SAN RAFFAELE GSD",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "POLICLINICO SAN DONATO",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "OSPEDALE GALEAZZI SANTAMBROGIO",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "ISTITUTO AUXOLOGICO ITALIANO",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "MULTIMEDICA MILANO",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "GVM CARE AND RESEARCH",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "GAROFALO HEALTH CARE",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "POLICLINICO GEMELLI ROMA",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "CAMPUS BIO MEDICO ROMA",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "OSPEDALE BAMBINO GESU",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "IEO ISTITUTO EUROPEO ONCOLOGIA",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "FONDAZIONE MONZINO",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "KOS CARE SANTO STEFANO",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "AFFIDEA ITALIA DIAGNOSTICA",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "ALLIANCE MEDICAL DIAGNOSTICA",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "MARAZZI CENTRO DIAGNOSTICO",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "ARTEMISIA LAB ROMA",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "DENTALPRO",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "CENTRI DENTISTICI PRIMO",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "CAREDENT CLINICHE DENTALI",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "BLUDENTAL CLINIQUE",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "HDENTAL",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "DENTALCOOP",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "FREEDENT CLINICHE",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "AMPLIFON ITALIA",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "AUDIKA ITALIA",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "UNISALUTE ASSICURAZIONE",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "RBM SALUTE INTESA SANPAOLO",
+    "category": "Healthcare",
+    "country": "IT"
+  },
+  {
+    "name": "OVS SPA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "UPIM",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "CROFF",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "STEFANEL",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "PIOMBO OVS",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "COIN DEPARTMENT STORE",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "COINCASA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "RINASCENTE",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "CALZEDONIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "INTIMISSIMI",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "INTIMISSIMI UOMO",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "TEZENIS",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "FALCONERI",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "SIGNORVINO",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "UNITED COLORS OF BENETTON",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "SISLEY ABBIGLIAMENTO",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "TERRANOVA ABBIGLIAMENTO",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "CALLIOPE MODA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "RINASCIMENTO MODA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "PIAZZA ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "ALCOTT",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "GUTTERIDGE",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "DAN JOHN",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "DOPPELGANGER ROMA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "BOGGI MILANO",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "CAMICISSIMA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "NARACAMICIE",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "MOTIVI",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "OLTRE ABBIGLIAMENTO",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "FIORELLA RUBINO",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "ELENA MIRO",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "LIU JO",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "PINKO",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "TWINSET MILANO",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "PATRIZIA PEPE",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "MAX MARA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "MAX AND CO",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "PENNYBLACK",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "MARELLA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "WEEKEND MAX MARA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "MARINA RINALDI",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "SUBDUED",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "BRANDY MELVILLE ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "ORIGINAL MARINES",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "PRENATAL ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "BIMBO STORE",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "CHICCO ARTSANA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "GIOCHI PREZIOSI",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "TOYS CENTER",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "LEGO STORE ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "ZARA ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "PULL AND BEAR ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "BERSHKA ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "STRADIVARIUS ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "OYSHO ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "MASSIMO DUTTI ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "ZARA HOME ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "HM HENNES MAURITZ ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "COS STORE ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "UNIQLO ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "PRIMARK ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "MANGO ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "KIABI ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "PEPCO ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "ACTION ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "TEDI ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "FLYING TIGER COPENHAGEN ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "MINISO ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "DECATHLON ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "CISALFA SPORT",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "MAXISPORT",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "DF SPORT SPECIALIST",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "SPORTLER",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "AW LAB",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "FOOT LOCKER ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "JD SPORTS ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "SNIPES ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "SCARPE E SCARPE",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "PITTAROSSO",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "DEICHMANN ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "BATA ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "GEOX SHOP",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "NERO GIARDINI",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "PRIMADONNA COLLECTION",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "CARPISA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "YAMAMAY",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "FURLA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "COCCINELLE",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "PIQUADRO",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "MEDIAWORLD ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "UNIEURO SPA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "EURONICS ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "TRONY",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "EXPERT ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "COMET ELETTRODOMESTICI",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "APPLE STORE ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "GAMESTOP ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "IKEA ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "LEROY MERLIN ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "TECNOMAT BRICOMAN",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "BRICOCENTER",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "BRICOFER",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "KASANOVA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "RISPARMIO CASA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "ACQUA E SAPONE",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "TIGOTA GOTTARDO",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "SEPHORA ITALIA",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "DOUGLAS PROFUMERIE",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "KIKO MILANO",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "FELTRINELLI LIBRERIE",
+    "category": "Shopping",
+    "country": "IT"
+  },
+  {
+    "name": "ENEL ENERGIA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "SERVIZIO ELETTRICO NAZIONALE",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "ENI PLENITUDE",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "A2A ENERGIA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "ACEA ENERGIA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "SERVIZIO ELETTRICO ROMA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "EDISON ENERGIA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "IREN MERCATO",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "HERA COMM",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "SORGENIA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "ENGIE ITALIA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "EON ENERGIA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "ALPERIA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "DOLOMITI ENERGIA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "AGSM AIM ENERGIA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "ESTRA ENERGIE",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "CVA ENERGIE",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "DUFERCO ENERGIA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "AXPO ITALIA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "PULSEE LUCE E GAS",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "ILLUMIA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "NEN ENERGIA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "OCTOPUS ENERGY ITALIA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "WEKIWI",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "TATE ENERGIA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "OPTIMA ITALIA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "SINERGAS",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "BLUENERGY GROUP",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "VIVIGAS ENERGIA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "ESTRA PROMETEO",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "ITALGAS RETI",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "2I RETE GAS",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "UNARETI",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "INRETE DISTRIBUZIONE",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "MM METROPOLITANA MILANESE ACQUA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "CAP HOLDING ACQUA MILANO",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "ACEA ATO 2 ACQUA ROMA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "SMAT ACQUA TORINO",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "ABC ACQUA BENE COMUNE NAPOLI",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "GORI ACQUA CAMPANIA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "ACQUEDOTTO PUGLIESE AQP",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "PUBLIACQUA FIRENZE",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "ACQUE SPA PISA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "VERITAS VENEZIA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "ETRA VENETO",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "ACQUE BRESCIANE",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "UNIACQUE BERGAMO",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "BRIANZACQUE",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "ABBANOA SARDEGNA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "TIM TELECOM ITALIA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "VODAFONE ITALIA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "WINDTRE SPA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "FASTWEB SPA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "ILIAD ITALIA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "POSTEPAY POSTEMOBILE",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "HO MOBILE",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "VERY MOBILE",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "KENA MOBILE",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "COOPVOCE",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "TISCALI ITALIA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "EOLO SPA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "LINKEM OPNET",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "ARUBA FIBRA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "SKY ITALIA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "DAZN ITALIA",
+    "category": "Utilities",
+    "country": "IT"
+  },
+  {
+    "name": "MERCADONA",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "CARREFOUR ESPANA",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "CARREFOUR MARKET ESPANA",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "CARREFOUR EXPRESS ESPANA",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "DIA SUPERMERCADOS",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "DIA MARKET",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "LA PLAZA DE DIA",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "CLAREL DIA",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "LIDL ESPANA",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "ALDI ESPANA",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "ALCAMPO",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "MI ALCAMPO",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "EROSKI",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "EROSKI CENTER",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "EROSKI CITY",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "CAPRABO",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "CONSUM COOPERATIVA",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "CHARTER CONSUM",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "AHORRAMAS",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "BONPREU",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "ESCLAT BONPREU",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "BONAREA AGROALIMENTARIA",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "CONDIS SUPERMERCATS",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "CONDISLIFE",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "SUPERCOR",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "SUPERCOR EXPRES",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "HIPERCOR",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "SANCHEZ ROMERO SUPERMERCADOS",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "GADIS SUPERMERCADOS",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "CLAUDIO SUPERMERCADOS",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "FROIZ SUPERMERCADOS",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "FAMILIA AUTOSERVICIOS",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "VEGALSA EROSKI",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "ALIMERKA",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "MAS Y MAS SUPERMERCADOS",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "LUPA SUPERMERCADOS",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "BM SUPERMERCADOS UVESCO",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "SUPER AMARA",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "SUPERMERCADOS MAS",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "MASKOM SUPERMERCADOS",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "SUPERMERCADOS EL JAMON",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "COVIRAN",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "CASH FRESH",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "HIPERBER",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "SUPERDUMBO",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "UPPER SPAR",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "SPAR ESPANA",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "EUROSPAR ESPANA",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "DANI SUPERMERCADOS",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "DEZA CALIDAD",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "PIEDRA SUPERMERCADOS",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "ALSARA SUPERMERCADOS",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "SUPECO",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "ELECLERC ESPANA",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "HIPER USERA",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "UNIDE SUPERMERCADOS",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "UDACO ALIMENTACION",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "SUMA SUPERMERCADOS",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "SORLI DISCAU",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "PLUSFRESC",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "VALVI SUPERMERCATS",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "FRAGADIS",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "SIMPLY SUPERMERCADOS",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "HIPERDINO",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "SUPERDINO",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "DINO EXPRESS",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "ALTEZA SUPERMERCADOS",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "LA DESPENSA SUPERMERCADOS",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "SUPERMERCADOS PLAZA",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "AMETLLER ORIGEN",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "VERITAS ECOLOGICO",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "HERBOLARIO NAVARRO",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "NATURITAS",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "LA SIRENA CONGELADOS",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "HIPERXEL CONGELADOS",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "CONGELADOS DIL",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "MAKRO MAYORISTA",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "GROS MERCAT",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "COSTCO WHOLESALE ESPANA",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "DEALZ ESPANA",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "GRANIER PANADERIA",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "TURRIS PANADERIA",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "MACXIPAN",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "FORN DE PA SANT JORDI",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "PANISHOP",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "LEVADURA MADRE",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "BALUARD BARCELONA",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "EL HORNO DE BABETTE",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "PASTELERIA MALLORCA",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "PETRAMORA",
+    "category": "Groceries",
+    "country": "ES"
+  },
+  {
+    "name": "MCDONALDS ESPANA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "BURGER KING ESPANA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "KFC ESPANA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "POPEYES ESPANA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "TACO BELL ESPANA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "FIVE GUYS ESPANA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "CARLS JR ESPANA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "SUBWAY ESPANA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "TELEPIZZA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "DOMINOS PIZZA ESPANA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "PIZZA HUT ESPANA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "PAPA JOHNS ESPANA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "PAPIZZA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "POMODORO PIZZA PASTA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "100 MONTADITOS",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "CERVECERIA LA SURENA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "THE GOOD BURGER TGB",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "PEPE TACO",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "PANTHER JUICE SANDWICH",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "VIPS CAFETERIA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "VIPS SMART",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "GINOS RISTORANTE",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "FOSTERS HOLLYWOOD",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "FRIDAYS ESPANA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "OLEMOLE",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "LA TAGLIATELLA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "BACOA BURGER",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "SUSHI SHOP ESPANA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "GOIKO GRILL",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "VICIO BURGER",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "FITZGERALD BURGER",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "HAMBURGUESA NOSTRA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "NEW YORK BURGER",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "HOME BURGER BAR",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "TOMMY MELS",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "RIBS TRUE AMERICAN BARBECUE",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "TONY ROMAS ESPANA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "PANS AND COMPANY",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "RODILLA SANDWICHES",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "VIENA CAPELLANES",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "ESTABLECIMIENTOS VIENA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "BOCATTA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "ENRIQUE TOMAS JAMON",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "MUSEO DEL JAMON",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "LIZARRAN PINCHOS",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "CANTINA MARIACHI",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "DON G COMIDA ESPANOLA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "TABERNA DEL VOLAPIE",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "MASQMENOS",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "LATERAL RESTAURANTES",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "CASA CARMEN RESTAURANTE",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "LA MAFIA SE SIENTA A LA MESA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "DITALY PIZZA NAPOLITANA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "GROSSO NAPOLETANO",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "FRATELLI FIGURATO",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "NAP NEAPOLITAN PIZZA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "PASTA CITY",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "HONEST GREENS",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "FLAX AND KALE",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "GREEN VITA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "ALOHA POKE",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "POKE HOUSE ESPANA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "HEALTHY POKE",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "TASTY POKE BAR",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "UDON ASIAN FOOD",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "SIBUYA URBAN SUSHI BAR",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "KAMADO ASIAN FOOD",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "MISS SUSHI",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "SUMO RESTAURANTE JAPONES",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "RUNNING SUSHI OSAKA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "TIERRA BURRITO BAR",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "GONZALEZ Y CO",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "LA MORDIDA MEXICANO",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "STARBUCKS ESPANA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "TIM HORTONS ESPANA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "COSTA COFFEE ESPANA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "DUNKIN COFFEE ESPANA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "SANTAGLORIA COFFEE BAKERY",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "365 OBRADOR",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "MANOLO BAKES",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "PANARIA CAFETERIA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "CAFE Y TE",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "JAMAICA COFFEE SHOP",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "CAFE DE INDIAS",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "VANADI COFFEE",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "SYRA COFFEE",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "EAST CREMA COFFEE",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "LLAOLLAO YOGUR HELADO",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "SMOOY YOGUR HELADO",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "JUST EAT ESPANA",
+    "category": "Dining Out",
+    "country": "ES"
+  },
+  {
+    "name": "E S REPSOL ESTACION SERVICIO",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "REPSOL WAYLET",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "CEPSA MOEVE",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "BP ESTACION SERVICIO",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "GALP ENERGIA ESPANA",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "SHELL ESPANA",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "DISA ESTACION SERVICIO",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "AVIA ESTACION SERVICIO",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "Q8 ESPANA CARBURANTES",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "MERCOIL",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "PLENOIL",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "BALLENOIL",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "PETROPRIX",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "BONAREA CARBURANTS",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "AUTONETOIL",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "GM OIL",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "GASEXPRESS",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "EASYGAS",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "FAMILY ENERGY GASOLINERA",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "ALCAMPO GASOLINERA",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "CARREFOUR GASOLINERA",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "EROSKI GASOLINERA",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "ESCLATOIL",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "PETROMIRALLES",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "SARAS ENERGIA",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "IBERDROLA RECARGA PUBLICA",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "ENDESA X WAY ESPANA",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "ZUNDER RECARGA",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "WENEA RECARGA",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "TESLA SUPERCHARGER ESPANA",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "IONITY ESPANA",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "RENFE OPERADORA",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "RENFE AVE",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "RENFE CERCANIAS",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "AVLO RENFE",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "OUIGO ESPANA",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "IRYO INTERMODALIDAD",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "FGC FERROCARRILS CATALUNYA",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "EUSKOTREN",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "METRO DE MADRID",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "EMT MADRID AUTOBUSES",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "CONSORCIO TRANSPORTES MADRID",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "TMB TRANSPORTS BARCELONA",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "RODALIES DE CATALUNYA",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "METROVALENCIA FGV",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "EMT VALENCIA",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "TUSSAM SEVILLA",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "METRO DE BILBAO",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "TRANVIA DE ZARAGOZA",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "EMT MALAGA",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "ALSA AUTOBUSES",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "AVANZA GRUPO AUTOBUSES",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "SOCIBUS",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "MONBUS",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "SAMAR AUTOBUSES",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "DAMAS AUTOBUSES",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "MOVENTIS AUTOBUSES",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "ABERTIS AUTOPISTAS",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "AUCAT AUTOPISTAS",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "ACESA AUTOPISTAS",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "AUTEMA",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "ITINERE INFRAESTRUCTURAS",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "GLOBALVIA AUTOPISTAS",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "BIP AND DRIVE VIA T",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "PAGATELIA VIA T",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "IBERIA LINEAS AEREAS",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "IBERIA EXPRESS",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "VUELING AIRLINES",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "AIR EUROPA",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "BINTER CANARIAS",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "VOLOTEA",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "RYANAIR ESPANA",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "AENA AEROPUERTOS",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "CABIFY ESPANA",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "UBER ESPANA",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "FREE NOW ESPANA",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "ZITY CARSHARING",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "WIBLE CARSHARING",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "SABA APARCAMIENTOS",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "EMPARK TELPARK",
+    "category": "Transport & Auto",
+    "country": "ES"
+  },
+  {
+    "name": "FARMACIA TREBOL",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "FARMACIAS ECOCEUTICS",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "FARMACIA ARENAL",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "FARMACIA ECOGETAFE",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "FARMACIA BOQUERIA",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "FARMACIA ALMIRALL",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "FARMACIA INTERNACIONAL BARCELONA",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "FARMACIA EL GLOBO MADRID",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "FARMACIA GALENO",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "FARMACIA ORTOPEDIA",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "PARAFARMACIA EL CORTE INGLES",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "PARAFARMACIA CARREFOUR",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "PROMOFARMA",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "DOSFARMA",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "MIFARMA ATIDA",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "FARMAVAZQUEZ",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "FARMACIA BARATA",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "FARMA2GO",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "OKFARMA",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "BOTICARIA GARCIA",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "COFARES DISTRIBUCION",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "FEDEFARMA",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "ALLIANCE HEALTHCARE ESPANA",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "BIDAFARMA",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "QUIRONSALUD HOSPITALES",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "HOSPITAL RUBER INTERNACIONAL",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "CENTRO MEDICO TEKNON",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "HOSPITAL UNIVERSITARIO DEXEUS",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "HM HOSPITALES",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "VITHAS HOSPITALES",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "HLA GRUPO HOSPITALARIO",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "HOSPITALES SAN JUAN DE DIOS",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "RIBERA SALUD",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "GRUPO HOSPITEN",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "CLINICA UNIVERSIDAD DE NAVARRA",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "IMO INSTITUTO MICROCIURGIA OCULAR",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "CLINICA BAVIERA",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "MIRANZA OFTALMOLOGIA",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "IVI CLINICAS FERTILIDAD",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "EUGIN CLINICA",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "VITALDENT",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "SANITAS DENTAL",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "ADESLAS DENTAL",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "ASISA DENTAL",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "DONTE GROUP",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "MAEX DENTAL",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "MOONZ ORTODONCIA",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "SMYSECRET",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "DENTAL COMPANY",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "CLINICAS CLEARDENT",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "IMPLANT DETECTIVES",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "VIVANTA DENTAL",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "SYNLAB DIAGNOSTICOS ESPANA",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "MEGALAB LABORATORIOS",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "EUROFINS MEGALAB",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "ECHEVERNE LABORATORIOS",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "ANALIZA DIAGNOSTICO",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "SANITAS SEGUROS",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "SEGURCAIXA ADESLAS",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "ASISA SALUD",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "DKV SEGUROS SALUD",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "MAPFRE SALUD",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "AXA SALUD ESPANA",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "AEGON SALUD",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "GAES AMPLIFON ESPANA",
+    "category": "Healthcare",
+    "country": "ES"
+  },
+  {
+    "name": "ZARA INDITEX ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "PULL AND BEAR ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "MASSIMO DUTTI ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "BERSHKA ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "STRADIVARIUS ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "OYSHO ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "LEFTIES",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "ZARA HOME ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "MANGO ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "EL CORTE INGLES",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "SFERA EL CORTE INGLES",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "BRICOR",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "CORTEFIEL",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "SPRINGFIELD",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "WOMENSECRET",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "PEDRO DEL HIERRO",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "HOSS INTROPIA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "FIFTY OUTLET",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "DESIGUAL",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "BIMBA Y LOLA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "TOUS JOYEROS",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "PARFOIS ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "ADOLFO DOMINGUEZ",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "ROBERTO VERINO",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "PURIFICACION GARCIA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "CAROLINA HERRERA ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "LOEWE ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "SCALPERS",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "EL GANSO",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "SILBON",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "ALVARO MORENO",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "BOSTON WEAR",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "NUDE PROJECT",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "BLUE BANANA BRAND",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "POMPEII BRAND",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "HAWKERS",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "HOFF SNEAKERS",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "MUNICH SPORTS",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "CAMPER SHOES",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "PIKOLINOS",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "PABLOSKY",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "MUSTANG SHOES",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "KRACK ZAPATERIAS",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "MERKAL CALZADOS",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "MARLOS ONLINE",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "ULANKA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "MARYPAZ",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "MISAKO",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "PACO MARTINEZ",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "SALVADOR BACHILLER",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "MAYORAL MODA INFANTIL",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "GOCCO",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "CHARANGA MODA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "NECK AND NECK",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "BOBOLI",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "PRENATAL ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "JUGUETTOS",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "TOYS R US IBERIA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "POLY JUGUETES",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "EUREKAKIDS",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "PRIMARK ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "HM ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "UNIQLO ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "CA MODA ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "KIABI ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "PEPCO ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "ACTION ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "TEDI ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "ALE HOP",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "FLYING TIGER ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "MUY MUCHO",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "NATURA TIENDAS",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "DECATHLON ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "SPRINTER DEPORTES",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "FORUM SPORT",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "BASE DEPORTES",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "DECIMAS",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "FOOT LOCKER ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "JD SPORTS ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "SNIPES ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "DEICHMANN ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "CALZEDONIA ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "INTIMISSIMI ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "TEZENIS ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "MEDIA MARKT ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "WORTEN ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "PCCOMPONENTES",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "FNAC ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "PHONE HOUSE ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "GAME STORES ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "K TUIN APPLE RESELLER",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "APPLE STORE ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "MILAR ELECTRODOMESTICOS",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "TIEN 21",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "EURONICS ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "IKEA IBERICA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "LEROY MERLIN ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "OBRAMAT BRICOMART",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "BAUHAUS ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "BRICO DEPOT ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "CONFORAMA ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "MAISONS DU MONDE ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "KAVE HOME",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "JYSK ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "PRIMOR PERFUMERIAS",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "DRUNI PERFUMERIAS",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "AROMAS PERFUMERIAS",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "SEPHORA ESPANA",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "CASA DEL LIBRO",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "TIENDANIMAL",
+    "category": "Shopping",
+    "country": "ES"
+  },
+  {
+    "name": "ENDESA ENERGIA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "ENERGIA XXI ENDESA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "IBERDROLA CLIENTES",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "CURENERGIA IBERDROLA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "NATURGY IBERIA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "GAS Y POWER NATURGY",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "REPSOL LUZ Y GAS",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "REGSITI REPSOL",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "TOTALENERGIES MERCADO",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "BASER TOTALENERGIES",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "HOLALUZ CLIDOM",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "OCTOPUS ENERGY ESPANA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "FACTOR ENERGIA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "LUCERA ENERGIA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "PEPEENERGY",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "PODO ENERGIA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "SOM ENERGIA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "GANA ENERGIA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "FENIE ENERGIA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "ALDRO PLENITUDE",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "PLENITUDE ESPANA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "BONPREU ESCLAT ENERGIA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "AUDAX RENOVABLES",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "COX ENERGY",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "ELEIA ENERGIA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "NEXUS ENERGIA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "CONTIGO ENERGIA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "VISALIA ENERGIA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "WEKIWI ESPANA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "IMAGINA ENERGIA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "CANAL DE ISABEL II AGUA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "AIGUES DE BARCELONA AGBAR",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "FCC AQUALIA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "EMASESA SEVILLA AGUA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "GLOBAL OMNIUM AGUAS VALENCIA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "EMAYA PALMA AGUA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "CONSORCIO AGUAS BILBAO",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "EMASA MALAGA AGUA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "EMASAGRA GRANADA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "ACOSOL COSTA DEL SOL",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "CANARAGUA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "HIDRAQUA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "VIAQUA GALICIA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "MOVISTAR TELEFONICA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "O2 ESPANA TELEFONICA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "VODAFONE ESPANA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "LOWI VODAFONE",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "ORANGE ESPANA MASORANGE",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "JAZZTEL",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "SIMYO",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "YOIGO MASMOVIL",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "MASMOVIL IBERCOM",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "PEPEPHONE",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "LLAMAYA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "LEBARA ESPANA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "DIGI SPAIN TELECOM",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "FINETWORK WEWI",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "SUOP MOBILE",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "AVATEL TELECOM",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "ADAMO TELECOM",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "EUSKALTEL",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "R CABLE GALICIA",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "TELECABLE ASTURIAS",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "GUUK TELECOM",
+    "category": "Utilities",
+    "country": "ES"
+  },
+  {
+    "name": "SECURITAS DIRECT ESPANA",
+    "category": "Utilities",
+    "country": "ES"
+  }
+]

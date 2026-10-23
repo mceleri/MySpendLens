@@ -896,7 +896,9 @@ export const App: React.FC = () => {
         transactions={transactions}
         categories={categories}
         tier1Engine={engineTier1Ref.current}
+        tier2Engine={engineTier2Ref.current}
         ensureTier1Engine={ensureTier1Engine}
+        ensureTier2Engine={ensureTier2Engine}
         onTrainingComplete={handleTrainingComplete}
       />
     </div>
