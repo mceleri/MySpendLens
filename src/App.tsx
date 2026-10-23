@@ -7,6 +7,7 @@ import { SettingsView } from './components/SettingsView';
 import { UploadView } from './components/UploadView';
 import { TransactionsTable } from './components/TransactionsTable';
 import { CategoriesView } from './components/CategoriesView';
+import { ExportImportView } from './components/ExportImportView';
 import {
   MySpendLensTier1Engine,
   Tier1ModelArtifact,
@@ -36,6 +37,12 @@ import {
   deleteCategoryFromDB,
   renameCategoryInDB,
   reassignCategoryInDB,
+  replaceAllTransactionsInDB,
+  replaceAllCategoriesInDB,
+  saveAppSettingsToDB,
+  getAppSettingsFromDB,
+  saveCustomTier1ModelToDB,
+  getCustomTier1ModelFromDB,
 } from './db/transactionDb';
 import {
   CategoryDefinition,
@@ -44,7 +51,14 @@ import {
 import { computeFinancialOverview, parseTransactionAmount } from './utils/financialCalculations';
 import { Loader2 } from 'lucide-react';
 
-type ActiveView = 'home' | 'distribution' | 'transactions' | 'settings' | 'upload' | 'categories';
+type ActiveView =
+  | 'home'
+  | 'distribution'
+  | 'transactions'
+  | 'settings'
+  | 'upload'
+  | 'categories'
+  | 'export_import';
 
 export const App: React.FC = () => {
   // Navigation & View State
@@ -87,6 +101,17 @@ export const App: React.FC = () => {
         const storedCats = await getAllCategoriesFromDB();
         setCategories(storedCats);
         registerDynamicCategories(storedCats);
+
+        // Load app settings (Tier 1 strategy & threshold)
+        const savedSettings = await getAppSettingsFromDB();
+        if (savedSettings) {
+          if (typeof savedSettings.useTier1 === 'boolean') {
+            setUseTier1(savedSettings.useTier1);
+          }
+          if (typeof savedSettings.tier1Threshold === 'number') {
+            setTier1Threshold(savedSettings.tier1Threshold);
+          }
+        }
 
         const stored = await getAllTransactionsFromDB();
         if (stored.length > 0) {
@@ -181,9 +206,15 @@ export const App: React.FC = () => {
     setIsLoadingModel(true);
     setProcessingProgress('Loading Tier 1 base model...');
     try {
-      const res = await fetch('/myspendlens_tier1_base_model.json');
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const artifact: Tier1ModelArtifact = await res.json();
+      // 1. Check if a custom or learned Tier 1 model is stored in IndexedDB
+      let artifact: Tier1ModelArtifact | null = await getCustomTier1ModelFromDB();
+      if (!artifact || !artifact.weights || !artifact.vocabulary) {
+        const res = await fetch('/myspendlens_tier1_base_model.json');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        artifact = await res.json();
+      }
+      if (!artifact) throw new Error('Could not load Tier 1 model artifact.');
+
       const engine = new MySpendLensTier1Engine(artifact);
       engineTier1Ref.current = engine;
 
@@ -498,10 +529,20 @@ export const App: React.FC = () => {
 
   const handleToggleTier1 = async (enabled: boolean) => {
     setUseTier1(enabled);
+    try {
+      await saveAppSettingsToDB({ useTier1: enabled, tier1Threshold });
+    } catch (e) {
+      console.warn('Could not persist setting useTier1:', e);
+    }
   };
 
   const handleChangeThreshold = async (threshold: number) => {
     setTier1Threshold(threshold);
+    try {
+      await saveAppSettingsToDB({ useTier1, tier1Threshold: threshold });
+    } catch (e) {
+      console.warn('Could not persist setting tier1Threshold:', e);
+    }
   };
 
   // Clears all records from IndexedDB
@@ -555,6 +596,16 @@ export const App: React.FC = () => {
 
         await updateSingleTransactionInDB(updatedTx);
         setTransactions((prev) => prev.map((t) => (t.id === id ? updatedTx : t)));
+
+        // Continuously adapt Tier 1 local SGD weights & persist to IndexedDB
+        if (engineTier1Ref.current && tx.rawDescription) {
+          try {
+            engineTier1Ref.current.learnFromUserFeedback(tx.rawDescription, newCategory);
+            await saveCustomTier1ModelToDB(engineTier1Ref.current.getArtifact());
+          } catch {
+            // Category might not be part of the base model vocabulary/classes
+          }
+        }
       } catch (err) {
         console.error('Failed to update category:', err);
         alert(`Error updating category: ${(err as Error).message}`);
@@ -634,6 +685,76 @@ export const App: React.FC = () => {
     []
   );
 
+  // Backup & Restore handler
+  const handleRestoreAll = useCallback(
+    async (data: {
+      transactions?: ProcessedTransaction[];
+      categories?: CategoryDefinition[];
+      config?: { useTier1?: boolean; tier1Threshold?: number };
+      tier1Artifact?: Tier1ModelArtifact;
+      replaceTransactions?: boolean;
+    }) => {
+      let txCount = 0;
+      let catCount = 0;
+
+      // 1. Transactions
+      if (data.transactions && data.transactions.length > 0) {
+        if (data.replaceTransactions) {
+          await replaceAllTransactionsInDB(data.transactions);
+          setTransactions(data.transactions);
+          txCount = data.transactions.length;
+        } else {
+          await addTransactionsToDB(data.transactions, 'imported_backup');
+          const updatedTxs = await getAllTransactionsFromDB();
+          setTransactions(updatedTxs);
+          txCount = data.transactions.length;
+        }
+      }
+
+      // 2. Categories
+      if (data.categories && data.categories.length > 0) {
+        await replaceAllCategoriesInDB(data.categories);
+        setCategories(data.categories);
+        registerDynamicCategories(data.categories);
+        catCount = data.categories.length;
+        if (engineTier2Ref.current?.isReady) {
+          await engineTier2Ref.current.syncDynamicCategories(data.categories);
+        }
+      }
+
+      // 3. Config
+      if (data.config) {
+        if (typeof data.config.useTier1 === 'boolean') {
+          setUseTier1(data.config.useTier1);
+        }
+        if (typeof data.config.tier1Threshold === 'number') {
+          setTier1Threshold(data.config.tier1Threshold);
+        }
+        await saveAppSettingsToDB({
+          useTier1: data.config.useTier1,
+          tier1Threshold: data.config.tier1Threshold,
+        });
+      }
+
+      // 4. Tier 1 Model
+      if (data.tier1Artifact) {
+        await saveCustomTier1ModelToDB(data.tier1Artifact);
+        const newEngine = new MySpendLensTier1Engine(data.tier1Artifact);
+        engineTier1Ref.current = newEngine;
+        setModelStats({
+          version: data.tier1Artifact.version,
+          featuresCount: data.tier1Artifact.metrics.num_features,
+          classesCount: data.tier1Artifact.metrics.num_classes,
+          validationAccuracy: data.tier1Artifact.metrics.validation_accuracy,
+          countries: data.tier1Artifact.config.countries,
+        });
+      }
+
+      return { transactionsAdded: txCount, categoriesSaved: catCount };
+    },
+    []
+  );
+
   return (
     <div className="mobile-app-layout">
       {/* Sleek Mobile Header */}
@@ -656,13 +777,14 @@ export const App: React.FC = () => {
               onOpenDistribution={() => navigateToView('distribution')}
             />
 
-            {/* Griglia Azioni: Upload, Distribuzione, Movimenti, Categories, Settings */}
+            {/* Griglia Azioni: Upload, Distribuzione, Movimenti, Categories, Settings, Export/Import */}
             <ActionGrid
               onOpenUpload={() => navigateToView('upload')}
               onOpenDistribution={() => navigateToView('distribution')}
               onOpenTransactions={() => navigateToView('transactions')}
               onOpenCategories={() => navigateToView('categories')}
               onOpenSettings={() => navigateToView('settings')}
+              onOpenExportImport={() => navigateToView('export_import')}
               totalTransactions={transactions.length}
               categoriesCount={categories.filter((c) => c.isActive).length}
               useTier1={useTier1}
@@ -708,6 +830,17 @@ export const App: React.FC = () => {
             onRenameCategory={handleRenameCategory}
             onDeleteCategory={handleDeleteCategory}
             onReassignCategory={handleReassignCategory}
+          />
+        )}
+
+        {activeView === 'export_import' && (
+          <ExportImportView
+            transactions={transactions}
+            categories={categories}
+            useTier1={useTier1}
+            tier1Threshold={tier1Threshold}
+            tier1Artifact={engineTier1Ref.current ? engineTier1Ref.current.getArtifact() : null}
+            onRestoreAll={handleRestoreAll}
           />
         )}
 

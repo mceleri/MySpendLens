@@ -8,6 +8,7 @@
 
 import { ProcessedTransaction } from '../types';
 import { CategoryDefinition, DEFAULT_CATEGORY_DEFINITIONS } from '../utils/categories';
+import { Tier1ModelArtifact } from '../engine/tier1_browser_engine';
 
 export interface StoredTransaction extends ProcessedTransaction {
   fingerprint: string;
@@ -15,10 +16,17 @@ export interface StoredTransaction extends ProcessedTransaction {
   importedAt: number;
 }
 
+export interface AppStoredSettings {
+  useTier1?: boolean;
+  tier1Threshold?: number;
+  [key: string]: unknown;
+}
+
 const DB_NAME = 'myspendlens_db';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 const STORE_NAME = 'transactions';
 const CATEGORIES_STORE = 'categories';
+const APP_SETTINGS_STORE = 'app_settings';
 
 /**
  * Generates a deterministic normalized fingerprint for deduplication.
@@ -82,6 +90,9 @@ function getDb(): Promise<IDBDatabase> {
         }
         if (!db.objectStoreNames.contains(CATEGORIES_STORE)) {
           db.createObjectStore(CATEGORIES_STORE, { keyPath: 'id' });
+        }
+        if (!db.objectStoreNames.contains(APP_SETTINGS_STORE)) {
+          db.createObjectStore(APP_SETTINGS_STORE, { keyPath: 'key' });
         }
       };
 
@@ -400,6 +411,145 @@ export async function reassignCategoryInDB(
         cursor.continue();
       }
     };
+
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error);
+  });
+}
+
+/**
+ * Replaces all transactions in DB with an imported dataset.
+ */
+export async function replaceAllTransactionsInDB(
+  transactions: ProcessedTransaction[]
+): Promise<void> {
+  const db = await getDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    store.clear();
+    const now = Date.now();
+    for (const item of transactions) {
+      const storedItem: StoredTransaction = {
+        ...item,
+        fingerprint:
+          (item as StoredTransaction).fingerprint ||
+          generateTransactionFingerprint(item.date, item.rawDescription, item.amount),
+        sourceFile: (item as StoredTransaction).sourceFile || 'imported_backup',
+        importedAt: (item as StoredTransaction).importedAt || now,
+      };
+      store.put(storedItem);
+    }
+
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error);
+  });
+}
+
+/**
+ * Replaces all categories in DB with an imported dataset.
+ */
+export async function replaceAllCategoriesInDB(
+  categories: CategoryDefinition[]
+): Promise<void> {
+  const db = await getDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(CATEGORIES_STORE, 'readwrite');
+    const store = tx.objectStore(CATEGORIES_STORE);
+    store.clear();
+    for (const cat of categories) {
+      store.put(cat);
+    }
+
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error);
+  });
+}
+
+/**
+ * Saves app settings (e.g. useTier1, tier1Threshold) in IndexedDB.
+ */
+export async function saveAppSettingsToDB(settings: AppStoredSettings): Promise<void> {
+  const db = await getDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(APP_SETTINGS_STORE, 'readwrite');
+    const store = tx.objectStore(APP_SETTINGS_STORE);
+    store.put({ key: 'app_config', ...settings, updatedAt: Date.now() });
+
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error);
+  });
+}
+
+/**
+ * Retrieves stored app settings from IndexedDB.
+ */
+export async function getAppSettingsFromDB(): Promise<AppStoredSettings | null> {
+  const db = await getDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(APP_SETTINGS_STORE, 'readonly');
+    const store = tx.objectStore(APP_SETTINGS_STORE);
+    const req = store.get('app_config');
+
+    req.onsuccess = () => {
+      resolve(req.result || null);
+    };
+    req.onerror = () => reject(req.error || new Error('Failed to load app settings'));
+  });
+}
+
+/**
+ * Saves a customized or learned Tier 1 model artifact into IndexedDB.
+ */
+export async function saveCustomTier1ModelToDB(
+  artifact: Tier1ModelArtifact
+): Promise<void> {
+  const db = await getDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(APP_SETTINGS_STORE, 'readwrite');
+    const store = tx.objectStore(APP_SETTINGS_STORE);
+    store.put({ key: 'tier1_custom_model', artifact, updatedAt: Date.now() });
+
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error);
+  });
+}
+
+/**
+ * Retrieves the stored custom Tier 1 model artifact from IndexedDB if present.
+ */
+export async function getCustomTier1ModelFromDB(): Promise<Tier1ModelArtifact | null> {
+  const db = await getDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(APP_SETTINGS_STORE, 'readonly');
+    const store = tx.objectStore(APP_SETTINGS_STORE);
+    const req = store.get('tier1_custom_model');
+
+    req.onsuccess = () => {
+      if (req.result && req.result.artifact) {
+        resolve(req.result.artifact as Tier1ModelArtifact);
+      } else {
+        resolve(null);
+      }
+    };
+    req.onerror = () => reject(req.error || new Error('Failed to load custom Tier 1 model'));
+  });
+}
+
+/**
+ * Clears the custom Tier 1 model from IndexedDB, resetting to the global base model.
+ */
+export async function clearCustomTier1ModelFromDB(): Promise<void> {
+  const db = await getDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(APP_SETTINGS_STORE, 'readwrite');
+    const store = tx.objectStore(APP_SETTINGS_STORE);
+    store.delete('tier1_custom_model');
 
     tx.oncomplete = () => resolve();
     tx.onerror = () => reject(tx.error);

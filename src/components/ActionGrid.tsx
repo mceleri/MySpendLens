@@ -1,5 +1,13 @@
 import React from 'react';
-import { UploadCloud, Search, TableProperties, Settings, Tags, ChevronRight } from 'lucide-react';
+import {
+  UploadCloud,
+  Search,
+  TableProperties,
+  Settings,
+  Tags,
+  FolderArchive,
+  ChevronRight,
+} from 'lucide-react';
 
 interface ActionGridProps {
   onOpenUpload: () => void;
@@ -7,6 +15,7 @@ interface ActionGridProps {
   onOpenTransactions: () => void;
   onOpenCategories: () => void;
   onOpenSettings: () => void;
+  onOpenExportImport: () => void;
   totalTransactions: number;
   categoriesCount: number;
   useTier1: boolean;
@@ -19,6 +28,7 @@ export const ActionGrid: React.FC<ActionGridProps> = ({
   onOpenTransactions,
   onOpenCategories,
   onOpenSettings,
+  onOpenExportImport,
   totalTransactions,
   categoriesCount,
   useTier1,
@@ -123,6 +133,23 @@ export const ActionGrid: React.FC<ActionGridProps> = ({
           </div>
           <div className="action-card-text">
             <h4 className="action-title">Settings</h4>
+          </div>
+        </button>
+
+        {/* 6. Export & Import */}
+        <button
+          type="button"
+          className="action-card action-backup"
+          onClick={onOpenExportImport}
+        >
+          <div className="action-card-top">
+            <div className="action-icon-wrap icon-backup">
+              <FolderArchive size={22} />
+            </div>
+            <ChevronRight size={16} className="action-arrow" />
+          </div>
+          <div className="action-card-text">
+            <h4 className="action-title">Export / Import</h4>
           </div>
         </button>
       </div>

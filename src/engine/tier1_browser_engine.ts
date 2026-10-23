@@ -205,4 +205,8 @@ export class MySpendLensTier1Engine {
   public serialize(): string {
     return JSON.stringify(this.artifact);
   }
+
+  public getArtifact(): Tier1ModelArtifact {
+    return this.artifact;
+  }
 }
