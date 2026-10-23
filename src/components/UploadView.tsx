@@ -254,11 +254,23 @@ export const UploadView: React.FC<UploadViewProps> = ({
                   <UploadCloud size={32} className="text-primary" />
                 </div>
                 <div>
-                  <h4 className="dropzone-title-sm">Select or drop a CSV statement</h4>
+                  <h4 className="dropzone-title-sm">Seleziona o trascina un estratto conto CSV</h4>
                   <p className="dropzone-desc-sm">
-                    Only CSV (.csv) format is supported. All data is processed 100% locally on your device.
+                    Formato .csv supportato. Tutto viene analizzato al 100% in locale sul tuo browser.
                   </p>
                 </div>
+                <button
+                  type="button"
+                  className="btn-secondary btn-drop-browse"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    fileInputRef.current?.click();
+                  }}
+                  disabled={disabled}
+                >
+                  <UploadCloud size={15} />
+                  <span>Sfoglia CSV dal dispositivo</span>
+                </button>
               </div>
             </div>
 
