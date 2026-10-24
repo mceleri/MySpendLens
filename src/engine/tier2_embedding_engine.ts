@@ -238,15 +238,15 @@ export class MySpendLensTier2Engine {
 
     this.extractor = await pipeline('feature-extraction', MySpendLensTier2Engine.MODEL_ID, {
       quantized: true,
-      progress_callback: (p: any) => {
+      progress_callback: (p: Record<string, unknown>) => {
         if (onProgress) {
           onProgress({
-            status: p.status,
-            name: p.name,
-            file: p.file,
-            progress: p.progress,
-            loaded: p.loaded,
-            total: p.total,
+            status: p.status as Tier2ProgressInfo['status'],
+            name: typeof p.name === 'string' ? p.name : undefined,
+            file: typeof p.file === 'string' ? p.file : undefined,
+            progress: typeof p.progress === 'number' ? p.progress : undefined,
+            loaded: typeof p.loaded === 'number' ? p.loaded : undefined,
+            total: typeof p.total === 'number' ? p.total : undefined,
           });
         }
       },
