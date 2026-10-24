@@ -7,7 +7,6 @@ import { getCategoryMeta } from '../utils/categories';
 interface ExpensesDistributionViewProps {
   overview: FinancialOverviewData;
   transactions: ProcessedTransaction[];
-  onBack?: () => void;
   onFilterByCategory: (category: string) => void;
 }
 

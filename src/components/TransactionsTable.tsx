@@ -518,8 +518,8 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
                               className="btn-tx-action btn-tx-delete"
                               onClick={() => handleDelete(tx)}
                               disabled={deletingId === tx.id}
-                              title="Delete movement"
-                              aria-label="Delete movement"
+                              title="Delete transaction"
+                              aria-label="Delete transaction"
                             >
                               <Trash2 size={14} />
                             </button>
@@ -561,7 +561,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
                                   disabled={deletingId === tx.id}
                                 >
                                   <Trash2 size={14} />
-                                  <span>Delete Movement</span>
+                                  <span>Delete Transaction</span>
                                 </button>
                               </div>
 

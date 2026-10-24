@@ -43,14 +43,6 @@ export interface Tier2LoadingState {
   message?: string;
 }
 
-export type CategoryName =
-  | 'Groceries'
-  | 'Dining Out'
-  | 'Transport & Auto'
-  | 'Healthcare'
-  | 'Shopping'
-  | 'Utilities';
-
 export interface BatchProcessingSummary {
   totalProcessed: number;
   totalTimeMs: number;

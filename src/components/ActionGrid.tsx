@@ -20,8 +20,6 @@ interface ActionGridProps {
   onOpenExportImport: () => void;
   totalTransactions: number;
   categoriesCount: number;
-  useTier1?: boolean;
-  tier2Ready?: boolean;
 }
 
 export const ActionGrid: React.FC<ActionGridProps> = ({

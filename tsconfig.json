@@ -20,5 +20,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "tier1_browser_engine.ts"]
+  "include": ["src"]
 }

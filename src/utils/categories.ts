@@ -26,7 +26,6 @@ import {
 export interface CategoryMeta {
   name: string;
   label: string;
-  labelIt: string; // for compatibility
   color: string;
   bgLight: string;
   borderLight: string;
@@ -162,7 +161,6 @@ export const CATEGORIES_META: Record<string, CategoryMeta> = {
   Groceries: {
     name: 'Groceries',
     label: 'Groceries',
-    labelIt: 'Groceries',
     color: '#10b981',
     bgLight: 'rgba(16, 185, 129, 0.12)',
     borderLight: 'rgba(16, 185, 129, 0.3)',
@@ -173,7 +171,6 @@ export const CATEGORIES_META: Record<string, CategoryMeta> = {
   'Dining Out': {
     name: 'Dining Out',
     label: 'Dining Out',
-    labelIt: 'Dining Out',
     color: '#f97316',
     bgLight: 'rgba(249, 115, 22, 0.12)',
     borderLight: 'rgba(249, 115, 22, 0.3)',
@@ -184,7 +181,6 @@ export const CATEGORIES_META: Record<string, CategoryMeta> = {
   'Transport & Auto': {
     name: 'Transport & Auto',
     label: 'Transport & Auto',
-    labelIt: 'Transport & Auto',
     color: '#06b6d4',
     bgLight: 'rgba(6, 182, 212, 0.12)',
     borderLight: 'rgba(6, 182, 212, 0.3)',
@@ -195,7 +191,6 @@ export const CATEGORIES_META: Record<string, CategoryMeta> = {
   Healthcare: {
     name: 'Healthcare',
     label: 'Healthcare',
-    labelIt: 'Healthcare',
     color: '#ef4444',
     bgLight: 'rgba(239, 68, 68, 0.12)',
     borderLight: 'rgba(239, 68, 68, 0.3)',
@@ -206,7 +201,6 @@ export const CATEGORIES_META: Record<string, CategoryMeta> = {
   Shopping: {
     name: 'Shopping',
     label: 'Shopping',
-    labelIt: 'Shopping',
     color: '#a855f7',
     bgLight: 'rgba(168, 85, 247, 0.12)',
     borderLight: 'rgba(168, 85, 247, 0.3)',
@@ -217,7 +211,6 @@ export const CATEGORIES_META: Record<string, CategoryMeta> = {
   Utilities: {
     name: 'Utilities',
     label: 'Utilities',
-    labelIt: 'Utilities',
     color: '#eab308',
     bgLight: 'rgba(234, 179, 8, 0.12)',
     borderLight: 'rgba(234, 179, 8, 0.3)',
@@ -228,7 +221,6 @@ export const CATEGORIES_META: Record<string, CategoryMeta> = {
   Income: {
     name: 'Income',
     label: 'Income',
-    labelIt: 'Income',
     color: '#22c55e',
     bgLight: 'rgba(34, 197, 94, 0.12)',
     borderLight: 'rgba(34, 197, 94, 0.3)',
@@ -261,7 +253,6 @@ export function registerDynamicCategories(defs: CategoryDefinition[]): void {
     map[def.name] = {
       name: def.name,
       label: def.name,
-      labelIt: def.name,
       color: def.color,
       bgLight: `${def.color}1f`,
       borderLight: `${def.color}4d`,
@@ -283,7 +274,6 @@ export function getCategoryMeta(categoryName: string): CategoryMeta {
   return {
     name: categoryName,
     label: categoryName,
-    labelIt: categoryName,
     color: '#64748b',
     bgLight: 'rgba(100, 116, 139, 0.12)',
     borderLight: 'rgba(100, 116, 139, 0.3)',

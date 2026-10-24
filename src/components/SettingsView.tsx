@@ -26,7 +26,6 @@ interface SettingsViewProps {
   totalTransactions?: number;
   onClearDatabase?: () => void;
   onFactoryReset?: () => void;
-  onBack?: () => void;
 }
 
 export const SettingsView: React.FC<SettingsViewProps> = ({

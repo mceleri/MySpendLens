@@ -4,7 +4,6 @@ import { getCategoryMeta } from './categories';
 export interface CategorySpendSegment {
   category: string;
   label: string;
-  labelIt: string;
   color: string;
   amount: number;
   percentage: number;
@@ -195,7 +194,6 @@ export function computeFinancialOverview(
       return {
         category: cat,
         label,
-        labelIt: label,
         color: meta ? meta.color : '#94a3b8',
         amount,
         percentage,

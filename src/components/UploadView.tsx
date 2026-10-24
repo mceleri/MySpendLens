@@ -214,12 +214,12 @@ export const UploadView: React.FC<UploadViewProps> = ({
           <h2 className="upload-view-title mt-2">
             {step === 'select_file' && 'Upload Bank Statement'}
             {step === 'map_columns' && 'Map Statement Columns'}
-            {step === 'review_merge' && 'Review & Merge Movements'}
+            {step === 'review_merge' && 'Review & Merge Transactions'}
           </h2>
           <p className="upload-view-desc">
             {step === 'select_file' && 'Select any bank CSV export. You will map columns in the next step.'}
             {step === 'map_columns' && 'Confirm which columns correspond to date, description, and amount.'}
-            {step === 'review_merge' && 'Compare movements with database to prevent duplicates.'}
+            {step === 'review_merge' && 'Compare transactions with database to prevent duplicates.'}
           </p>
         </div>
 
@@ -277,7 +277,7 @@ export const UploadView: React.FC<UploadViewProps> = ({
             {totalLoaded > 0 && (
               <div className="mt-3 text-center">
                 <span className="text-xs text-muted">
-                  Your local database currently holds <strong className="text-main">{totalLoaded}</strong> saved movements.
+                  Your local database currently holds <strong className="text-main">{totalLoaded}</strong> saved transactions.
                 </span>
               </div>
             )}
@@ -453,14 +453,14 @@ export const UploadView: React.FC<UploadViewProps> = ({
             <div className="merge-meta-box">
               <Layers size={14} className="text-primary" />
               <span>
-                Total in file: <strong>{totalInFile}</strong> movements &bull; Identified by{' '}
-                <em>(date + causale + amount)</em>.
+                Total in file: <strong>{totalInFile}</strong> transactions &bull; Identified by{' '}
+                <em>(date + description + amount)</em>.
               </span>
             </div>
 
             {newRowsToImport.length === 0 ? (
               <div className="merge-empty-alert">
-                <p className="font-semibold text-main">All movements already exist in database.</p>
+                <p className="font-semibold text-main">All transactions already exist in database.</p>
                 <p className="text-xs text-dim mt-1">
                   No new transactions need classification or import.
                 </p>

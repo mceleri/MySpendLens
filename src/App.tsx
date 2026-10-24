@@ -21,7 +21,6 @@ import {
 import {
   ProcessedTransaction,
   ModelStats,
-  BatchProcessingSummary,
   Tier2LoadingState,
 } from './types';
 import { RawRow } from './utils/csvParser';
@@ -104,7 +103,6 @@ export const App: React.FC = () => {
   const [loadedFileName, setLoadedFileName] = useState<string | null>(null);
   const [transactions, setTransactions] = useState<ProcessedTransaction[]>([]);
   const [categories, setCategories] = useState<CategoryDefinition[]>([]);
-  const [, setSummary] = useState<BatchProcessingSummary | null>(null);
 
   const engineTier1Ref = useRef<MySpendLensTier1Engine | null>(null);
   const engineTier2Ref = useRef<MySpendLensTier2Engine | null>(null);
@@ -327,12 +325,6 @@ export const App: React.FC = () => {
     ): Promise<ProcessedTransaction[]> => {
       if (rows.length === 0) return [];
 
-      const tStartBatch = performance.now();
-      let totalConfidence = 0;
-      let tier1Count = 0;
-      let tier2Count = 0;
-      const categoryCounts: Record<string, number> = {};
-
       let t1Engine: MySpendLensTier1Engine | null = null;
       let t2Engine: MySpendLensTier2Engine | null = null;
 
@@ -365,7 +357,6 @@ export const App: React.FC = () => {
             tier1Result: undefined,
             tier2Result: undefined,
           });
-          categoryCounts['Income'] = (categoryCounts['Income'] || 0) + 1;
           continue;
         }
 
@@ -396,7 +387,6 @@ export const App: React.FC = () => {
             chosenProbabilities = pred1.probabilities;
             chosenSourceTier = 'Tier 1';
             txInferenceTime = pred1.inferenceTimeMs;
-            tier1Count++;
           } else {
             // On-demand escalation to Tier 2 (Fallback)
             if (!t2Engine) {
@@ -417,7 +407,6 @@ export const App: React.FC = () => {
             chosenProbabilities = pred2.probabilities;
             chosenSourceTier = 'Tier 2 (Fallback)';
             txInferenceTime = pred1.inferenceTimeMs + pred2.inferenceTimeMs;
-            tier2Count++;
           }
         } else if (t2Engine && t2Engine.isReady) {
           // Tier 1 is disabled -> Baseline only Tier 2
@@ -445,7 +434,6 @@ export const App: React.FC = () => {
           chosenProbabilities = pred2.probabilities;
           chosenSourceTier = 'Tier 2 (Solo)';
           txInferenceTime = pred2.inferenceTimeMs;
-          tier2Count++;
         } else if (t1Engine) {
           const pred1 = t1Engine.predict(row.description);
           chosenCategory = pred1.category;
@@ -453,11 +441,7 @@ export const App: React.FC = () => {
           chosenProbabilities = pred1.probabilities;
           chosenSourceTier = 'Tier 1';
           txInferenceTime = pred1.inferenceTimeMs;
-          tier1Count++;
         }
-
-        totalConfidence += chosenConfidence;
-        categoryCounts[chosenCategory] = (categoryCounts[chosenCategory] || 0) + 1;
 
         processed.push({
           id: `tx-${Date.now()}-${i}-${Math.random().toString(36).slice(2, 7)}`,
@@ -477,17 +461,6 @@ export const App: React.FC = () => {
         });
       }
 
-      const totalTimeMs = performance.now() - tStartBatch;
-      setSummary({
-        totalProcessed: processed.length,
-        totalTimeMs,
-        avgTimeMs: totalTimeMs / processed.length,
-        avgConfidence: totalConfidence / processed.length,
-        tier1Count,
-        tier2Count,
-        categoryCounts,
-      });
-
       return processed;
     },
     [ensureTier1Engine, ensureTier2Engine]
@@ -501,13 +474,13 @@ export const App: React.FC = () => {
     _skippedDuplicates: number
   ) => {
     if (newRows.length === 0) {
-      alert(`All ${totalInFile} movements in "${fileName}" are already stored in your local database (duplicates skipped).`);
+      alert(`All ${totalInFile} transactions in "${fileName}" are already stored in your local database (duplicates skipped).`);
       return;
     }
 
     setIsProcessing(true);
     try {
-      setProcessingProgress(`Classifying ${newRows.length} new movements...`);
+      setProcessingProgress(`Classifying ${newRows.length} new transactions...`);
       const classified = await classifyRows(newRows, useTier1, tier1Threshold);
       await addTransactionsToDB(classified, fileName);
 

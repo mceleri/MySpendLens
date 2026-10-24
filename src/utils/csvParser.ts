@@ -107,19 +107,3 @@ export function extractRowsWithMapping(
 
   return rows;
 }
-
-/**
- * Legacy automated parser fallback
- */
-export async function parseTransactionFile(
-  fileContent: string,
-  _fileName: string
-): Promise<RawRow[]> {
-  const inspection = await inspectCsvFile(fileContent);
-  const descCol = inspection.suggestedColumns.descriptionColumn || inspection.headers[0];
-  return extractRowsWithMapping(inspection.rawPapaResult.data, {
-    dateColumn: inspection.suggestedColumns.dateColumn || undefined,
-    descriptionColumn: descCol,
-    amountColumn: inspection.suggestedColumns.amountColumn || undefined,
-  });
-}

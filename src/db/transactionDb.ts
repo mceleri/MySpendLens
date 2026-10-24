@@ -30,8 +30,8 @@ const CATEGORIES_STORE = 'categories';
 const APP_SETTINGS_STORE = 'app_settings';
 
 /**
- * Generates a deterministic normalized fingerprint for deduplication.
- * Usiamo data, causale e amount per identificare un movimento.
+ * Generates a deterministic normalized fingerprint for deduplication:
+ * Uses normalized date, description, and amount to identify unique transactions.
  */
 export function generateTransactionFingerprint(
   date?: string,

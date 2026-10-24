@@ -320,7 +320,7 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
                   id="cat-new-examples"
                   className="form-textarea"
                   rows={2}
-                  placeholder="e.g. veterinario, cibo gatti, pet shop, animali domestici, arcaplanet"
+                  placeholder="e.g. vet, pet food, pet shop, animal care"
                   value={examplesInput}
                   onChange={(e) => setExamplesInput(e.target.value)}
                 />
@@ -519,7 +519,7 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
                         id={`cat-examples-${cat.id}`}
                         className="form-textarea"
                         rows={2}
-                        placeholder="e.g. veterinario, cibo animali, pet shop"
+                        placeholder="e.g. vet, pet food, pet shop, animal care"
                         value={examplesInput}
                         onChange={(e) => setExamplesInput(e.target.value)}
                       />
