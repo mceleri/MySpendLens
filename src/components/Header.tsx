@@ -1,6 +1,29 @@
 import React from 'react';
-import { ShieldCheck, Loader2, AlertCircle, Home, Brain } from 'lucide-react';
+import {
+  ShieldCheck,
+  Loader2,
+  AlertCircle,
+  Home,
+  Brain,
+  PieChart,
+  TableProperties,
+  Tags,
+  UploadCloud,
+  FolderArchive,
+  Settings,
+  Activity,
+} from 'lucide-react';
 import { Tier2LoadingState } from '../types';
+
+export type HeaderView =
+  | 'home'
+  | 'charts'
+  | 'distribution'
+  | 'transactions'
+  | 'categories'
+  | 'upload'
+  | 'export_import'
+  | 'settings';
 
 interface HeaderProps {
   isLoadingModel: boolean;
@@ -10,6 +33,8 @@ interface HeaderProps {
   onGoHome: () => void;
   hasPendingTraining?: boolean;
   onOpenTrainingModal?: () => void;
+  activeView?: HeaderView;
+  onNavigate?: (view: HeaderView) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -20,6 +45,8 @@ export const Header: React.FC<HeaderProps> = ({
   onGoHome,
   hasPendingTraining = false,
   onOpenTrainingModal,
+  activeView = 'home',
+  onNavigate,
 }) => {
   return (
     <header className="mobile-app-header">
@@ -36,7 +63,13 @@ export const Header: React.FC<HeaderProps> = ({
             <Home size={19} />
           </button>
 
-          <div className="mobile-brand-text">
+          <div
+            className="mobile-brand-text clickable-brand"
+            onClick={onGoHome}
+            role="button"
+            tabIndex={0}
+            title="Go to Home"
+          >
             <span className="mobile-brand-title">MySpendLens</span>
             <div className="mobile-brand-badge-wrap">
               <span className="micro-badge-privacy">
@@ -46,6 +79,83 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
         </div>
+
+        {/* Center: Desktop Navigation Bar (Visible on laptop/desktop screens) */}
+        {onNavigate && (
+          <nav className="desktop-header-nav" aria-label="Main Navigation">
+            <button
+              type="button"
+              className={`desktop-nav-link ${activeView === 'home' ? 'active' : ''}`}
+              onClick={onGoHome}
+            >
+              <Home size={15} />
+              <span>Dashboard</span>
+            </button>
+
+            <button
+              type="button"
+              className={`desktop-nav-link ${activeView === 'charts' ? 'active' : ''}`}
+              onClick={() => onNavigate('charts')}
+            >
+              <PieChart size={15} />
+              <span>Charts</span>
+            </button>
+
+            <button
+              type="button"
+              className={`desktop-nav-link ${activeView === 'distribution' ? 'active' : ''}`}
+              onClick={() => onNavigate('distribution')}
+            >
+              <Activity size={15} />
+              <span>Distribution</span>
+            </button>
+
+            <button
+              type="button"
+              className={`desktop-nav-link ${activeView === 'transactions' ? 'active' : ''}`}
+              onClick={() => onNavigate('transactions')}
+            >
+              <TableProperties size={15} />
+              <span>Transactions</span>
+            </button>
+
+            <button
+              type="button"
+              className={`desktop-nav-link ${activeView === 'categories' ? 'active' : ''}`}
+              onClick={() => onNavigate('categories')}
+            >
+              <Tags size={15} />
+              <span>Categories</span>
+            </button>
+
+            <button
+              type="button"
+              className={`desktop-nav-link ${activeView === 'upload' ? 'active' : ''}`}
+              onClick={() => onNavigate('upload')}
+            >
+              <UploadCloud size={15} />
+              <span>Upload</span>
+            </button>
+
+            <button
+              type="button"
+              className={`desktop-nav-link ${activeView === 'export_import' ? 'active' : ''}`}
+              onClick={() => onNavigate('export_import')}
+            >
+              <FolderArchive size={15} />
+              <span>Backup</span>
+            </button>
+
+            <button
+              type="button"
+              className={`desktop-nav-link ${activeView === 'settings' ? 'active' : ''}`}
+              onClick={() => onNavigate('settings')}
+            >
+              <Settings size={15} />
+              <span>Settings</span>
+            </button>
+          </nav>
+        )}
 
         {/* Right: Status indicators */}
         <div className="mobile-header-actions">
@@ -77,7 +187,7 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           )}
 
-          {/* Tier 1 Personal Training Icon */}
+          {/* Tier 1 Personal Training Icon / Button */}
           {onOpenTrainingModal && (
             <button
               type="button"
@@ -101,6 +211,7 @@ export const Header: React.FC<HeaderProps> = ({
                   </span>
                 )}
               </div>
+              <span className="btn-header-brain-text">Train AI</span>
             </button>
           )}
         </div>

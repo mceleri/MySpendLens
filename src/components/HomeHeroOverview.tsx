@@ -85,6 +85,34 @@ export const HomeHeroOverview: React.FC<HomeHeroOverviewProps> = ({
             />
           ))}
         </div>
+
+        {/* Desktop category preview chips (hidden on mobile, visible on laptop/desktop) */}
+        {overview.spendSegments.length > 0 && (
+          <div className="hero-desktop-legend">
+            {overview.spendSegments.slice(0, 6).map((segment) => (
+              <div
+                key={segment.category}
+                className="hero-desktop-legend-item"
+                onClick={onOpenDistribution}
+                title={`${segment.label}: ${formatCurrency(segment.amount)} (${segment.percentage.toFixed(1)}%)`}
+              >
+                <span
+                  className="hero-legend-dot"
+                  style={{ backgroundColor: segment.color }}
+                />
+                <span className="hero-legend-name">{segment.label}</span>
+                <span className="hero-legend-pct font-mono">
+                  {segment.percentage.toFixed(0)}%
+                </span>
+              </div>
+            ))}
+            {overview.spendSegments.length > 6 && (
+              <span className="hero-legend-more" onClick={onOpenDistribution}>
+                +{overview.spendSegments.length - 6} more
+              </span>
+            )}
+          </div>
+        )}
       </div>
     </section>
   );

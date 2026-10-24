@@ -843,7 +843,7 @@ export const App: React.FC = () => {
 
   return (
     <div className="mobile-app-layout">
-      {/* Sleek Mobile Header */}
+      {/* Sleek Mobile & Desktop Header */}
       <Header
         isLoadingModel={isLoadingModel}
         modelError={modelError}
@@ -852,6 +852,8 @@ export const App: React.FC = () => {
         onGoHome={handleGoHome}
         hasPendingTraining={hasPendingTraining}
         onOpenTrainingModal={() => setIsTrainingModalOpen(true)}
+        activeView={activeView}
+        onNavigate={(view) => navigateToView(view)}
       />
 
       {/* Main Mobile Viewport */}

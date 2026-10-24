@@ -56,6 +56,7 @@ export const ActionGrid: React.FC<ActionGridProps> = ({
           </div>
           <div className="action-card-text">
             <h4 className="action-title">Upload File</h4>
+            <p className="action-desc">Import CSV bank statement files</p>
           </div>
         </button>
 
@@ -73,6 +74,7 @@ export const ActionGrid: React.FC<ActionGridProps> = ({
           </div>
           <div className="action-card-text">
             <h4 className="action-title">Charts</h4>
+            <p className="action-desc">Category donut & cash flow trajectory</p>
           </div>
         </button>
 
@@ -90,10 +92,11 @@ export const ActionGrid: React.FC<ActionGridProps> = ({
           </div>
           <div className="action-card-text">
             <h4 className="action-title">Distribution</h4>
+            <p className="action-desc">Detailed expense breakdown & share</p>
           </div>
         </button>
 
-        {/* 3. Visualizza Movimenti (Table Icon) */}
+        {/* 4. Visualizza Movimenti (Table Icon) */}
         <button
           type="button"
           className="action-card action-transactions"
@@ -110,10 +113,11 @@ export const ActionGrid: React.FC<ActionGridProps> = ({
           </div>
           <div className="action-card-text">
             <h4 className="action-title">Transactions</h4>
+            <p className="action-desc">Search, filter & reclassify records</p>
           </div>
         </button>
 
-        {/* 4. Categories (Tags Icon) */}
+        {/* 5. Categories (Tags Icon) */}
         <button
           type="button"
           className="action-card action-categories"
@@ -130,10 +134,11 @@ export const ActionGrid: React.FC<ActionGridProps> = ({
           </div>
           <div className="action-card-text">
             <h4 className="action-title">Categories</h4>
+            <p className="action-desc">Customize labels, colors & icons</p>
           </div>
         </button>
 
-        {/* 5. Settings */}
+        {/* 6. Settings */}
         <button
           type="button"
           className="action-card action-settings"
@@ -147,10 +152,11 @@ export const ActionGrid: React.FC<ActionGridProps> = ({
           </div>
           <div className="action-card-text">
             <h4 className="action-title">Settings</h4>
+            <p className="action-desc">Cascade strategy & database actions</p>
           </div>
         </button>
 
-        {/* 6. Export & Import */}
+        {/* 7. Export & Import */}
         <button
           type="button"
           className="action-card action-backup"
@@ -164,6 +170,7 @@ export const ActionGrid: React.FC<ActionGridProps> = ({
           </div>
           <div className="action-card-text">
             <h4 className="action-title">Export / Import</h4>
+            <p className="action-desc">Backup & restore complete app data</p>
           </div>
         </button>
       </div>
