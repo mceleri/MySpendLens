@@ -46,6 +46,7 @@ export interface Tier1ModelArtifact {
 export interface PredictionResult {
   category: string;
   confidence: number;
+  margin?: number;
   probabilities: Record<string, number>;
   inferenceTimeMs: number;
 }
@@ -92,16 +93,17 @@ export class MySpendLensTier1Engine {
   }
 
   private static readonly BANK_NOISE_REGEX =
-    /\b(PAGAMENTO CONTABILIZZATO|ADDEBITO PREAUTORIZZATO|ADDEBITO DIRETTO SDD|ADEUDO POR DOMICILIACION|RECIBO DOMICILIADO|COMPRA EN COMERCIO|OPERACION TARJETA|PAGO CON TARJETA|COMPRA TARJETA|PAGAMENTO CARTA|PAGAMENTO POS|PAG BANCOMAT|PAG CONTACTLESS|OP POS CARTA|UTILIZZO CARTA|CARTA CREDITO|ADDEBITO SDD|CARGO RECIBO|CARGO REBO|ADEUDO SEPA|BIZUM COMPRA|PAGO TARJETA|SDD SEPA|PAG POS|RECIBO|BOLLETTA|FATTURA|MANDATO SEPA|MANDATO|SUMINISTRO|ADDEBITO PERIODICO|SERVIZI|AUT|ID|TX|REF|MND|SRL|SPA|SAU|SL|SA|MILANO|ROMA|TORINO|BOLOGNA|FIRENZE|NAPOLI|GENOVA|VERONA|PADOVA|BARI|MADRID|BARCELONA|VALENCIA|SEVILLA|BILBAO|ZARAGOZA|MALAGA|ALICANTE|MURCIA|VALLADOLID|VIA|VIALE|CORSO|PIAZZA|CALLE|PASEO|AVENIDA|ITALIA|ITALY|ESPANA)\b/g;
+    /\b(PAGAMENTO CONTABILIZZATO|ADDEBITO PREAUTORIZZATO|ADDEBITO DIRETTO SDD|ADEUDO POR DOMICILIACION|RECIBO DOMICILIADO|COMPRA EN COMERCIO|OPERACION TARJETA|PAGO CON TARJETA|COMPRA TARJETA|PAGAMENTO CARTA|PAGAMENTO POS|PAG BANCOMAT|PAG CONTACTLESS|OP POS CARTA|UTILIZZO CARTA|CARTA CREDITO|ADDEBITO SDD|CARGO RECIBO|CARGO REBO|ADEUDO SEPA|BIZUM COMPRA|PAGO TARJETA|SDD SEPA|PAG POS|RECIBO|BOLLETTA|FATTURA|MANDATO SEPA|MANDATO|SUMINISTRO|ADDEBITO PERIODICO|SERVIZI|SRL|SPA|SAU|SL|SA|MILANO|ROMA|TORINO|BOLOGNA|FIRENZE|NAPOLI|GENOVA|VERONA|PADOVA|BARI|MADRID|BARCELONA|VALENCIA|SEVILLA|BILBAO|ZARAGOZA|MALAGA|ALICANTE|MURCIA|VALLADOLID|VIA|VIALE|CORSO|PIAZZA|CALLE|PASEO|AVENIDA|ITALIA|ITALY|ESPANA)\b/gi;
 
   /**
-   * Computes L2-normalized sublinear TF-IDF sparse vector over 3-5 character n-grams.
+   * Cleans text and computes L2-normalized sublinear TF-IDF sparse vector over 3-5 character n-grams.
+   * Matches train_base_model.py tokenization identically to prevent train/serve skew.
    */
   private vectorize(rawDescription: string): Map<number, number> {
-    const baseText = this.artifact.config.lowercase
-      ? rawDescription.trim().toLowerCase()
-      : rawDescription.trim().toUpperCase();
-    const noTx = baseText.replace(/\b(AUT|ID|TX|REF|MND)\s*[0-9A-Z]*\b/gi, " ");
+    // 1. Python-identical preprocessing in uppercase first
+    const upper = rawDescription.trim().toUpperCase();
+    // Match only transaction identifiers followed by digits/separators (preserves Autogrill, Autostrade, etc.)
+    const noTx = upper.replace(/\b(?:AUT|ID|TX|REF|MND)\b[\s:.\-]*\d[\w-]*/gi, " ");
     const alphaOnly = noTx.replace(/[^A-Z\s]+/gi, " ");
     const stripped = alphaOnly
       .replace(MySpendLensTier1Engine.BANK_NOISE_REGEX, " ")
@@ -110,10 +112,15 @@ export class MySpendLensTier1Engine {
     const baseClean =
       stripped.length >= 3 ? stripped : alphaOnly.replace(/\s+/g, " ").trim();
     const tokens = baseClean.split(" ").filter(Boolean);
-    const text =
+    const textFormatted =
       tokens.length >= 2
         ? ` ${tokens.slice(0, 2).join(" ")} ${baseClean} `
         : ` ${baseClean} `;
+
+    // 2. Lowercase if model was trained with lowercase: true (matching scikit-learn TfidfVectorizer)
+    const text = this.artifact.config.lowercase
+      ? textFormatted.toLowerCase()
+      : textFormatted;
 
     const [nMin, nMax] = this.artifact.config.ngram_range;
     const vocab = this.artifact.vocabulary;
@@ -154,12 +161,38 @@ export class MySpendLensTier1Engine {
 
   /**
    * Sub-millisecond Tier 1 classification directly in browser / Web Worker.
+   * Can optionally mask predictions to active categories only.
    */
-  public predict(rawDescription: string): PredictionResult {
+  public predict(rawDescription: string, activeCategories?: string[]): PredictionResult {
     const t0 = performance.now();
     const xVec = this.vectorize(rawDescription);
     const { classes, weights } = this.artifact;
     const numClasses = classes.length;
+
+    // Filter to active classes if provided
+    const activeSet = activeCategories && activeCategories.length > 0 ? new Set(activeCategories) : null;
+    const activeIndices: number[] = [];
+    for (let c = 0; c < numClasses; c++) {
+      if (!activeSet || activeSet.has(classes[c])) {
+        activeIndices.push(c);
+      }
+    }
+    const candidateIndices = activeIndices.length > 0 ? activeIndices : Array.from({ length: numClasses }, (_, i) => i);
+
+    // If description has zero matching n-grams, confidence is 0 so it immediately escalates to Tier 2
+    if (xVec.size === 0) {
+      const uniformP = candidateIndices.length > 0 ? 1 / candidateIndices.length : 0;
+      const probabilities: Record<string, number> = {};
+      for (const idx of candidateIndices) {
+        probabilities[classes[idx]] = uniformP;
+      }
+      return {
+        category: candidateIndices.length > 0 ? classes[candidateIndices[0]] : 'Other',
+        confidence: 0,
+        probabilities,
+        inferenceTimeMs: performance.now() - t0,
+      };
+    }
 
     const logits = weights.intercept.slice();
     for (const [featIdx, featVal] of xVec.entries()) {
@@ -168,24 +201,36 @@ export class MySpendLensTier1Engine {
       }
     }
 
-    // Numerically stable softmax
-    const maxLogit = Math.max(...logits);
-    const exps = logits.map((l) => Math.exp(l - maxLogit));
+    // Numerically stable softmax over candidate (active) classes only
+    const candidateLogits = candidateIndices.map((i) => logits[i]);
+    const maxLogit = Math.max(...candidateLogits);
+    const exps = candidateLogits.map((l) => Math.exp(l - maxLogit));
     const sumExps = exps.reduce((a, b) => a + b, 0);
-    const probs = exps.map((e) => e / sumExps);
 
-    let bestIdx = 0;
+    let bestIdx = candidateIndices[0];
+    let maxProb = -1;
     const probabilities: Record<string, number> = {};
-    for (let c = 0; c < numClasses; c++) {
-      probabilities[classes[c]] = probs[c];
-      if (probs[c] > probs[bestIdx]) {
+
+    // Calculate top-1 and runner-up probability to determine the decision margin (p1 - p2)
+    const sortedProbs: number[] = [];
+    for (let i = 0; i < candidateIndices.length; i++) {
+      const c = candidateIndices[i];
+      const p = exps[i] / sumExps;
+      probabilities[classes[c]] = p;
+      sortedProbs.push(p);
+      if (p > maxProb) {
+        maxProb = p;
         bestIdx = c;
       }
     }
+    sortedProbs.sort((a, b) => b - a);
+    const runnerUpProb = sortedProbs.length > 1 ? sortedProbs[1] : 0;
+    const margin = maxProb - runnerUpProb;
 
     return {
       category: classes[bestIdx],
-      confidence: probs[bestIdx],
+      confidence: maxProb,
+      margin,
       probabilities,
       inferenceTimeMs: performance.now() - t0,
     };
@@ -193,7 +238,7 @@ export class MySpendLensTier1Engine {
 
   /**
    * Ensures that a given class name exists in the model's classes and weight matrix.
-   * If it doesn't exist, dynamically expands weights.coef with a new row and weights.intercept with 0.
+   * Initializes intercept with the median of existing intercepts for balanced prior calibration.
    */
   public ensureClass(className: string): number {
     const trimmed = className.trim();
@@ -205,7 +250,15 @@ export class MySpendLensTier1Engine {
     this.artifact.classes.push(trimmed);
     const numFeatures = this.artifact.metrics.num_features;
     this.artifact.weights.coef.push(new Array(numFeatures).fill(0));
-    this.artifact.weights.intercept.push(0);
+
+    // Initialize new class intercept with median of existing intercepts
+    const existingIntercepts = this.artifact.weights.intercept;
+    let initialIntercept = -1.0;
+    if (existingIntercepts.length > 0) {
+      const sorted = [...existingIntercepts].sort((a, b) => a - b);
+      initialIntercept = sorted[Math.floor(sorted.length / 2)];
+    }
+    this.artifact.weights.intercept.push(initialIntercept);
     this.artifact.metrics.num_classes = this.artifact.classes.length;
     return this.artifact.classes.length - 1;
   }
@@ -220,9 +273,52 @@ export class MySpendLensTier1Engine {
   }
 
   /**
+   * Dynamically expands vocabulary with new character n-grams from unseen text.
+   */
+  private expandVocabularyWithUnseenNgrams(rawDescription: string): void {
+    const upper = rawDescription.trim().toUpperCase();
+    const noTx = upper.replace(/\b(?:AUT|ID|TX|REF|MND)\b[\s:.\-]*\d[\w-]*/gi, " ");
+    const alphaOnly = noTx.replace(/[^A-Z\s]+/gi, " ").replace(/\s+/g, " ").trim();
+    const cleanText = this.artifact.config.lowercase ? alphaOnly.toLowerCase() : alphaOnly;
+    const text = ` ${cleanText} `;
+
+    const [nMin, nMax] = this.artifact.config.ngram_range;
+    const vocab = this.artifact.vocabulary;
+    const len = text.length;
+    const newGrams: string[] = [];
+
+    for (let n = nMin; n <= nMax; n++) {
+      for (let i = 0; i <= len - n; i++) {
+        const ng = text.slice(i, i + n);
+        if (vocab[ng] === undefined && !newGrams.includes(ng)) {
+          newGrams.push(ng);
+          if (newGrams.length >= 15) break; // Limit expansion per feedback
+        }
+      }
+      if (newGrams.length >= 15) break;
+    }
+
+    if (newGrams.length === 0) return;
+
+    // Compute median IDF as sensible default for newly discovered n-grams
+    const sortedIdfs = [...this.artifact.idf].sort((a, b) => a - b);
+    const medianIdf = sortedIdfs[Math.floor(sortedIdfs.length / 2)] || 4.5;
+
+    for (const ng of newGrams) {
+      const newFeatIdx = this.artifact.metrics.num_features;
+      vocab[ng] = newFeatIdx;
+      this.artifact.idf.push(medianIdf);
+      for (let c = 0; c < this.artifact.classes.length; c++) {
+        this.artifact.weights.coef[c].push(0);
+      }
+      this.artifact.metrics.num_features += 1;
+    }
+  }
+
+  /**
    * Continuous Local Learning: updates the weight matrix in-place using a single step
-   * of multinomial logistic regression SGD when the user corrects a transaction category,
-   * ready to be persisted to IndexedDB or Origin Private File System (OPFS).
+   * of multinomial logistic regression SGD when the user corrects a transaction category.
+   * Dynamically expands vocabulary if transaction has unseen n-grams so feedback is never dropped.
    */
   public learnFromUserFeedback(
     rawDescription: string,
@@ -232,8 +328,13 @@ export class MySpendLensTier1Engine {
     const targetIdx = this.ensureClass(trueCategory);
     if (targetIdx === -1) return;
 
-    const xVec = this.vectorize(rawDescription);
-    if (xVec.size === 0) return;
+    let xVec = this.vectorize(rawDescription);
+    if (xVec.size === 0) {
+      // Unseen n-grams: expand vocabulary dynamically to capture user's merchant/term
+      this.expandVocabularyWithUnseenNgrams(rawDescription);
+      xVec = this.vectorize(rawDescription);
+      if (xVec.size === 0) return;
+    }
 
     const { classes, weights } = this.artifact;
     const numClasses = classes.length;
@@ -274,7 +375,8 @@ export class MySpendLensTier1Engine {
   ): Promise<TrainingSummary> {
     const t0 = performance.now();
     const epochs = options.epochs ?? 10;
-    const baseLr = options.learningRate ?? 0.35;
+    // Base LR of 0.08 prevents gradient explosion and loss oscillation with high sample weights
+    const baseLr = options.learningRate ?? 0.08;
     const l2Reg = options.l2Reg ?? 0.0001;
     const yieldMs = options.yieldIntervalMs ?? 50;
 
@@ -296,8 +398,13 @@ export class MySpendLensTier1Engine {
       if (!s.description || !s.category) continue;
       const targetIdx = this.artifact.classes.indexOf(s.category.trim());
       if (targetIdx === -1) continue;
-      const xVec = this.vectorize(s.description);
-      if (xVec.size === 0) continue;
+      let xVec = this.vectorize(s.description);
+      if (xVec.size === 0) {
+        // Expand vocabulary with user sample if unseen
+        this.expandVocabularyWithUnseenNgrams(s.description);
+        xVec = this.vectorize(s.description);
+        if (xVec.size === 0) continue;
+      }
       const weight = typeof s.weight === 'number' && s.weight > 0 ? s.weight : 1.0;
       vectorizedDataset.push({ xVec, targetIdx, weight });
     }
@@ -309,15 +416,16 @@ export class MySpendLensTier1Engine {
     const { classes, weights } = this.artifact;
     const numClasses = classes.length;
 
-    // Calculate balanced class weights to prevent synthetic anchor classes from overwhelming user classes
+    // Calculate balanced class weights ONLY over active classes with samples (prevents multiplier collapse to 0.5)
     const classWeightsSum = new Array(numClasses).fill(0);
     let totalSampleWeight = 0;
     for (const item of vectorizedDataset) {
       classWeightsSum[item.targetIdx] += item.weight;
       totalSampleWeight += item.weight;
     }
+    const activeClassesWithSamples = classWeightsSum.filter((w) => w > 0).length || 1;
     const classBalanceMultiplier = classWeightsSum.map((w) =>
-      w > 0 ? Math.min(5.0, Math.max(0.5, totalSampleWeight / (numClasses * w))) : 1.0
+      w > 0 ? Math.min(5.0, Math.max(0.5, totalSampleWeight / (activeClassesWithSamples * w))) : 1.0
     );
 
     // Helper: evaluate current cross-entropy loss and accuracy over the dataset
@@ -363,11 +471,17 @@ export class MySpendLensTier1Engine {
     let finalLoss = initialMetrics.loss;
     let finalAccuracy = initialMetrics.accuracy;
 
+    // Safety Snapshot & Checkpoint: record initial and best weights for rollback if loss degrades
+    let bestLoss = initialMetrics.loss;
+    let bestAccuracy = initialMetrics.accuracy;
+    let bestCoef = weights.coef.map((row) => row.slice());
+    let bestIntercept = weights.intercept.slice();
+
     // 3. Epoch Training Loop
     for (let epoch = 1; epoch <= epochs; epoch++) {
       const stepStart = performance.now();
-      // Decay learning rate gradually per epoch
-      const currentLr = baseLr / (1 + 0.05 * (epoch - 1));
+      // Decay learning rate proportionally to 1 / sqrt(epoch) for smooth, monotonic convergence
+      const currentLr = baseLr / Math.sqrt(epoch);
 
       // In-place Fisher-Yates shuffle for stochastic gradient descent
       for (let i = vectorizedDataset.length - 1; i > 0; i--) {
@@ -410,6 +524,14 @@ export class MySpendLensTier1Engine {
       finalLoss = epochMetrics.loss;
       finalAccuracy = epochMetrics.accuracy;
 
+      // Track best checkpoint
+      if (epochMetrics.loss < bestLoss) {
+        bestLoss = epochMetrics.loss;
+        bestAccuracy = epochMetrics.accuracy;
+        bestCoef = weights.coef.map((row) => row.slice());
+        bestIntercept = weights.intercept.slice();
+      }
+
       if (options.onProgress) {
         options.onProgress({
           epoch,
@@ -425,6 +547,14 @@ export class MySpendLensTier1Engine {
       if (yieldMs > 0) {
         await new Promise((resolve) => setTimeout(resolve, yieldMs));
       }
+    }
+
+    // Safety Rollback: if training ended at worse loss than best checkpoint, restore best weights
+    if (finalLoss > bestLoss) {
+      this.artifact.weights.coef = bestCoef;
+      this.artifact.weights.intercept = bestIntercept;
+      finalLoss = bestLoss;
+      finalAccuracy = bestAccuracy;
     }
 
     // 4. Update artifact metadata

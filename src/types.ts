@@ -10,10 +10,11 @@ export interface ProcessedTransaction {
   confidence: number;
   probabilities: Record<string, number>;
   inferenceTimeMs: number;
-  sourceTier: 'Tier 1' | 'Tier 2 (Fallback)' | 'Tier 2 (Solo)' | 'Income' | 'Manual';
+  sourceTier: 'Tier 0' | 'Tier 1' | 'Tier 2 (Fallback)' | 'Tier 2 (Solo)' | 'Income' | 'Manual';
   tier1Result?: {
     category: string;
     confidence: number;
+    margin?: number;
     probabilities: Record<string, number>;
     inferenceTimeMs: number;
   };

@@ -12,6 +12,7 @@ import {
   X,
   Check,
   ArrowDownLeft,
+  Zap,
 } from 'lucide-react';
 import { ProcessedTransaction } from '../types';
 import {
@@ -444,6 +445,11 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
                             <span className="tier-badge-chip tier-badge-income" title="Positive movement (Income) - ML classification skipped">
                               <ArrowDownLeft size={12} />
                               <span>Income</span>
+                            </span>
+                          ) : tx.sourceTier === 'Tier 0' ? (
+                            <span className="tier-badge-chip tier-badge-t0" title="Classified with Tier 0 Exact Memory (0 ms, 100% confidence)">
+                              <Zap size={12} />
+                              <span>Tier 0</span>
                             </span>
                           ) : tx.sourceTier === 'Manual' ? (
                             <span className="tier-badge-chip tier-badge-manual" title="Manually classified">

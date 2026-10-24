@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useMemo } from 'react';
 import {
   MySpendLensTier1Engine,
   Tier1ModelArtifact,
@@ -20,10 +20,35 @@ import {
   saveAppSettingsToDB,
 } from '../db/transactionDb';
 
-export function useClassificationEngines(categories: CategoryDefinition[]) {
+export function useClassificationEngines(
+  categories: CategoryDefinition[],
+  existingTransactions?: ProcessedTransaction[]
+) {
   const [isLoadingModel, setIsLoadingModel] = useState<boolean>(false);
   const [modelStats, setModelStats] = useState<ModelStats | null>(null);
   const [modelError, setModelError] = useState<string | null>(null);
+
+  // Tier 0: Deterministic Historical Merchant Memory
+  // Builds a dictionary of verified clean merchant descriptions -> category from past transactions
+  const merchantMemory = useMemo(() => {
+    const memory = new Map<string, string>();
+    if (!existingTransactions || existingTransactions.length === 0) return memory;
+    for (const tx of existingTransactions) {
+      if (tx.category && tx.category !== 'Income' && tx.rawDescription) {
+        const cleanKey = tx.rawDescription
+          .trim()
+          .toLowerCase()
+          .replace(/\b(?:AUT|ID|TX|REF|MND)\b[\s:.\-]*\d[\w-]*/gi, ' ')
+          .replace(/[^A-Za-zÀ-ÿ0-9\s]/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+        if (cleanKey.length >= 3) {
+          memory.set(cleanKey, tx.category);
+        }
+      }
+    }
+    return memory;
+  }, [existingTransactions]);
 
   const [tier2LoadingState, setTier2LoadingState] = useState<Tier2LoadingState>({
     status: 'idle',
@@ -149,6 +174,7 @@ export function useClassificationEngines(categories: CategoryDefinition[]) {
         t2Engine = await ensureTier2Engine(onProgressUpdate);
       }
 
+      const activeCategoryNames = categories.filter((c) => c.isActive && c.name !== 'Income').map((c) => c.name);
       const processed: ProcessedTransaction[] = [];
 
       for (let i = 0; i < rows.length; i++) {
@@ -175,6 +201,37 @@ export function useClassificationEngines(categories: CategoryDefinition[]) {
           continue;
         }
 
+        // TIER 0: Deterministic Historical Merchant Memory (0ms, 100% confidence)
+        const cleanMerchantKey = row.description
+          .trim()
+          .toLowerCase()
+          .replace(/\b(?:AUT|ID|TX|REF|MND)\b[\s:.\-]*\d[\w-]*/gi, ' ')
+          .replace(/[^A-Za-zÀ-ÿ0-9\s]/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+
+        if (cleanMerchantKey && merchantMemory.has(cleanMerchantKey)) {
+          const memorizedCategory = merchantMemory.get(cleanMerchantKey)!;
+          if (activeCategoryNames.includes(memorizedCategory)) {
+            processed.push({
+              id: `tx-${Date.now()}-${i}-${Math.random().toString(36).slice(2, 7)}`,
+              originalIndex: i,
+              date: row.date,
+              amount: row.amount,
+              rawDescription: row.description,
+              category: memorizedCategory,
+              systemCategory: memorizedCategory,
+              confidence: 1.0,
+              probabilities: { [memorizedCategory]: 1.0 },
+              inferenceTimeMs: 0,
+              sourceTier: 'Tier 0',
+              tier1Result: undefined,
+              tier2Result: undefined,
+            });
+            continue;
+          }
+        }
+
         onProgressUpdate?.(`Classifying ${i + 1} of ${rows.length}...`);
 
         let chosenCategory = '';
@@ -188,15 +245,19 @@ export function useClassificationEngines(categories: CategoryDefinition[]) {
 
         // Run Tier 1 if enabled
         if (tier1Active && t1Engine) {
-          const pred1 = t1Engine.predict(row.description);
+          const pred1 = t1Engine.predict(row.description, activeCategoryNames);
           t1Result = {
             category: pred1.category,
             confidence: pred1.confidence,
+            margin: pred1.margin,
             probabilities: pred1.probabilities,
             inferenceTimeMs: pred1.inferenceTimeMs,
           };
 
-          if (pred1.confidence >= threshold) {
+          // Confident only if both probability threshold is met AND runner-up margin is >= 0.15
+          const isConfident = pred1.confidence >= threshold && (pred1.margin === undefined || pred1.margin >= 0.15);
+
+          if (isConfident) {
             chosenCategory = pred1.category;
             chosenConfidence = pred1.confidence;
             chosenProbabilities = pred1.probabilities;
@@ -235,7 +296,7 @@ export function useClassificationEngines(categories: CategoryDefinition[]) {
           };
 
           if (t1Engine) {
-            const pred1 = t1Engine.predict(row.description);
+            const pred1 = t1Engine.predict(row.description, activeCategoryNames);
             t1Result = {
               category: pred1.category,
               confidence: pred1.confidence,
@@ -250,7 +311,7 @@ export function useClassificationEngines(categories: CategoryDefinition[]) {
           chosenSourceTier = 'Tier 2 (Solo)';
           txInferenceTime = pred2.inferenceTimeMs;
         } else if (t1Engine) {
-          const pred1 = t1Engine.predict(row.description);
+          const pred1 = t1Engine.predict(row.description, activeCategoryNames);
           chosenCategory = pred1.category;
           chosenConfidence = pred1.confidence;
           chosenProbabilities = pred1.probabilities;
@@ -278,7 +339,7 @@ export function useClassificationEngines(categories: CategoryDefinition[]) {
 
       return processed;
     },
-    [ensureTier1Engine, ensureTier2Engine]
+    [categories, merchantMemory, ensureTier1Engine, ensureTier2Engine]
   );
 
   const handleToggleTier1 = useCallback(async (enabled: boolean) => {

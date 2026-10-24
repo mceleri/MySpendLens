@@ -77,7 +77,7 @@ export const App: React.FC = () => {
     classifyRows,
     handleToggleTier1,
     handleChangeThreshold,
-  } = useClassificationEngines(categories);
+  } = useClassificationEngines(categories, transactions);
 
   // Save trained Tier 1 model to IndexedDB and update status
   const handleTrainingComplete = useCallback(async () => {

@@ -168,6 +168,7 @@ configureTransformersCache();
 export class MySpendLensTier2Engine {
   private extractor: FeatureExtractionPipeline | null = null;
   private classCentroids: Record<string, number[]> = {};
+  private categoryFingerprints: Record<string, string> = {};
   public isReady: boolean = false;
 
   private static readonly MODEL_ID = 'Xenova/multilingual-e5-small';
@@ -214,7 +215,7 @@ export class MySpendLensTier2Engine {
    */
   public cleanDescription(rawDescription: string): string {
     const withoutCodes = rawDescription
-      .replace(/\b(AUT|ID|TX|REF|MND)\s*[0-9A-Z]*\b/gi, ' ')
+      .replace(/\b(?:AUT|ID|TX|REF|MND)\b[\s:.\-]*\d[\w-]*/gi, ' ')
       .replace(/\b\d{1,2}[/.]\d{1,2}([/.]\d{2,4})?\b/g, ' ')
       .replace(/[.,\-_/\\#;:()]/g, ' ');
 
@@ -306,12 +307,16 @@ export class MySpendLensTier2Engine {
     if (!this.extractor) return;
 
     const newCentroids: Record<string, number[]> = {};
+    const newFingerprints: Record<string, string> = {};
     const activeExpenseCategories = categories.filter((c) => c.isActive && c.name !== 'Income');
 
     for (const cat of activeExpenseCategories) {
-      // If centroid already exists and was cached, reuse it
-      if (this.classCentroids[cat.name]) {
+      const currentFingerprint = `${cat.name}::${cat.examples || ''}`;
+
+      // If category examples haven't changed and centroid is cached, reuse it
+      if (this.classCentroids[cat.name] && this.categoryFingerprints[cat.name] === currentFingerprint) {
         newCentroids[cat.name] = this.classCentroids[cat.name];
+        newFingerprints[cat.name] = currentFingerprint;
         continue;
       }
 
@@ -347,10 +352,12 @@ export class MySpendLensTier2Engine {
         }
         const invNorm = 1 / Math.sqrt(sumSq || 1);
         newCentroids[cat.name] = centroid.map((v) => v * invNorm);
+        newFingerprints[cat.name] = currentFingerprint;
       }
     }
 
     this.classCentroids = newCentroids;
+    this.categoryFingerprints = newFingerprints;
   }
 
   private static dotProduct(a: number[], b: number[]): number {
@@ -391,8 +398,8 @@ export class MySpendLensTier2Engine {
       sims.push(sim);
     }
 
-    // Softmax with temperature scaling (tau = 0.02) to produce calibrated confidence probabilities
-    const tau = 0.02;
+    // Softmax with calibrated temperature scaling (tau = 0.05) to prevent over-polarization on narrow cosine ranges
+    const tau = 0.05;
     const maxSim = Math.max(...sims);
     const exps = sims.map((s) => Math.exp((s - maxSim) / tau));
     const sumExps = exps.reduce((a, b) => a + b, 0);
@@ -409,11 +416,19 @@ export class MySpendLensTier2Engine {
     }
 
     const bestCat = categories[bestIdx];
+    const bestSim = sims[bestIdx];
+
+    // Absolute similarity floor: if top cosine similarity is under 0.65, scale confidence down to reflect semantic uncertainty
+    let confidence = probabilities[bestCat];
+    if (bestSim < 0.65) {
+      const dampening = Math.max(0, (bestSim - 0.40) / 0.25);
+      confidence = confidence * dampening;
+    }
 
     return {
       sourceTier: 'Tier 2',
       category: bestCat,
-      confidence: probabilities[bestCat],
+      confidence,
       probabilities,
       cosineSimilarities,
       rawQueryText: query,

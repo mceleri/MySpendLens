@@ -158,17 +158,21 @@ export const UploadView: React.FC<UploadViewProps> = ({
         return;
       }
 
-      // Check duplicates against existing database fingerprints
+      // Check duplicates against existing database fingerprints using multiset occurrence index
+      // Prevents merging legitimate identical transactions on the same day (e.g. 2 identical coffees)
+      const fileOccurrences = new Map<string, number>();
       const freshRows: RawRow[] = [];
       let dupes = 0;
-      const seenInBatch = new Set<string>();
 
       for (const row of extracted) {
-        const fp = generateTransactionFingerprint(row.date, row.description, row.amount);
-        if (existingFingerprints.has(fp) || seenInBatch.has(fp)) {
+        const baseFp = generateTransactionFingerprint(row.date, row.description, row.amount);
+        const occ = fileOccurrences.get(baseFp) ?? 0;
+        fileOccurrences.set(baseFp, occ + 1);
+        const indexedFp = occ > 0 ? `${baseFp}#${occ}` : baseFp;
+
+        if (existingFingerprints.has(indexedFp)) {
           dupes++;
         } else {
-          seenInBatch.add(fp);
           freshRows.push(row);
         }
       }

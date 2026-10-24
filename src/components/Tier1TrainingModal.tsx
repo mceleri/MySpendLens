@@ -185,8 +185,11 @@ export const Tier1TrainingModal: React.FC<Tier1TrainingModalProps> = ({
         for (let i = 0; i < anchorsNeedingRelabel.length; i++) {
           const item = anchorsNeedingRelabel[i];
           const pred = await t2.predict(item.name);
-          relabeledMap.set(item.name, pred.category);
-          relabeledCount++;
+          // High-confidence filter: only accept pseudo-labels with sufficient semantic certainty to prevent error amplification
+          if (pred.confidence >= 0.60 && activeCategoryNames.has(pred.category)) {
+            relabeledMap.set(item.name, pred.category);
+            relabeledCount++;
+          }
 
           if (i % 10 === 0 || i === anchorsNeedingRelabel.length - 1) {
             updateStep('distillation', {
@@ -197,12 +200,11 @@ export const Tier1TrainingModal: React.FC<Tier1TrainingModalProps> = ({
           }
         }
 
-        // Apply new labels to anchors
-        processedAnchors = rawAnchors.map((a) => {
-          if (relabeledMap.has(a.name)) {
-            return { ...a, category: relabeledMap.get(a.name)! };
-          }
-          return a;
+        // Apply new labels to anchors, discarding uncertain orphan anchors to preserve dataset purity
+        processedAnchors = rawAnchors.flatMap((a) => {
+          if (activeCategoryNames.has(a.category)) return [a];
+          if (relabeledMap.has(a.name)) return [{ ...a, category: relabeledMap.get(a.name)! }];
+          return []; // Filter out ambiguous orphan anchors
         });
 
         updateStep('distillation', {

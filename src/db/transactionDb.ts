@@ -30,13 +30,15 @@ const CATEGORIES_STORE = 'categories';
 const APP_SETTINGS_STORE = 'app_settings';
 
 /**
- * Generates a deterministic normalized fingerprint for deduplication:
- * Uses normalized date, description, and amount to identify unique transactions.
+ * Generates a deterministic normalized fingerprint for deduplication.
+ * Uses normalized date, description, amount, and an optional occurrence index (multiset deduplication)
+ * to prevent fusing legitimate identical transactions on the same day (e.g. two identical coffees).
  */
 export function generateTransactionFingerprint(
   date?: string,
   rawDescription?: string,
-  amount?: string
+  amount?: string,
+  occurrence: number = 0
 ): string {
   // 1. Normalize date (e.g. "14/10/2026" or "2026-10-14")
   const normDate = (date || '')
@@ -67,7 +69,8 @@ export function generateTransactionFingerprint(
   const parsedAmt = parseFloat(normAmt);
   const formattedAmt = isNaN(parsedAmt) ? normAmt : parsedAmt.toFixed(2);
 
-  return `${normDate}|${normDesc}|${formattedAmt}`;
+  const baseFp = `${normDate}|${normDesc}|${formattedAmt}`;
+  return occurrence > 0 ? `${baseFp}#${occurrence}` : baseFp;
 }
 
 let dbInstancePromise: Promise<IDBDatabase> | null = null;
@@ -121,14 +124,14 @@ export async function getAllTransactionsFromDB(): Promise<StoredTransaction[]> {
 
     request.onsuccess = () => {
       const items = (request.result as StoredTransaction[]) || [];
-      // Ensure each item has a fingerprint
+      // Ensure each item has a multiset occurrence fingerprint
+      const counts = new Map<string, number>();
       for (const item of items) {
         if (!item.fingerprint) {
-          item.fingerprint = generateTransactionFingerprint(
-            item.date,
-            item.rawDescription,
-            item.amount
-          );
+          const baseFp = generateTransactionFingerprint(item.date, item.rawDescription, item.amount);
+          const occ = counts.get(baseFp) ?? 0;
+          counts.set(baseFp, occ + 1);
+          item.fingerprint = occ > 0 ? `${baseFp}#${occ}` : baseFp;
         }
       }
       resolve(items);
@@ -170,10 +173,14 @@ export async function addTransactionsToDB(
     const store = tx.objectStore(STORE_NAME);
     const now = Date.now();
 
+    const counts = new Map<string, number>();
     for (const item of transactions) {
+      const baseFp = generateTransactionFingerprint(item.date, item.rawDescription, item.amount);
+      const occ = counts.get(baseFp) ?? 0;
+      counts.set(baseFp, occ + 1);
       const storedItem: StoredTransaction = {
         ...item,
-        fingerprint: generateTransactionFingerprint(item.date, item.rawDescription, item.amount),
+        fingerprint: occ > 0 ? `${baseFp}#${occ}` : baseFp,
         sourceFile: sourceFileName || 'unknown',
         importedAt: now,
       };
