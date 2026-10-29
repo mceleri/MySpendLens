@@ -1,83 +1,93 @@
-# MySpendLens 🔍💳
+# MySpendLens
 
-> **100% Client-Side, Privacy-First Transaction Categorizer & Financial Lens**  
-> Classify, explore, and analyze your bank statements entirely in your browser. Zero telemetry. Zero server calls. Zero financial data leaves your device.
-
----
-
-## ✨ Overview
-
-**MySpendLens** is an open-source, local-first web application designed to categorize and visualize bank statement transactions without sending sensitive financial records to external servers or proprietary cloud AI APIs.
-
-It features a **Hybrid Two-Tier Edge Machine Learning Cascade** that combines ultra-fast local linear classification with semantic deep embedding models, running entirely in browser memory using WebAssembly.
+A local-first, privacy-focused bank statement categorizer and financial visualization tool that runs entirely in the browser. No server uploads, no telemetry, and no external AI API calls.
 
 ---
 
-## 🚀 Key Features
+## Overview
 
-- **🛡️ 100% Private & Local**:
-  All parsing, categorization, and storage run on your device. The app operates offline and works without internet connection once assets are cached.
-- **⚡ Hybrid Two-Tier AI Cascade**:
-  - **Tier 1 (Sub-millisecond Engine)**: Multinomial Logistic Regression running over sparse word & character n-grams directly in pure JavaScript (<1 ms inference per record).
-  - **Tier 2 (Deep Semantic Fallback)**: `Xenova/multilingual-e5-small` running client-side via [Transformers.js](https://huggingface.co/docs/transformers.js) and ONNX Runtime Web. Automatically invoked only when Tier 1 confidence falls below user-configured thresholds.
-- **🧠 In-Browser Personal AI Training**:
-  Fine-tune and retrain the Tier 1 model directly in your browser. When you add new custom categories or modify labels, the app performs semantic anchor distillation with Tier 2 and retrains Tier 1 weights with in-place Stochastic Gradient Descent.
-- **📊 Financial Analytics & Visualizations**:
-  - **Interactive Expense Donut**: SVG-based category distribution with instant percentage and drill-down inspection.
-  - **Budget Trajectory & Cash Flow**: Daily chronological cash flow tracking with surplus/deficit status, burn rate metrics, and erosion curves.
-- **📥 Universal Statement Parser**:
-  Automatic column detection and 2-row preview wizard supporting diverse European and international CSV statement formats.
-- **🗄️ Offline IndexedDB Storage & Portable Backups**:
-  - Deterministic cryptographic fingerprint deduplication (`date + description + amount`).
-  - Full database ZIP backup and restore functionality.
-- **📱 Responsive Layout**:
-  Optimized for touchscreens and mobile browsers, while seamlessly expanding into a full-featured desktop dashboard on laptops and tablets ($\ge 768\text{px}$).
+**MySpendLens** lets you import, categorize, and analyze bank statements locally on your device. All data parsing, machine learning inference, and storage happen directly in the browser using WebAssembly and IndexedDB.
+
+Transactions are classified using a tiered cascade:
+1. **Tier 0 (Merchant Memory)**: Instant matching against previously verified transactions from your history.
+2. **Tier 1 (Linear Model)**: Fast multinomial logistic regression over 3–5 character n-grams (~0.2 ms per transaction), pre-trained on Italian and Spanish merchant datasets.
+3. **Tier 2 (Embedding Model Fallback)**: `Xenova/multilingual-e5-small` embedding model running via [Transformers.js](https://huggingface.co/docs/transformers.js) and ONNX Runtime Web, invoked only when Tier 1 confidence falls below a user-configured threshold.
 
 ---
 
-## 🏛️ Architecture & Project Structure
+## Features
 
-The codebase is structured around clean React hooks and standalone domain engines:
+- **Private by Design**: Financial records, account details, and amounts never leave your browser.
+- **Statement Import (CSV & Excel)**:
+  - Supports CSV (`.csv`) and Excel (`.xlsx`, `.xls`) statement files.
+  - Automatic column detection (Date, Description, Amount) with interactive 3-row preview.
+  - Date format ambiguity detection (e.g. distinguishing `DD/MM/YYYY` from `MM/DD/YYYY`).
+  - Automatic filtering of non-transaction header/footer metadata.
+- **Multi-Tier Classification**:
+  - Combined Tier 0 / Tier 1 / Tier 2 cascade.
+  - Option to toggle Tier 1 off to evaluate Tier 2 embeddings as a baseline.
+  - Configurable Tier 1 confidence threshold (50%–95%).
+- **In-Browser Model Adaptation**:
+  - Retrain Tier 1 weights locally via Stochastic Gradient Descent (SGD) directly in browser memory.
+  - Automatic semantic distillation with Tier 2 when custom categories are added or renamed.
+- **Financial Visualizations**:
+  - **Category Donut Chart**: Interactive SVG spending distribution with category drill-down.
+  - **Cash Flow Trajectory**: Chronological cumulative balance tracking, net burn rate, and daily expense erosion curves.
+  - **Expense Breakdown**: Segmented expenditure distribution over rolling timeframes (30d, 60d, 90d, month, all).
+- **Transaction Registry**:
+  - Client-side pagination (25, 50, 100, 250 items per page) for fluid browsing of large statement files.
+  - Real-time search, multi-column sorting, and inline manual category reassignment.
+  - Detailed inference inspector showing latency, probabilities, and model tier per transaction.
+- **Storage & Backup**:
+  - Local persistence in IndexedDB with multiset occurrence fingerprint deduplication.
+  - Export and import full `.zip` backup archives containing transactions, categories, configuration, and trained Tier 1 model weights.
+  - Granular `.json` export options.
+
+---
+
+## Architecture & Codebase Structure
 
 ```
 src/
-├── components/          # Specialized UI views & presentation components
-│   ├── ActionGrid.tsx               # Main dashboard action hub
-│   ├── CategoriesView.tsx           # Dynamic category management & customization
-│   ├── ChartsView.tsx               # Responsive SVG donut & cash flow trajectory
-│   ├── ExpensesDistributionView.tsx # Categorized expenditure breakdown
-│   ├── ExportImportView.tsx         # Full database backup & restore (.zip)
-│   ├── Header.tsx                   # Top navigation & system status
-│   ├── HomeHeroOverview.tsx         # Executive financial overview & segmented bar
-│   ├── SettingsView.tsx             # Strategy thresholds & database controls
-│   ├── Tier1TrainingModal.tsx       # In-browser model distillation & training modal
-│   ├── TransactionsTable.tsx        # Filterable & editable transaction registry
-│   └── UploadView.tsx               # 3-step CSV upload & column mapping wizard
-├── db/                  # IndexedDB schema, operations, and deduplication
-│   └── transactionDb.ts
-├── engine/              # In-browser machine learning inference & training engines
-│   ├── tier1_browser_engine.ts      # Multinomial Logistic Regression & in-memory SGD
-│   └── tier2_embedding_engine.ts    # Transformers.js ONNX embedding pipeline
-├── hooks/               # Composable business logic hooks
-│   ├── useAppNavigation.ts          # History-aware view routing
-│   ├── useClassificationEngines.ts  # ML lifecycle, lazy loaders, and cascade prediction
-│   └── useTransactionData.ts        # Database state, CRUD handlers, and backups
-├── utils/               # Numerical, financial, and string utilities
-│   ├── categories.ts                # Metadata, color palette, and dynamic icon resolver
-│   ├── csvParser.ts                 # PapaParse wrapper & column header heuristics
-│   └── financialCalculations.ts     # Cash flow aggregations & currency formatting
-├── types.ts             # Domain TypeScript interfaces
-├── App.tsx              # Root declarative orchestrator
-└── main.tsx             # React DOM entrypoint
+├── components/          # UI views and components
+│   ├── ActionGrid.tsx               # Quick-action dashboard navigation
+│   ├── CategoriesView.tsx           # Category customization, color palette & icon picker
+│   ├── ChartsView.tsx               # SVG category donut and cash flow trajectory
+│   ├── ErrorBoundary.tsx            # Global application error boundary
+│   ├── ExpensesDistributionView.tsx # Categorized expenditure breakdown list
+│   ├── ExportImportView.tsx         # Full backup packaging (.zip) and JSON restore
+│   ├── Header.tsx                   # Top navigation bar and model status indicators
+│   ├── HomeHeroOverview.tsx         # Financial overview card & segmented expenditure bar
+│   ├── SettingsView.tsx             # Strategy thresholds, model preloading & database reset
+│   ├── Tier1TrainingModal.tsx       # Local distillation and fine-tuning pipeline
+│   ├── TransactionsTable.tsx        # Paginated, filterable transaction table with manual review
+│   └── UploadView.tsx               # 3-step CSV/Excel upload and column mapping wizard
+├── db/                  # IndexedDB schema and operations
+│   └── transactionDb.ts             # Persistent storage, multiset deduplication, batch merge
+├── engine/              # In-browser machine learning engines
+│   ├── tier1_browser_engine.ts      # Logistic regression inference & in-browser SGD training
+│   └── tier2_embedding_engine.ts    # Multilingual-e5 embedding pipeline & cache adapters
+├── hooks/               # Application logic hooks
+│   ├── useAppNavigation.ts          # History-aware view navigation
+│   ├── useClassificationEngines.ts  # Model lifecycle, lazy loading, and cascade predictions
+│   └── useTransactionData.ts        # Database state, CRUD operations, and backups
+├── utils/               # Formatting and parsing utilities
+│   ├── categories.ts                # Default definitions, color palettes, and Lucide icons
+│   ├── csvParser.ts                 # CSV/Excel parsing, header heuristics, row extraction
+│   └── financialCalculations.ts     # Currency formatting, date parsing, cash flow metrics
+├── types.ts             # TypeScript domain interfaces
+├── App.tsx              # Root application component with code-split views
+├── index.css            # Stylesheet
+└── main.tsx             # Application entrypoint
 ```
 
 ---
 
-## 🛠️ Quickstart
+## Getting Started
 
 ### Prerequisites
 - [Node.js](https://nodejs.org/) (version 18 or later)
-- `npm` or `pnpm`
+- `npm`
 
 ### Installation & Development
 ```bash
@@ -88,7 +98,7 @@ cd MySpendLens
 # Install dependencies
 npm install
 
-# Start local development server
+# Start the development server
 npm run dev
 ```
 
@@ -99,20 +109,20 @@ Open `http://localhost:3000` in your browser.
 # Typecheck and bundle with Vite
 npm run build
 
-# Preview production build locally
+# Preview the production build locally
 npm run preview
 ```
 
 ---
 
-## 🔒 Privacy & Threat Model
+## Privacy Model
 
-1. **No External API Calls**: Transaction descriptions, dates, and amounts are never transmitted across network boundaries.
-2. **Local Persistence**: Data is saved exclusively in your browser's local `IndexedDB` storage (`myspendlens_db`).
-3. **Cache Storage Support**: Pre-trained model artifacts are cached locally using standard Cache API or IndexedDB.
+1. **Local Processing**: Raw transaction strings, amounts, dates, and account details never leave your browser sandbox.
+2. **Local Storage**: All data is stored in the browser's `IndexedDB` under `myspendlens_db`.
+3. **Model Caching**: Pre-trained model weights are retrieved once and cached locally via the browser Cache API or IndexedDB.
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the [MIT License](LICENSE).
