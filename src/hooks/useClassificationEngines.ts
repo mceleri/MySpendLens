@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useMemo } from 'react';
+import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import {
   MySpendLensTier1Engine,
   Tier1ModelArtifact,
@@ -60,6 +60,29 @@ export function useClassificationEngines(
 
   const engineTier1Ref = useRef<MySpendLensTier1Engine | null>(null);
   const engineTier2Ref = useRef<MySpendLensTier2Engine | null>(null);
+  const tier2InitPromiseRef = useRef<Promise<MySpendLensTier2Engine> | null>(null);
+
+  // Synchronize tier2LoadingState whenever engineTier2Ref becomes ready
+  useEffect(() => {
+    if (engineTier2Ref.current?.isReady && tier2LoadingState.status !== 'ready') {
+      setTier2LoadingState({
+        status: 'ready',
+        progress: 100,
+        message: 'Model loaded in memory.',
+      });
+    }
+  }, [tier2LoadingState.status]);
+
+  const effectiveTier2LoadingState = useMemo<Tier2LoadingState>(() => {
+    if (engineTier2Ref.current?.isReady) {
+      return {
+        status: 'ready',
+        progress: 100,
+        message: 'Model loaded in memory.',
+      };
+    }
+    return tier2LoadingState;
+  }, [tier2LoadingState]);
 
   // Lazy loader for Tier 1 Engine (loaded on demand)
   const ensureTier1Engine = useCallback(async (
@@ -104,55 +127,89 @@ export function useClassificationEngines(
     onProgressUpdate?: (msg: string) => void
   ): Promise<MySpendLensTier2Engine> => {
     if (engineTier2Ref.current && engineTier2Ref.current.isReady) {
-      return engineTier2Ref.current;
-    }
-
-    setTier2LoadingState({
-      status: 'downloading',
-      progress: 5,
-      message: 'Initializing Transformers.js...',
-    });
-    onProgressUpdate?.('Loading multilingual embedding engine...');
-
-    try {
-      const t2Engine = engineTier2Ref.current || new MySpendLensTier2Engine();
-      engineTier2Ref.current = t2Engine;
-
-      await t2Engine.init((p: Tier2ProgressInfo) => {
-        if (p.status === 'progress' && p.progress !== undefined) {
-          setTier2LoadingState({
-            status: 'downloading',
-            file: p.file,
-            progress: p.progress,
-            loadedBytes: p.loaded,
-            totalBytes: p.total,
-          });
-          onProgressUpdate?.(`Loading Tier 2: ${Math.round(p.progress)}%`);
-        } else if (p.status === 'done') {
-          setTier2LoadingState((prev) => ({
-            ...prev,
-            status: 'downloading',
-            progress: 98,
-            file: p.file,
-          }));
-        }
-      }, categories);
-
-      setTier2LoadingState({
+      setTier2LoadingState((prev) => (prev.status === 'ready' ? prev : {
         status: 'ready',
         progress: 100,
         message: 'Model loaded in memory.',
-      });
-      return t2Engine;
-    } catch (err) {
-      console.error('Tier 2 load error:', err);
-      setTier2LoadingState({
-        status: 'error',
-        progress: 0,
-        message: (err as Error).message,
-      });
-      throw err;
+      }));
+      return engineTier2Ref.current;
     }
+
+    if (tier2InitPromiseRef.current) {
+      return await tier2InitPromiseRef.current;
+    }
+
+    const initPromise = (async () => {
+      setTier2LoadingState({
+        status: 'downloading',
+        progress: 5,
+        message: 'Initializing Transformers.js...',
+      });
+      onProgressUpdate?.('Loading multilingual embedding engine...');
+
+      try {
+        const t2Engine = engineTier2Ref.current || new MySpendLensTier2Engine();
+        engineTier2Ref.current = t2Engine;
+
+        let isCompleted = false;
+
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('Tier 2 model download/init timed out (120s). Check your connection.')), 120000)
+        );
+
+        await Promise.race([
+          t2Engine.init((p: Tier2ProgressInfo) => {
+            if (isCompleted) return;
+
+            if (p.status === 'progress' && p.progress !== undefined) {
+              const clampedProgress = Math.min(99, Math.max(5, p.progress));
+              setTier2LoadingState((prev) => {
+                if (prev.status === 'ready') return prev;
+                return {
+                  status: 'downloading',
+                  file: p.file || prev.file,
+                  progress: clampedProgress,
+                  loadedBytes: p.loaded,
+                  totalBytes: p.total,
+                };
+              });
+              onProgressUpdate?.(`Loading Tier 2: ${Math.round(clampedProgress)}%`);
+            } else if (p.status === 'done') {
+              setTier2LoadingState((prev) => {
+                if (prev.status === 'ready') return prev;
+                return {
+                  ...prev,
+                  file: p.file || prev.file,
+                };
+              });
+            }
+          }, categories),
+          timeoutPromise,
+        ]);
+
+        isCompleted = true;
+
+        setTier2LoadingState(() => ({
+          status: 'ready',
+          progress: 100,
+          message: 'Model loaded in memory.',
+        }));
+        return t2Engine;
+      } catch (err) {
+        console.error('Tier 2 load error:', err);
+        setTier2LoadingState({
+          status: 'error',
+          progress: 0,
+          message: (err as Error).message,
+        });
+        throw err;
+      } finally {
+        tier2InitPromiseRef.current = null;
+      }
+    })();
+
+    tier2InitPromiseRef.current = initPromise;
+    return await initPromise;
   }, [categories]);
 
   // Core cascade classification logic
@@ -177,7 +234,8 @@ export function useClassificationEngines(
       const activeCategoryNames = categories.filter((c) => c.isActive && c.name !== 'Income').map((c) => c.name);
       const processed: ProcessedTransaction[] = [];
 
-      for (let i = 0; i < rows.length; i++) {
+      try {
+        for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
 
         // Incomes (>0) are tracked directly as Income without ML expense categorization
@@ -353,7 +411,22 @@ export function useClassificationEngines(
       }
 
       return processed;
-    },
+    } finally {
+      if (engineTier2Ref.current?.isReady) {
+        setTier2LoadingState({
+          status: 'ready',
+          progress: 100,
+          message: 'Model loaded in memory.',
+        });
+      } else {
+        setTier2LoadingState((prev) => (prev.status === 'downloading' ? {
+          status: 'idle',
+          progress: 0,
+          message: 'On-Demand',
+        } : prev));
+      }
+    }
+  },
     [categories, merchantMemory, ensureTier1Engine, ensureTier2Engine]
   );
 
@@ -384,7 +457,7 @@ export function useClassificationEngines(
     modelStats,
     setModelStats,
     modelError,
-    tier2LoadingState,
+    tier2LoadingState: effectiveTier2LoadingState,
     engineTier1Ref,
     engineTier2Ref,
     ensureTier1Engine,

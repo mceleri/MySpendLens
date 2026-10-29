@@ -13,7 +13,6 @@ import {
   Settings,
   Activity,
 } from 'lucide-react';
-import { Tier2LoadingState } from '../types';
 
 export type HeaderView =
   | 'home'
@@ -28,7 +27,6 @@ export type HeaderView =
 interface HeaderProps {
   isLoadingModel: boolean;
   modelError: string | null;
-  tier2LoadingState: Tier2LoadingState;
   isProcessing?: boolean;
   onGoHome: () => void;
   hasPendingTraining?: boolean;
@@ -40,7 +38,6 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({
   isLoadingModel,
   modelError,
-  tier2LoadingState,
   isProcessing = false,
   onGoHome,
   hasPendingTraining = false,
@@ -166,14 +163,7 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           )}
 
-          {tier2LoadingState.status === 'downloading' && (
-            <div className="mobile-status-pill text-purple">
-              <Loader2 size={13} className="spinner text-purple" />
-              <span>Tier 2 ({Math.round(tier2LoadingState.progress)}%)</span>
-            </div>
-          )}
-
-          {isProcessing && !isLoadingModel && tier2LoadingState.status !== 'downloading' && (
+          {isProcessing && !isLoadingModel && (
             <div className="mobile-status-pill text-muted">
               <Loader2 size={13} className="spinner" />
               <span>Classifying...</span>

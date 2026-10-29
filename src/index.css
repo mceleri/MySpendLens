@@ -1076,6 +1076,33 @@ body {
   color: var(--text-dim);
 }
 
+.btn-preload-tier2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #c084fc;
+  background: rgba(168, 85, 247, 0.12);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-preload-tier2:hover:not(:disabled) {
+  background: rgba(168, 85, 247, 0.22);
+  border-color: rgba(168, 85, 247, 0.5);
+  color: #e9d5ff;
+}
+
+.btn-preload-tier2:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .privacy-card {
   border-color: rgba(16, 185, 129, 0.25);
   background: rgba(16, 185, 129, 0.04);

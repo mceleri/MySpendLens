@@ -60,6 +60,21 @@ class IndexedDBCache {
         req.onsuccess = () => {
           const val = req.result;
           if (val && val.buffer) {
+            // Check for corrupted HTML response
+            try {
+              const sample = new TextDecoder().decode(
+                new Uint8Array(val.buffer, 0, Math.min(128, val.buffer.byteLength))
+              );
+              const sampleLower = sample.trim().toLowerCase();
+              if (sampleLower.startsWith('<!doctype') || sampleLower.startsWith('<html')) {
+                this.delete(url);
+                resolve(undefined);
+                return;
+              }
+            } catch {
+              // Binary files may fail decoding, which is fine
+            }
+
             const headers = new Headers(val.headers || {});
             if (!headers.has('content-length')) {
               headers.set('content-length', String(val.buffer.byteLength));
@@ -80,6 +95,21 @@ class IndexedDBCache {
     try {
       const url = typeof key === 'string' ? key : (key?.url || String(key));
       const buffer = await response.arrayBuffer();
+
+      // Guard against caching HTML responses (e.g. SPA fallback <!DOCTYPE)
+      try {
+        const sample = new TextDecoder().decode(
+          new Uint8Array(buffer, 0, Math.min(128, buffer.byteLength))
+        );
+        const sampleLower = sample.trim().toLowerCase();
+        if (sampleLower.startsWith('<!doctype') || sampleLower.startsWith('<html')) {
+          console.warn('Blocked caching HTML document in IndexedDB cache for:', url);
+          return;
+        }
+      } catch {
+        // Binary files may fail decoding, safe to proceed
+      }
+
       const headers: Record<string, string> = {
         'content-length': String(buffer.byteLength),
       };
@@ -130,13 +160,126 @@ function getIndexedDBCacheInstance(): IndexedDBCache {
   return cachedIDBInstance;
 }
 
+/**
+ * Scans CacheStorage and IndexedDB to purge corrupted HTML responses
+ * (e.g. index.html cached under config.json from previous runs).
+ */
+export async function purgeCorruptedTransformersCache(): Promise<void> {
+  if (typeof window === 'undefined') return;
+
+  // 1. Clean CacheStorage ('transformers-cache')
+  if ('caches' in window && window.caches) {
+    try {
+      const cacheNames = await window.caches.keys();
+      for (const name of cacheNames) {
+        if (name.includes('transformers')) {
+          const cache = await window.caches.open(name);
+          const requests = await cache.keys();
+          for (const req of requests) {
+            const url = req.url || '';
+            // If the key is a local model path or contains /models/, purge it
+            if (url.includes('/models/') || !url.startsWith('http')) {
+              await cache.delete(req);
+              continue;
+            }
+            try {
+              const res = await cache.match(req);
+              if (res) {
+                const contentType = res.headers.get('content-type') || '';
+                if (contentType.includes('text/html')) {
+                  await cache.delete(req);
+                  continue;
+                }
+                const text = await res.clone().text();
+                const sample = text.trim().toLowerCase();
+                if (sample.startsWith('<!doctype') || sample.startsWith('<html')) {
+                  await cache.delete(req);
+                }
+              }
+            } catch {
+              // Binary files will fail text() or match, which is expected
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('CacheStorage inspection warning:', e);
+    }
+  }
+
+  // 2. Clean IndexedDB ('myspendlens-transformers-cache')
+  if ('indexedDB' in window && window.indexedDB) {
+    try {
+      await new Promise<void>((resolve) => {
+        const req = indexedDB.open('myspendlens-transformers-cache', 1);
+        req.onsuccess = () => {
+          const db = req.result;
+          if (!db.objectStoreNames.contains('files')) {
+            db.close();
+            resolve();
+            return;
+          }
+          const tx = db.transaction('files', 'readwrite');
+          const store = tx.objectStore('files');
+          const getAllKeysReq = store.getAllKeys();
+          getAllKeysReq.onsuccess = () => {
+            const keys = getAllKeysReq.result;
+            for (const key of keys) {
+              const keyStr = String(key);
+              if (keyStr.includes('/models/') || !keyStr.startsWith('http')) {
+                store.delete(key);
+                continue;
+              }
+              const getValReq = store.get(key);
+              getValReq.onsuccess = () => {
+                const val = getValReq.result;
+                if (val && val.buffer) {
+                  try {
+                    const sample = new TextDecoder().decode(
+                      new Uint8Array(val.buffer, 0, Math.min(128, val.buffer.byteLength))
+                    );
+                    const sampleLower = sample.trim().toLowerCase();
+                    if (sampleLower.startsWith('<!doctype') || sampleLower.startsWith('<html')) {
+                      store.delete(key);
+                    }
+                  } catch {
+                    // Binary files, safe to keep
+                  }
+                }
+              };
+            }
+          };
+          tx.oncomplete = () => {
+            db.close();
+            resolve();
+          };
+          tx.onerror = () => {
+            db.close();
+            resolve();
+          };
+        };
+        req.onerror = () => resolve();
+      });
+    } catch (e) {
+      console.warn('IndexedDB inspection warning:', e);
+    }
+  }
+}
+
 // Safely configure caching based on available APIs in the current environment
 function configureTransformersCache() {
   // Models are fetched from Hugging Face Hub CDN and cached in browser storage.
-  // Disable allowLocalModels in browser so it does not query non-existent local paths
-  // that return index.html on SPA servers (preventing JSON.parse '<!DOCTYPE' SyntaxError).
+  // Disable allowLocalModels in browser so it never queries non-existent local paths
+  // that return index.html on SPA servers.
   env.allowLocalModels = false;
   env.allowRemoteModels = true;
+  env.localModelPath = '';
+
+  // Single-threaded WASM to avoid SharedArrayBuffer / crossOriginIsolated requirement in browser
+  if (typeof window !== 'undefined' && env.backends?.onnx?.wasm) {
+    env.backends.onnx.wasm.numThreads = 1;
+    env.backends.onnx.wasm.proxy = false;
+  }
 
   const hasCacheStorage =
     typeof window !== 'undefined' &&
@@ -236,23 +379,61 @@ export class MySpendLensTier2Engine {
     onProgress?: (info: Tier2ProgressInfo) => void,
     categories?: CategoryDefinition[]
   ): Promise<void> {
-    configureTransformersCache();
+    if (this.isReady && this.extractor) {
+      if (categories && categories.length > 0) {
+        await this.syncDynamicCategories(categories);
+      }
+      return;
+    }
 
-    this.extractor = await pipeline('feature-extraction', MySpendLensTier2Engine.MODEL_ID, {
-      quantized: true,
-      progress_callback: (p: Record<string, unknown>) => {
-        if (onProgress) {
-          onProgress({
-            status: p.status as Tier2ProgressInfo['status'],
-            name: typeof p.name === 'string' ? p.name : undefined,
-            file: typeof p.file === 'string' ? p.file : undefined,
-            progress: typeof p.progress === 'number' ? p.progress : undefined,
-            loaded: typeof p.loaded === 'number' ? p.loaded : undefined,
-            total: typeof p.total === 'number' ? p.total : undefined,
-          });
+    if (!this.extractor) {
+      configureTransformersCache();
+      await purgeCorruptedTransformersCache();
+
+      const loadPipeline = () =>
+        pipeline('feature-extraction', MySpendLensTier2Engine.MODEL_ID, {
+          quantized: true,
+          progress_callback: (p: Record<string, unknown>) => {
+            if (onProgress) {
+              onProgress({
+                status: p.status as Tier2ProgressInfo['status'],
+                name: typeof p.name === 'string' ? p.name : undefined,
+                file: typeof p.file === 'string' ? p.file : undefined,
+                progress: typeof p.progress === 'number' ? p.progress : undefined,
+                loaded: typeof p.loaded === 'number' ? p.loaded : undefined,
+                total: typeof p.total === 'number' ? p.total : undefined,
+              });
+            }
+          },
+        });
+
+      try {
+        this.extractor = await loadPipeline();
+      } catch (err: unknown) {
+        const errMsg = String(err);
+        if (
+          errMsg.includes('<!DOCTYPE') ||
+          errMsg.includes('Unexpected token') ||
+          errMsg.includes('SyntaxError')
+        ) {
+          console.warn('Corrupted model cache detected. Wiping cache and retrying clean download...', err);
+          if (typeof window !== 'undefined' && 'caches' in window && window.caches) {
+            try {
+              await window.caches.delete('transformers-cache');
+            } catch {}
+          }
+          if (typeof window !== 'undefined' && 'indexedDB' in window && window.indexedDB) {
+            try {
+              indexedDB.deleteDatabase('myspendlens-transformers-cache');
+            } catch {}
+          }
+          // Retry download once with clean cache
+          this.extractor = await loadPipeline();
+        } else {
+          throw err;
         }
-      },
-    });
+      }
+    }
 
     // Compute class centroid embedding vectors
     await this.computeClassCentroids(categories);

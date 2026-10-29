@@ -10,6 +10,8 @@ import {
   Database,
   Trash2,
   RotateCcw,
+  DownloadCloud,
+  Loader2,
 } from 'lucide-react';
 import { ModelStats, Tier2LoadingState } from '../types';
 
@@ -26,6 +28,7 @@ interface SettingsViewProps {
   totalTransactions?: number;
   onClearDatabase?: () => void;
   onFactoryReset?: () => void;
+  onPreloadTier2?: () => void;
 }
 
 export const SettingsView: React.FC<SettingsViewProps> = ({
@@ -41,6 +44,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   totalTransactions = 0,
   onClearDatabase,
   onFactoryReset,
+  onPreloadTier2,
 }) => {
   return (
     <div className="view-container">
@@ -224,11 +228,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 {tier2State.status === 'downloading' && (
                   <span className="badge-pill badge-amber">Loading {Math.round(tier2State.progress)}%</span>
                 )}
-                {tier2State.status === 'idle' && (
-                  <span className="badge-pill badge-muted">On-Demand</span>
-                )}
                 {tier2State.status === 'error' && (
                   <span className="badge-pill badge-rose">Error</span>
+                )}
+                {tier2State.status !== 'ready' && tier2State.status !== 'downloading' && tier2State.status !== 'error' && (
+                  <span className="badge-pill badge-muted">On-Demand</span>
                 )}
               </div>
               <span className="engine-status-detail">
@@ -236,11 +240,32 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   ? 'Quantized ONNX stored in local cache & memory'
                   : tier2State.status === 'downloading'
                   ? `Loading (${tier2State.file || 'ONNX'})...`
-                  : tier2State.status === 'idle'
-                  ? `Loads only on low confidence fallback (<${(tier1Threshold * 100).toFixed(0)}%) or if Tier 1 is disabled.`
-                  : 'Engine encountered an issue.'}
+                  : tier2State.status === 'error'
+                  ? `Engine issue: ${tier2State.message || 'Error initializing'}`
+                  : `Loads only on low confidence fallback (<${(tier1Threshold * 100).toFixed(0)}%) or if Tier 1 is disabled.`}
               </span>
             </div>
+            {onPreloadTier2 && tier2State.status !== 'ready' && (
+              <button
+                type="button"
+                className="btn-preload-tier2"
+                onClick={onPreloadTier2}
+                disabled={isProcessing || tier2State.status === 'downloading'}
+                title="Initialize Tier 2 ONNX model into memory now"
+              >
+                {tier2State.status === 'downloading' ? (
+                  <>
+                    <Loader2 size={13} className="spinner" />
+                    <span>Loading...</span>
+                  </>
+                ) : (
+                  <>
+                    <DownloadCloud size={13} />
+                    <span>Load in RAM</span>
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </div>
 

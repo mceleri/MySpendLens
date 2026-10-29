@@ -8,15 +8,41 @@ export default defineConfig({
     {
       name: 'spa-fallback-filter',
       configureServer(server) {
-        server.middlewares.use((req, res, next) => {
-          // If a request is for /models/ or static model files, return 404 instead of falling back to index.html
-          if (req.url && (req.url.startsWith('/models/') || req.url.includes('/models/'))) {
-            res.statusCode = 404;
-            res.end('Model file not found locally');
-            return;
-          }
-          next();
-        });
+        // Return a post-hook callback so it runs AFTER static file middleware (allowing public/ files to be served)
+        // and BEFORE or intercepting the SPA index.html fallback
+        return () => {
+          server.middlewares.use((req, res, next) => {
+            // Never serve index.html for model assets, json, or binary files not found on disk
+            if (req.url && (
+              req.url.startsWith('/models/') ||
+              req.url.includes('/models/') ||
+              req.url.includes('Xenova') ||
+              /\.(json|onnx|wasm|bin|txt)(\?.*)?$/i.test(req.url)
+            )) {
+              res.statusCode = 404;
+              res.end('File not found locally');
+              return;
+            }
+            next();
+          });
+        };
+      },
+      configurePreviewServer(server) {
+        return () => {
+          server.middlewares.use((req, res, next) => {
+            if (req.url && (
+              req.url.startsWith('/models/') ||
+              req.url.includes('/models/') ||
+              req.url.includes('Xenova') ||
+              /\.(json|onnx|wasm|bin|txt)(\?.*)?$/i.test(req.url)
+            )) {
+              res.statusCode = 404;
+              res.end('File not found locally');
+              return;
+            }
+            next();
+          });
+        };
       },
     },
   ],

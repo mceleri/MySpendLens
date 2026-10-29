@@ -101,7 +101,6 @@ export const App: React.FC = () => {
       <Header
         isLoadingModel={isLoadingModel}
         modelError={modelError}
-        tier2LoadingState={tier2LoadingState}
         isProcessing={isProcessing}
         onGoHome={handleGoHome}
         hasPendingTraining={hasPendingTraining}
@@ -244,7 +243,11 @@ export const App: React.FC = () => {
             tier1Threshold={tier1Threshold}
             onChangeThreshold={handleChangeThreshold}
             tier1Stats={modelStats}
-            tier2State={tier2LoadingState}
+            tier2State={
+              engineTier2Ref.current?.isReady
+                ? { status: 'ready', progress: 100, message: 'Model loaded in memory.' }
+                : tier2LoadingState
+            }
             isProcessing={isProcessing}
             onReclassify={() =>
               handleReclassify((rows, onProg) => classifyRows(rows, useTier1, tier1Threshold, onProg))
@@ -252,6 +255,13 @@ export const App: React.FC = () => {
             hasTransactions={transactions.length > 0}
             totalTransactions={transactions.length}
             onClearDatabase={handleClearDatabase}
+            onPreloadTier2={async () => {
+              try {
+                await ensureTier2Engine();
+              } catch (e) {
+                console.warn('Preload Tier 2 failed:', e);
+              }
+            }}
             onFactoryReset={() =>
               handleFactoryReset(async () => {
                 setUseTier1(true);
