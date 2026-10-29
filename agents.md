@@ -29,7 +29,7 @@ flowchart TD
 
 ### 1. Dati & Dataset
 
-#### 🔹 [`clean_anchors_it_es.csv`](file:///home/mceleri/workspace/MySpendLens/clean_anchors_it_es.csv)
+#### 🔹 [`clean_anchors_it_es.csv`](./clean_anchors_it_es.csv)
 - **Ruolo:** Dataset delle ancore semantiche pulite (Phase 1 & Phase 2).
 - **Contenuto:** Esattamente **1.000 POI unici** (500 Italia, 500 Spagna) categorizzati secondo lo schema standard di MySpendLens.
 - **Colonne:** `Country`, `Clean_Name`, `Category`.
@@ -41,7 +41,7 @@ flowchart TD
   - `Shopping` (110 IT / 110 ES = 220 POI)
   - `Utilities` (65 IT / 65 ES = 130 POI)
 
-#### 🔹 [`myspendlens_synthetic_training_it_es.csv`](file:///home/mceleri/workspace/MySpendLens/myspendlens_synthetic_training_it_es.csv)
+#### 🔹 [`myspendlens_synthetic_training_it_es.csv`](./myspendlens_synthetic_training_it_es.csv)
 - **Ruolo:** Dataset di addestramento sintetico per il bootstrap (Tier 1).
 - **Contenuto:** **4.000 transazioni bancarie realistiche** (4 variazioni per ciascuno dei 1.000 POI).
 - **Colonne:** `Noisy_Description` (feature di testo), `Target_Category` (etichetta supervisionata).
@@ -55,22 +55,22 @@ flowchart TD
 
 ### 2. Script della Pipeline di Build & Sintesi
 
-#### 🔹 [`build_datasets.py`](file:///home/mceleri/workspace/MySpendLens/build_datasets.py)
+#### 🔹 [`build_datasets.py`](./build_datasets.py)
 - **Ruolo:** Generatore deterministico e validatore locale della base POI e del CSV sintetico da 4.000 righe.
 - **Funzionalità:**
   - Valida l'unicità e la normalizzazione dei 500 POI italiani e 500 spagnoli.
   - Genera le 4 variazioni sintetiche con algoritmi deterministici di compressione consonantica (`truncate_vowels` e `truncate_prefix_slice`).
 
-#### 🔹 [`generate_dataset.py`](file:///home/mceleri/workspace/MySpendLens/generate_dataset.py)
+#### 🔹 [`generate_dataset.py`](./generate_dataset.py)
 - **Ruolo:** Pipeline di generazione sintetica LLM-based tramite **Google Gemini API** (Phase 3).
 - **SDK & Modello:** Utilizza l'SDK ufficiale corrente `google-genai` e il modello `gemini-3.8-flash` con output strutturato vincolato tramite schema JSON (`response_format`).
 - **Logica:** Legge `clean_anchors_it_es.csv` a blocchi (chunk), invia il prompt contestuale con i prefissi bancari locali e raccoglie le risposte gestendo rate limiting (`time.sleep`) e retry con gestione errori.
 
-#### 🔹 [`fetch_pois_overpass.py`](file:///home/mceleri/workspace/MySpendLens/fetch_pois_overpass.py)
+#### 🔹 [`fetch_pois_overpass.py`](./fetch_pois_overpass.py)
 - **Ruolo:** Script ausiliario di estrazione OpenStreetMap Overpass API (Phase 1 Action A).
 - **Dettagli:** Definisce le bounding box metropolitane per Milano, Roma, Madrid e Barcellona, interrogando i tag `shop=*` e `amenity=*` con normalizzazione automatica dei nomi commerciali.
 
-#### 🔹 [`train_base_model.py`](file:///home/mceleri/workspace/MySpendLens/train_base_model.py)
+#### 🔹 [`train_base_model.py`](./train_base_model.py)
 - **Ruolo:** Script di build del modello (Step 1 Build Pipeline).
 - **Componenti ML:**
   - `TfidfVectorizer(analyzer='char', ngram_range=(3, 5), max_features=7000, max_df=0.04, sublinear_tf=True, norm='l2')`.
@@ -86,7 +86,7 @@ flowchart TD
 
 ### 3. Asset & Runtime per la Webapp
 
-#### 🔹 [`myspendlens_tier1_base_model.json`](file:///home/mceleri/workspace/MySpendLens/myspendlens_tier1_base_model.json)
+#### 🔹 [`myspendlens_tier1_base_model.json`](./public/myspendlens_tier1_base_model.json)
 - **Ruolo:** Artefatto statico finale del modello di classificazione Tier 1, servito come file statico nella webapp (nella cartella `public/` o `assets/`).
 - **Dimensione:** **486,7 KB** (riducibile a **~110 KB** tramite compressione standard gzip/brotli del web server/CDN).
 - **Struttura interna del JSON:**
@@ -129,7 +129,7 @@ flowchart TD
   }
   ```
 
-#### 🔹 [`tier1_browser_engine.ts`](file:///home/mceleri/workspace/MySpendLens/tier1_browser_engine.ts)
+#### 🔹 [`tier1_browser_engine.ts`](./src/engine/tier1_browser_engine.ts)
 - **Ruolo:** Modulo client TypeScript per l'inferenza e l'apprendimento incrementale in-browser.
 - **Interfaccia principale:**
   ```typescript
