@@ -2,6 +2,9 @@
 
 A local-first, privacy-focused bank statement categorizer and financial visualization tool that runs entirely in the browser. No server uploads, no telemetry, and no external AI API calls.
 
+> 🌐 **Live Web App**: [https://mceleri.github.io/MySpendLens/](https://mceleri.github.io/MySpendLens/)  
+> Try it directly online — all processing and data storage remain 100% private and local to your device.
+
 ---
 
 ## Overview
