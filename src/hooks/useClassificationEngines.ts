@@ -85,7 +85,7 @@ export function useClassificationEngines(
       // 1. Check if a custom or learned Tier 1 model is stored in IndexedDB
       let artifact: Tier1ModelArtifact | null = await getCustomTier1ModelFromDB();
       if (!artifact || !artifact.weights || !artifact.vocabulary) {
-        const res = await fetch('/myspendlens_tier1_base_model.json');
+        const res = await fetch(`${import.meta.env.BASE_URL}myspendlens_tier1_base_model.json`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         artifact = await res.json();
       }

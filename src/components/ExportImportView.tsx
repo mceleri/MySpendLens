@@ -72,7 +72,7 @@ export const ExportImportView: React.FC<ExportImportViewProps> = ({
   const getActiveTier1Artifact = async (): Promise<Tier1ModelArtifact> => {
     if (tier1Artifact) return tier1Artifact;
     try {
-      const res = await fetch('/myspendlens_tier1_base_model.json');
+      const res = await fetch(`${import.meta.env.BASE_URL}myspendlens_tier1_base_model.json`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
     } catch {

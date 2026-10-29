@@ -279,7 +279,7 @@ export const App: React.FC = () => {
                 setUseTier1(true);
                 setTier1Threshold(0.85);
                 try {
-                  const res = await fetch('/myspendlens_tier1_base_model.json');
+                  const res = await fetch(`${import.meta.env.BASE_URL}myspendlens_tier1_base_model.json`);
                   if (res.ok) {
                     const artifact = await res.json();
                     engineTier1Ref.current = new MySpendLensTier1Engine(artifact);

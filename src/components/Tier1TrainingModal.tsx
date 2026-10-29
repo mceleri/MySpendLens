@@ -153,8 +153,8 @@ export const Tier1TrainingModal: React.FC<Tier1TrainingModalProps> = ({
 
     try {
       // STEP 1: Download & Load myspendlens_clean_anchors.json
-      updateStep('anchors_download', { status: 'running', detail: 'Downloading from /myspendlens_clean_anchors.json...' });
-      const anchorsRes = await fetch('/myspendlens_clean_anchors.json');
+      updateStep('anchors_download', { status: 'running', detail: 'Downloading base anchors...' });
+      const anchorsRes = await fetch(`${import.meta.env.BASE_URL}myspendlens_clean_anchors.json`);
       if (!anchorsRes.ok) {
         throw new Error(`Unable to download base anchors (HTTP ${anchorsRes.status})`);
       }
