@@ -45,9 +45,9 @@ export class ErrorBoundary extends Component<Props, State> {
             <div className="inline-flex p-3 rounded-full bg-rose-500/10 text-rose-500 mb-4">
               <AlertTriangle size={32} />
             </div>
-            <h2 className="text-xl font-bold text-white mb-2">Qualcosa è andato storto</h2>
+            <h2 className="text-xl font-bold text-white mb-2">Something went wrong</h2>
             <p className="text-sm text-slate-400 mb-4">
-              Si è verificato un errore imprevisto nell'interfaccia. I tuoi dati su IndexedDB sono al sicuro.
+              An unexpected UI error occurred. Your data in IndexedDB is safe.
             </p>
             {this.state.error && (
               <pre className="text-xs font-mono bg-slate-950 p-3 rounded text-rose-300 text-left overflow-auto max-h-32 mb-6 border border-slate-800">
@@ -60,7 +60,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 onClick={this.handleReset}
                 className="btn-secondary px-4 py-2 flex items-center gap-2 text-sm"
               >
-                <span>Riprova</span>
+                <span>Try Again</span>
               </button>
               <button
                 type="button"
@@ -68,7 +68,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 className="btn-primary px-4 py-2 flex items-center gap-2 text-sm"
               >
                 <RotateCcw size={15} />
-                <span>Ricarica Pagina</span>
+                <span>Reload Page</span>
               </button>
             </div>
           </div>

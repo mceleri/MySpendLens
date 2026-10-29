@@ -2,7 +2,7 @@
  * MySpendLens — IndexedDB Local Database
  *
  * Stores all historical transactions across multiple file uploads.
- * Provides deduplication based on transaction fingerprint: (date + causale/description + amount).
+ * Provides deduplication based on transaction fingerprint: (date + description + amount).
  * Also manages custom and default category definitions and reassignments.
  */
 

@@ -76,7 +76,7 @@ export const ActionGrid: React.FC<ActionGridProps> = ({
           </div>
         </button>
 
-        {/* 3. Visualizza Distribuzione Spese (Lens Icon) */}
+        {/* 3. View Expenses Distribution (Lens Icon) */}
         <button
           type="button"
           className="action-card action-distribution"
@@ -94,7 +94,7 @@ export const ActionGrid: React.FC<ActionGridProps> = ({
           </div>
         </button>
 
-        {/* 4. Visualizza Movimenti (Table Icon) */}
+        {/* 4. View Transactions (Table Icon) */}
         <button
           type="button"
           className="action-card action-transactions"

@@ -118,7 +118,7 @@ export const App: React.FC = () => {
             <div className="mobile-processing-overlay">
               <div className="mobile-processing-card">
                 <Loader2 size={24} className="spinner text-primary" />
-                <span>Caricamento vista...</span>
+                <span>Loading view...</span>
               </div>
             </div>
           }

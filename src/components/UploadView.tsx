@@ -198,7 +198,7 @@ export const UploadView: React.FC<UploadViewProps> = ({
   // STEP 2 -> STEP 3: Analyze mapping and deduplicate
   const handleConfirmMapping = () => {
     if (!inspection || !descCol) {
-      setErrorMsg('Please select at least a Description / Causale column.');
+      setErrorMsg('Please select at least a Description column.');
       return;
     }
 
@@ -458,7 +458,7 @@ export const UploadView: React.FC<UploadViewProps> = ({
                             <div className="preview-th-content">
                               <span>{h}</span>
                               {isDate && <span className="th-tag tag-date">Date</span>}
-                              {isDesc && <span className="th-tag tag-desc">Causale</span>}
+                              {isDesc && <span className="th-tag tag-desc">Description</span>}
                               {isAmt && <span className="th-tag tag-amount">Amount</span>}
                             </div>
                           </th>
@@ -539,23 +539,23 @@ export const UploadView: React.FC<UploadViewProps> = ({
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-xs font-semibold text-main flex items-center gap-1.5">
                         <Calendar size={12} className="text-primary" />
-                        <span>Formato data nel file:</span>
+                        <span>Date format in file:</span>
                       </span>
                       {dateInspection.isAmbiguous ? (
                         <span className="badge-pill badge-warning text-xs flex items-center gap-1">
                           <AlertTriangle size={11} />
-                          Formato ambiguo (richiesta conferma)
+                          Ambiguous format (confirmation required)
                         </span>
                       ) : (
                         <span className="badge-pill badge-primary text-xs">
-                          Rilevato: {dateFormat}
+                          Detected: {dateFormat}
                         </span>
                       )}
                     </div>
 
                     {dateInspection.isAmbiguous && (
                       <p className="text-xs text-muted mb-2">
-                        I valori come <code className="font-mono text-primary font-semibold">"{dateInspection.sampleValue}"</code> potrebbero essere Giorno/Mese o Mese/Giorno. Specifica quale parte viene prima:
+                        Values like <code className="font-mono text-primary font-semibold">"{dateInspection.sampleValue}"</code> could be Day/Month or Month/Day. Please specify which part comes first:
                       </p>
                     )}
 
@@ -566,7 +566,7 @@ export const UploadView: React.FC<UploadViewProps> = ({
                         onClick={() => setDateFormat('DD/MM/YYYY')}
                       >
                         <span className="toggle-main">DD/MM/YYYY</span>
-                        <span className="toggle-sub">Giorno prima (es. 28/09/2026)</span>
+                        <span className="toggle-sub">Day first (e.g. 28/09/2026)</span>
                       </button>
 
                       <button
@@ -575,7 +575,7 @@ export const UploadView: React.FC<UploadViewProps> = ({
                         onClick={() => setDateFormat('MM/DD/YYYY')}
                       >
                         <span className="toggle-main">MM/DD/YYYY</span>
-                        <span className="toggle-sub">Mese prima (es. 09/28/2026)</span>
+                        <span className="toggle-sub">Month first (e.g. 09/28/2026)</span>
                       </button>
                     </div>
                   </div>
@@ -585,7 +585,7 @@ export const UploadView: React.FC<UploadViewProps> = ({
               <div className="column-field">
                 <label className="column-label">
                   <FileText size={13} className="text-purple" />
-                  <span>Description / Causale *</span>
+                  <span>Description *</span>
                 </label>
                 <select
                   value={descCol}
