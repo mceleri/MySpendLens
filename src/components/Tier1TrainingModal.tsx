@@ -279,7 +279,7 @@ export const Tier1TrainingModal: React.FC<Tier1TrainingModalProps> = ({
 
       const trainSummary = await t1.trainDataset(fullDataset, {
         epochs: 10,
-        learningRate: 0.35,
+        learningRate: 0.08,
         l2Reg: 0.0001,
         yieldIntervalMs: 60,
         onProgress: (p) => {

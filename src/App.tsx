@@ -1,15 +1,7 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, Suspense, lazy } from 'react';
 import { Header } from './components/Header';
 import { HomeHeroOverview } from './components/HomeHeroOverview';
 import { ActionGrid } from './components/ActionGrid';
-import { ExpensesDistributionView } from './components/ExpensesDistributionView';
-import { SettingsView } from './components/SettingsView';
-import { UploadView } from './components/UploadView';
-import { TransactionsTable } from './components/TransactionsTable';
-import { CategoriesView } from './components/CategoriesView';
-import { ExportImportView } from './components/ExportImportView';
-import { ChartsView } from './components/ChartsView';
-import { Tier1TrainingModal } from './components/Tier1TrainingModal';
 import { MySpendLensTier1Engine } from './engine/tier1_browser_engine';
 import { DEFAULT_CATEGORY_DEFINITIONS } from './utils/categories';
 import { saveCustomTier1ModelToDB } from './db/transactionDb';
@@ -17,6 +9,16 @@ import { useAppNavigation } from './hooks/useAppNavigation';
 import { useClassificationEngines } from './hooks/useClassificationEngines';
 import { useTransactionData } from './hooks/useTransactionData';
 import { Loader2 } from 'lucide-react';
+
+// Code-split heavy view components for instant initial page loads
+const UploadView = lazy(() => import('./components/UploadView').then((m) => ({ default: m.UploadView })));
+const ChartsView = lazy(() => import('./components/ChartsView').then((m) => ({ default: m.ChartsView })));
+const ExpensesDistributionView = lazy(() => import('./components/ExpensesDistributionView').then((m) => ({ default: m.ExpensesDistributionView })));
+const TransactionsTable = lazy(() => import('./components/TransactionsTable').then((m) => ({ default: m.TransactionsTable })));
+const CategoriesView = lazy(() => import('./components/CategoriesView').then((m) => ({ default: m.CategoriesView })));
+const ExportImportView = lazy(() => import('./components/ExportImportView').then((m) => ({ default: m.ExportImportView })));
+const SettingsView = lazy(() => import('./components/SettingsView').then((m) => ({ default: m.SettingsView })));
+const Tier1TrainingModal = lazy(() => import('./components/Tier1TrainingModal').then((m) => ({ default: m.Tier1TrainingModal })));
 
 export const App: React.FC = () => {
   const [isTrainingModalOpen, setIsTrainingModalOpen] = useState<boolean>(false);
@@ -111,6 +113,16 @@ export const App: React.FC = () => {
 
       {/* Main Viewport */}
       <main className="mobile-main-viewport">
+        <Suspense
+          fallback={
+            <div className="mobile-processing-overlay">
+              <div className="mobile-processing-card">
+                <Loader2 size={24} className="spinner text-primary" />
+                <span>Caricamento vista...</span>
+              </div>
+            </div>
+          }
+        >
         {/* Dashboard / Home View */}
         {activeView === 'home' && (
           <div className="mobile-home-content">
@@ -290,6 +302,7 @@ export const App: React.FC = () => {
             }
           />
         )}
+        </Suspense>
 
         {/* Processing Indicator Overlay */}
         {isProcessing && (
@@ -303,17 +316,21 @@ export const App: React.FC = () => {
       </main>
 
       {/* Tier 1 Personal Training Modal */}
-      <Tier1TrainingModal
-        isOpen={isTrainingModalOpen}
-        onClose={() => setIsTrainingModalOpen(false)}
-        transactions={transactions}
-        categories={categories}
-        tier1Engine={engineTier1Ref.current}
-        tier2Engine={engineTier2Ref.current}
-        ensureTier1Engine={ensureTier1Engine}
-        ensureTier2Engine={ensureTier2Engine}
-        onTrainingComplete={handleTrainingComplete}
-      />
+      {isTrainingModalOpen && (
+        <Suspense fallback={null}>
+          <Tier1TrainingModal
+            isOpen={isTrainingModalOpen}
+            onClose={() => setIsTrainingModalOpen(false)}
+            transactions={transactions}
+            categories={categories}
+            tier1Engine={engineTier1Ref.current}
+            tier2Engine={engineTier2Ref.current}
+            ensureTier1Engine={ensureTier1Engine}
+            ensureTier2Engine={ensureTier2Engine}
+            onTrainingComplete={handleTrainingComplete}
+          />
+        </Suspense>
+      )}
     </div>
   );
 };

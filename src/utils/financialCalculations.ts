@@ -99,12 +99,12 @@ export function parseTransactionDate(dateStr?: string): Date | null {
     }
   }
 
-  // Try DD/MM without year (assume 2026 or current year)
+  // Try DD/MM without year (assume current year)
   const shortMatch = trimmed.match(/^(\d{1,2})[-/.](\d{1,2})/);
   if (shortMatch) {
     const day = parseInt(shortMatch[1], 10);
     const month = parseInt(shortMatch[2], 10) - 1;
-    return new Date(2026, month, day);
+    return new Date(new Date().getFullYear(), month, day);
   }
 
   const timestamp = Date.parse(trimmed);

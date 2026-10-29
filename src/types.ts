@@ -1,6 +1,7 @@
 export interface ProcessedTransaction {
   id: string;
   originalIndex: number;
+  fingerprint?: string;
   date?: string;
   amount?: string;
   rawDescription: string;

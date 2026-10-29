@@ -25,7 +25,7 @@ import time
 from collections import Counter, defaultdict
 
 INPUT_CSV = "myspendlens_synthetic_training_it_es.csv"
-OUTPUT_JSON = "myspendlens_tier1_base_model.json"
+OUTPUT_JSON = os.path.join("public", "myspendlens_tier1_base_model.json")
 
 import re
 
@@ -56,7 +56,7 @@ BANK_NOISE_REGEX = re.compile(
     r"CARTA CREDITO|ADDEBITO SDD|CARGO RECIBO|CARGO REBO|ADEUDO SEPA|"
     r"BIZUM COMPRA|PAGO TARJETA|SDD SEPA|PAG POS|RECIBO|"
     r"BOLLETTA|FATTURA|MANDATO SEPA|MANDATO|SUMINISTRO|ADDEBITO PERIODICO|SERVIZI|"
-    r"AUT|ID|TX|REF|MND|SRL|SPA|SAU|SL|SA|"
+    r"SRL|SPA|SAU|SL|SA|"
     r"MILANO|ROMA|TORINO|BOLOGNA|FIRENZE|NAPOLI|GENOVA|VERONA|PADOVA|BARI|"
     r"MADRID|BARCELONA|VALENCIA|SEVILLA|BILBAO|ZARAGOZA|MALAGA|ALICANTE|MURCIA|VALLADOLID|"
     r"VIA|VIALE|CORSO|PIAZZA|CALLE|PASEO|AVENIDA|"
@@ -75,7 +75,8 @@ def preprocess_description(text: str) -> str:
     - Boosts leading merchant token(s) over trailing street address noise
     """
     upper = text.upper()
-    no_tx_codes = re.sub(r"\b(AUT|ID|TX|REF|MND)\s*[0-9A-Z]*\b", " ", upper)
+    # Match only transaction identifiers followed by digits/separators (preserves Autogrill, Autostrade, etc.)
+    no_tx_codes = re.sub(r"\b(?:AUT|ID|TX|REF|MND)\b[\s:.\-]*\d[\w-]*", " ", upper, flags=re.IGNORECASE)
     alpha_only = re.sub(r"[^A-Z\s]+", " ", no_tx_codes)
     cleaned = BANK_NOISE_REGEX.sub(" ", alpha_only)
     cleaned = re.sub(r"\s+", " ", cleaned).strip()

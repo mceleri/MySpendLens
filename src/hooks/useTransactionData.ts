@@ -8,6 +8,7 @@ import {
 import {
   getAllTransactionsFromDB,
   addTransactionsToDB,
+  batchMergeTransactionsInDB,
   updateTransactionsInDB,
   updateSingleTransactionInDB,
   deleteTransactionFromDB,
@@ -108,11 +109,19 @@ export function useTransactionData(options: UseTransactionDataOptions = {}) {
     initDb();
   }, []);
 
-  // Fast duplicate check set for file uploads
+  // Fast duplicate check set for file uploads with multiset occurrence indexing
   const existingFingerprints = useMemo(() => {
     const set = new Set<string>();
+    const counts = new Map<string, number>();
     for (const t of transactions) {
-      set.add(generateTransactionFingerprint(t.date, t.rawDescription, t.amount));
+      if (t.fingerprint) {
+        set.add(t.fingerprint);
+      } else {
+        const baseFp = generateTransactionFingerprint(t.date, t.rawDescription, t.amount);
+        const occ = counts.get(baseFp) ?? 0;
+        counts.set(baseFp, occ + 1);
+        set.add(occ > 0 ? `${baseFp}#${occ}` : baseFp);
+      }
     }
     return set;
   }, [transactions]);
@@ -393,12 +402,10 @@ export function useTransactionData(options: UseTransactionDataOptions = {}) {
           setTransactions(data.transactions);
           txCount = data.transactions.length;
         } else {
-          for (const tx of data.transactions) {
-            await updateSingleTransactionInDB(tx);
-          }
+          // Single-transaction batch merge with deduplication (avoids N+1 sequential transactions)
+          txCount = await batchMergeTransactionsInDB(data.transactions);
           const allTxs = await getAllTransactionsFromDB();
           setTransactions(allTxs);
-          txCount = data.transactions.length;
         }
       }
 

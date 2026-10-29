@@ -58,20 +58,24 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(50);
+
   // Manual classification & delete state
   const [editingTx, setEditingTx] = useState<ProcessedTransaction | null>(null);
+  const [confirmDeleteTx, setConfirmDeleteTx] = useState<ProcessedTransaction | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const handleDelete = async (tx: ProcessedTransaction) => {
-    const desc = tx.rawDescription ? `"${tx.rawDescription}"` : 'this transaction';
-    const amt = tx.amount ? ` (${tx.amount})` : '';
-    if (window.confirm(`Delete ${desc}${amt}? This cannot be undone.`)) {
-      setDeletingId(tx.id);
-      try {
-        await onDeleteTransaction(tx.id);
-      } finally {
-        setDeletingId(null);
-      }
+  const handleDeleteConfirmed = async () => {
+    if (!confirmDeleteTx) return;
+    const tx = confirmDeleteTx;
+    setDeletingId(tx.id);
+    try {
+      await onDeleteTransaction(tx.id);
+      setConfirmDeleteTx(null);
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -125,7 +129,16 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
     return result;
   }, [transactions, searchTerm, selectedCategory, sortField, sortOrder]);
 
+  const totalPages = Math.max(1, Math.ceil(filteredAndSorted.length / pageSize));
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+
+  const paginatedTransactions = useMemo(() => {
+    const start = (safeCurrentPage - 1) * pageSize;
+    return filteredAndSorted.slice(start, start + pageSize);
+  }, [filteredAndSorted, safeCurrentPage, pageSize]);
+
   const handleSort = (field: SortField) => {
+    setCurrentPage(1);
     if (sortField === field) {
       setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
     } else {
@@ -229,13 +242,19 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
               className="search-input"
               placeholder="Search description, date or category..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
             />
             {searchTerm && (
               <button
                 type="button"
                 className="clear-search-btn"
-                onClick={() => setSearchTerm('')}
+                onClick={() => {
+                  setSearchTerm('');
+                  setCurrentPage(1);
+                }}
               >
                 ✕
               </button>
@@ -258,7 +277,10 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
           <button
             type="button"
             className={`cat-pill ${selectedCategory === 'ALL' ? 'cat-pill-active' : ''}`}
-            onClick={() => setSelectedCategory('ALL')}
+            onClick={() => {
+              setSelectedCategory('ALL');
+              setCurrentPage(1);
+            }}
           >
             All ({categoryCounts.ALL || 0})
           </button>
@@ -279,7 +301,10 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
                   color: isActive ? meta.color : undefined,
                   background: isActive ? meta.bgLight : undefined,
                 }}
-                onClick={() => setSelectedCategory(catKey)}
+                onClick={() => {
+                  setSelectedCategory(catKey);
+                  setCurrentPage(1);
+                }}
               >
                 <Icon size={12} />
                 <span>{meta.label}</span>
@@ -382,7 +407,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
                   </td>
                 </tr>
               ) : (
-                filteredAndSorted.map((tx) => {
+                paginatedTransactions.map((tx) => {
                   const catMeta = getCategoryMeta(tx.category);
                   const confMeta = getConfidenceBadgeClass(tx.confidence);
                   const IconComponent = catMeta.icon;
@@ -522,7 +547,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
                             <button
                               type="button"
                               className="btn-tx-action btn-tx-delete"
-                              onClick={() => handleDelete(tx)}
+                              onClick={() => setConfirmDeleteTx(tx)}
                               disabled={deletingId === tx.id}
                               title="Delete transaction"
                               aria-label="Delete transaction"
@@ -563,7 +588,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
                                 <button
                                   type="button"
                                   className="btn-detail-action btn-detail-delete"
-                                  onClick={() => handleDelete(tx)}
+                                  onClick={() => setConfirmDeleteTx(tx)}
                                   disabled={deletingId === tx.id}
                                 >
                                   <Trash2 size={14} />
@@ -690,14 +715,61 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
         </div>
 
         <div className="table-footer-status">
-          <span>
-            Showing {filteredAndSorted.length} of {transactions.length} transactions
-          </span>
-          <div className="footer-status-chips">
+          <div className="flex items-center gap-3">
+            <span>
+              Showing {filteredAndSorted.length > 0 ? (safeCurrentPage - 1) * pageSize + 1 : 0}–
+              {Math.min(filteredAndSorted.length, safeCurrentPage * pageSize)} of {filteredAndSorted.length} transactions
+              {filteredAndSorted.length !== transactions.length && ` (${transactions.length} total)`}
+            </span>
+            <div className="flex items-center gap-1.5 text-xs">
+              <span className="text-muted">Per page:</span>
+              <select
+                className="column-select text-xs py-0.5 px-1.5 h-auto"
+                style={{ width: 'auto', minWidth: '60px' }}
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+              >
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+                <option value={250}>250</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
             {selectedCategory !== 'ALL' && (
-              <span className="text-muted">
+              <span className="text-muted text-xs">
                 (Category: <strong>{selectedCategory}</strong>)
               </span>
+            )}
+            {totalPages > 1 && (
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  className="btn-header-row-step py-1 px-2 text-xs"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={safeCurrentPage <= 1}
+                  aria-label="Previous Page"
+                >
+                  &larr; Prev
+                </button>
+                <span className="text-xs font-mono px-2">
+                  {safeCurrentPage} / {totalPages}
+                </span>
+                <button
+                  type="button"
+                  className="btn-header-row-step py-1 px-2 text-xs"
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={safeCurrentPage >= totalPages}
+                  aria-label="Next Page"
+                >
+                  Next &rarr;
+                </button>
+              </div>
             )}
           </div>
         </div>
@@ -794,6 +866,66 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({
                   </button>
                 );
               })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {confirmDeleteTx && (
+        <div className="manual-classify-overlay" onClick={() => setConfirmDeleteTx(null)}>
+          <div className="manual-classify-modal" style={{ maxWidth: '440px' }} onClick={(e) => e.stopPropagation()}>
+            <div className="manual-classify-header">
+              <div>
+                <h3 className="manual-classify-title text-danger flex items-center gap-2">
+                  <Trash2 size={18} />
+                  <span>Delete Transaction</span>
+                </h3>
+                <p className="manual-classify-subtitle">This action cannot be undone.</p>
+              </div>
+              <button
+                type="button"
+                className="btn-close-modal"
+                onClick={() => setConfirmDeleteTx(null)}
+                aria-label="Close"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="manual-classify-info-card my-3">
+              <div className="manual-tx-desc">{confirmDeleteTx.rawDescription}</div>
+              <div className="manual-tx-meta-row mt-1">
+                {confirmDeleteTx.date && <span className="font-mono text-muted">{confirmDeleteTx.date}</span>}
+                {confirmDeleteTx.amount && (
+                  <span className="font-mono font-semibold">
+                    {confirmDeleteTx.amount}
+                  </span>
+                )}
+                <span className="manual-current-badge">
+                  {confirmDeleteTx.category}
+                </span>
+              </div>
+            </div>
+
+            <div className="cat-inline-actions-row mt-4">
+              <button
+                type="button"
+                className="btn-cancel"
+                onClick={() => setConfirmDeleteTx(null)}
+                disabled={deletingId === confirmDeleteTx.id}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn-confirm-delete-direct"
+                onClick={handleDeleteConfirmed}
+                disabled={deletingId === confirmDeleteTx.id}
+              >
+                <Trash2 size={14} />
+                <span>{deletingId === confirmDeleteTx.id ? 'Deleting...' : 'Confirm Delete'}</span>
+              </button>
             </div>
           </div>
         </div>

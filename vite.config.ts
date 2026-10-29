@@ -51,5 +51,29 @@ export default defineConfig({
     port: 3000,
     open: false,
     allowedHosts: true
+  },
+  build: {
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules/@xenova/transformers') || id.includes('node_modules/onnxruntime-web') || id.includes('node_modules/onnxruntime-common')) {
+            return 'vendor-transformers';
+          }
+          if (id.includes('node_modules/xlsx')) {
+            return 'vendor-xlsx';
+          }
+          if (id.includes('node_modules/jszip')) {
+            return 'vendor-jszip';
+          }
+          if (id.includes('node_modules/lucide-react')) {
+            return 'vendor-icons';
+          }
+          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
+            return 'vendor-react';
+          }
+        },
+      },
+    },
   }
 });

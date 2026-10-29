@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
+import { useState, useRef, useCallback, useMemo } from 'react';
 import {
   MySpendLensTier1Engine,
   Tier1ModelArtifact,
@@ -61,17 +61,6 @@ export function useClassificationEngines(
   const engineTier1Ref = useRef<MySpendLensTier1Engine | null>(null);
   const engineTier2Ref = useRef<MySpendLensTier2Engine | null>(null);
   const tier2InitPromiseRef = useRef<Promise<MySpendLensTier2Engine> | null>(null);
-
-  // Synchronize tier2LoadingState whenever engineTier2Ref becomes ready
-  useEffect(() => {
-    if (engineTier2Ref.current?.isReady && tier2LoadingState.status !== 'ready') {
-      setTier2LoadingState({
-        status: 'ready',
-        progress: 100,
-        message: 'Model loaded in memory.',
-      });
-    }
-  }, [tier2LoadingState.status]);
 
   const effectiveTier2LoadingState = useMemo<Tier2LoadingState>(() => {
     if (engineTier2Ref.current?.isReady) {

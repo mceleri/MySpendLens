@@ -103,10 +103,19 @@ function getDb(): Promise<IDBDatabase> {
       };
 
       request.onsuccess = () => {
-        resolve(request.result);
+        const db = request.result;
+        db.onclose = () => {
+          dbInstancePromise = null;
+        };
+        db.onversionchange = () => {
+          db.close();
+          dbInstancePromise = null;
+        };
+        resolve(db);
       };
 
       request.onerror = () => {
+        dbInstancePromise = null;
         reject(request.error || new Error('Failed to open database'));
       };
     });
@@ -190,6 +199,62 @@ export async function addTransactionsToDB(
     }
 
     tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error);
+  });
+}
+
+/**
+ * Merges a batch of transactions into IndexedDB in a single readwrite transaction,
+ * ensuring multiset fingerprint deduplication and avoiding N+1 sequential transaction roundtrips.
+ */
+export async function batchMergeTransactionsInDB(
+  transactions: ProcessedTransaction[]
+): Promise<number> {
+  if (transactions.length === 0) return 0;
+  const db = await getDb();
+
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    const now = Date.now();
+
+    const getAllReq = store.getAll();
+    getAllReq.onsuccess = () => {
+      const existingItems = (getAllReq.result as StoredTransaction[]) || [];
+      const existingFps = new Set<string>();
+      for (const item of existingItems) {
+        if (item.fingerprint) {
+          existingFps.add(item.fingerprint);
+        }
+      }
+
+      const fileOccurrences = new Map<string, number>();
+      let addedCount = 0;
+
+      for (const item of transactions) {
+        const baseFp = generateTransactionFingerprint(item.date, item.rawDescription, item.amount);
+        const occ = fileOccurrences.get(baseFp) ?? 0;
+        fileOccurrences.set(baseFp, occ + 1);
+        const indexedFp = occ > 0 ? `${baseFp}#${occ}` : baseFp;
+
+        if (!existingFps.has(indexedFp)) {
+          const storedItem: StoredTransaction = {
+            ...item,
+            fingerprint: (item as StoredTransaction).fingerprint || indexedFp,
+            sourceFile: (item as StoredTransaction).sourceFile || 'backup_restore',
+            importedAt: (item as StoredTransaction).importedAt || now,
+          };
+          store.put(storedItem);
+          existingFps.add(indexedFp);
+          addedCount++;
+        }
+      }
+
+      tx.oncomplete = () => resolve(addedCount);
+    };
+
+    getAllReq.onerror = () => reject(getAllReq.error);
     tx.onerror = () => reject(tx.error);
     tx.onabort = () => reject(tx.error);
   });

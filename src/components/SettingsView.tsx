@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   ToggleLeft,
   ToggleRight,
@@ -12,6 +12,8 @@ import {
   RotateCcw,
   DownloadCloud,
   Loader2,
+  AlertTriangle,
+  X,
 } from 'lucide-react';
 import { ModelStats, Tier2LoadingState } from '../types';
 
@@ -46,6 +48,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   onFactoryReset,
   onPreloadTier2,
 }) => {
+  const [confirmAction, setConfirmAction] = useState<'clear' | 'factory_reset' | null>(null);
   return (
     <div className="view-container">
       <div className="settings-cards-stack">
@@ -147,15 +150,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               <button
                 type="button"
                 className="btn-settings-danger"
-                onClick={() => {
-                  if (
-                    window.confirm(
-                      `Are you sure you want to delete all ${totalTransactions} saved transactions? This action cannot be undone.`
-                    )
-                  ) {
-                    onClearDatabase();
-                  }
-                }}
+                onClick={() => setConfirmAction('clear')}
                 disabled={isProcessing}
               >
                 <Trash2 size={15} />
@@ -167,20 +162,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               <button
                 type="button"
                 className="btn-settings-factory-reset"
-                onClick={() => {
-                  if (
-                    window.confirm(
-                      'WARNING: Are you sure you want to completely reset the app?\n\n' +
-                      '• ALL stored transactions will be deleted\n' +
-                      '• Custom Tier 1 models will be cleared and restored to default weights\n' +
-                      '• Categories and colors will be reset to defaults\n' +
-                      '• Classification settings will be reset\n\n' +
-                      'The app will restart 100% clean as new.'
-                    )
-                  ) {
-                    onFactoryReset();
-                  }
-                }}
+                onClick={() => setConfirmAction('factory_reset')}
                 disabled={isProcessing}
               >
                 <RotateCcw size={15} />
@@ -281,6 +263,74 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           </p>
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      {confirmAction && (
+        <div className="manual-classify-overlay" onClick={() => setConfirmAction(null)}>
+          <div className="manual-classify-modal" style={{ maxWidth: '440px' }} onClick={(e) => e.stopPropagation()}>
+            <div className="manual-classify-header">
+              <div>
+                <h3 className="manual-classify-title text-danger flex items-center gap-2">
+                  <AlertTriangle size={18} />
+                  <span>
+                    {confirmAction === 'clear' ? 'Delete All Transactions' : 'Factory Reset'}
+                  </span>
+                </h3>
+                <p className="manual-classify-subtitle">
+                  {confirmAction === 'clear'
+                    ? `Are you sure you want to delete all ${totalTransactions} saved transactions?`
+                    : 'This will reset transactions, models and categories to default.'}
+                </p>
+              </div>
+              <button
+                type="button"
+                className="btn-close-modal"
+                onClick={() => setConfirmAction(null)}
+                aria-label="Close"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="alert-error-msg my-3 text-xs leading-relaxed">
+              {confirmAction === 'clear' ? (
+                <span>All local transaction records will be permanently removed from IndexedDB.</span>
+              ) : (
+                <ul className="list-disc pl-4 space-y-1">
+                  <li>ALL stored transactions will be deleted</li>
+                  <li>Custom Tier 1 models will be reset to default weights</li>
+                  <li>Categories and colors will be reset to defaults</li>
+                  <li>All settings will be restored to factory state</li>
+                </ul>
+              )}
+            </div>
+
+            <div className="cat-inline-actions-row mt-4">
+              <button
+                type="button"
+                className="btn-cancel"
+                onClick={() => setConfirmAction(null)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn-confirm-delete-direct"
+                onClick={() => {
+                  if (confirmAction === 'clear') {
+                    onClearDatabase?.();
+                  } else {
+                    onFactoryReset?.();
+                  }
+                  setConfirmAction(null);
+                }}
+              >
+                <span>Confirm {confirmAction === 'clear' ? 'Deletion' : 'Reset'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

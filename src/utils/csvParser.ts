@@ -73,7 +73,7 @@ export function isValidAmountString(val?: unknown): boolean {
 }
 
 /**
- * Backwards compatibility helper for numeric amount check.
+ * @deprecated Use isValidAmountString instead.
  */
 export function isNumericAmountValue(s: unknown): boolean {
   return isValidAmountString(s);
