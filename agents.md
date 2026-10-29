@@ -77,10 +77,10 @@ flowchart TD
   - Advanced normalization in the preprocessor to strip authorization codes (`AUT`, `REF`, `ID`) and ubiquitous banking prefixes, maximizing the signal of brand root characters.
   - 6-class multinomial `LogisticRegression` model.
   - **Zero `.pkl`:** directly extracts `vocabulary_`, `idf_`, `classes_`, `coef_`, and `intercept_`, serializing them into a static JSON format.
-- **Metrics Achieved:**
-  - Accuracy on unseen truncated variations (holdout test): **97.00%**.
-  - Overall bootstrap accuracy (4,000 rows): **99.98%**.
-  - Average prediction latency: **0.204 ms per transaction**.
+- **Metrics & Practical Evaluation:**
+  - Initial tests: Demonstrates very good accuracy during initial exploratory tests of this work-in-progress application (validated on the author's real-world bank statements).
+  - Benchmark metric: **~93.8%** on a synthetic variation holdout set (evaluated on unseen truncated variations per POI).
+  - Average prediction latency: **~0.20 ms per transaction**.
 
 ---
 

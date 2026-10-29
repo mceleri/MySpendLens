@@ -13,7 +13,7 @@ A local-first, privacy-focused bank statement categorizer and financial visualiz
 
 Transactions are classified using a tiered cascade:
 1. **Tier 0 (Merchant Memory)**: Instant matching against previously verified transactions from your history.
-2. **Tier 1 (Linear Model)**: Fast multinomial logistic regression over 3–5 character n-grams (~0.2 ms per transaction), pre-trained on Italian and Spanish merchant datasets.
+2. **Tier 1 (Linear Model)**: Fast multinomial logistic regression over 3–5 character n-grams (~0.2 ms per transaction), pre-trained on Italian and Spanish merchant datasets. It provides very good practical accuracy in initial exploratory tests of this work-in-progress application (validated on the author's real-world bank statements, measuring ~93.8% on a synthetic variation holdout benchmark).
 3. **Tier 2 (Embedding Model Fallback)**: `Xenova/multilingual-e5-small` embedding model running via [Transformers.js](https://huggingface.co/docs/transformers.js) and ONNX Runtime Web, invoked only when Tier 1 confidence falls below a user-configured threshold.
 
 ---

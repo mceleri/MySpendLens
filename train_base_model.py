@@ -175,7 +175,7 @@ def train_with_sklearn(texts: list[str], labels: list[str]) -> dict:
 
 
 def extract_char_ngrams(text: str, n_min: int = NGRAM_MIN, n_max: int = NGRAM_MAX) -> Counter:
-    """Exact replica of scikit-learn's `analyzer='char'` n-gram extraction on preprocessed text."""
+    """Compatible pure-Python character n-gram extraction matching scikit-learn's `analyzer='char'` semantics."""
     clean = preprocess_description(text)
     counts: Counter = Counter()
     length = len(clean)
@@ -187,9 +187,9 @@ def extract_char_ngrams(text: str, n_min: int = NGRAM_MIN, n_max: int = NGRAM_MA
 
 def train_exact_compatible(texts: list[str], labels: list[str]) -> dict:
     """
-    Exact mathematical implementation of scikit-learn's TfidfVectorizer
-    (smooth_idf=True, sublinear_tf=True, norm='l2', max_features=7000, max_df=0.25) +
-    Multinomial Logistic Regression when sklearn C-extensions are not installed.
+    Pure-Python fallback implementation of TfidfVectorizer
+    (smooth_idf=True, sublinear_tf=True, norm='l2', max_features=7000, max_df=0.04) +
+    Multinomial Logistic Regression when scikit-learn C-extensions are not installed.
     """
     print(
         f"[Tier1-Builder] Extracting char n-grams ({NGRAM_MIN}-{NGRAM_MAX}) "
