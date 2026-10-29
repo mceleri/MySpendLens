@@ -9,6 +9,7 @@
 import { ProcessedTransaction } from '../types';
 import { CategoryDefinition, DEFAULT_CATEGORY_DEFINITIONS } from '../utils/categories';
 import { Tier1ModelArtifact } from '../engine/tier1_browser_engine';
+import { normalizeDateToIso } from '../utils/financialCalculations';
 
 export interface StoredTransaction extends ProcessedTransaction {
   fingerprint: string;
@@ -40,8 +41,9 @@ export function generateTransactionFingerprint(
   amount?: string,
   occurrence: number = 0
 ): string {
-  // 1. Normalize date (e.g. "14/10/2026" or "2026-10-14")
-  const normDate = (date || '')
+  // 1. Normalize date to standard ISO YYYY-MM-DD (e.g. "9/28/26" -> "2026-09-28")
+  const isoDate = normalizeDateToIso(date);
+  const normDate = isoDate || (date || '')
     .trim()
     .toLowerCase()
     .replace(/\s+/g, '');

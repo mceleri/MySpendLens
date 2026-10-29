@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useMemo, useEffect } from 'react';
 import {
   UploadCloud,
   ArrowRight,
@@ -12,13 +12,22 @@ import {
   Layers,
   FileSpreadsheet,
   Check,
+  ChevronUp,
+  ChevronDown,
 } from 'lucide-react';
 import {
-  inspectCsvFile,
+  inspectSpreadsheetFile,
+  inspectXlsxWorkbook,
+  buildInspectionFromGrid,
   extractRowsWithMapping,
   CsvInspectionResult,
   RawRow,
 } from '../utils/csvParser';
+import {
+  DateFormatPreference,
+  detectDateFormatFromValues,
+  parseAndFormatToIso,
+} from '../utils/financialCalculations';
 import { generateTransactionFingerprint } from '../db/transactionDb';
 
 interface UploadViewProps {
@@ -53,6 +62,24 @@ export const UploadView: React.FC<UploadViewProps> = ({
   const [dateCol, setDateCol] = useState<string>('');
   const [descCol, setDescCol] = useState<string>('');
   const [amountCol, setAmountCol] = useState<string>('');
+  const [dateFormat, setDateFormat] = useState<DateFormatPreference>('DD/MM/YYYY');
+
+  // Inspect selected date column for format ambiguity
+  const dateValues = useMemo(() => {
+    if (!inspection || !dateCol) return [];
+    return inspection.rawPapaResult.data.map((r) => r[dateCol]).filter(Boolean);
+  }, [inspection, dateCol]);
+
+  const dateInspection = useMemo(() => {
+    return detectDateFormatFromValues(dateValues);
+  }, [dateValues]);
+
+  // Sync initial detected format when date column changes
+  useEffect(() => {
+    if (dateInspection.hasSlashOrDashDates) {
+      setDateFormat(dateInspection.detectedFormat);
+    }
+  }, [dateInspection.detectedFormat, dateInspection.hasSlashOrDashDates]);
 
   // Deduplication state
   const [newRowsToImport, setNewRowsToImport] = useState<RawRow[]>([]);
@@ -69,6 +96,7 @@ export const UploadView: React.FC<UploadViewProps> = ({
     setDateCol('');
     setDescCol('');
     setAmountCol('');
+    setDateFormat('DD/MM/YYYY');
     setNewRowsToImport([]);
     setDuplicateCount(0);
     setTotalInFile(0);
@@ -99,44 +127,72 @@ export const UploadView: React.FC<UploadViewProps> = ({
     }
   };
 
-  const processSelectedFile = (file: File) => {
+  const processSelectedFile = async (file: File) => {
     setErrorMsg(null);
-    if (!file.name.toLowerCase().endsWith('.csv')) {
-      setErrorMsg('Please select a valid CSV file (.csv).');
+    const lowerName = file.name.toLowerCase();
+    const isSupported =
+      lowerName.endsWith('.csv') ||
+      lowerName.endsWith('.xlsx') ||
+      lowerName.endsWith('.xls');
+
+    if (!isSupported) {
+      setErrorMsg('Please select a valid CSV or Excel file (.csv, .xlsx, .xls).');
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-      const content = event.target?.result as string;
-      if (!content || content.trim().length === 0) {
-        setErrorMsg('The selected CSV file is empty.');
-        return;
-      }
+    try {
+      const inspected = await inspectSpreadsheetFile(file);
+      setSelectedFileName(file.name);
+      setInspection(inspected);
 
-      try {
-        const inspected = await inspectCsvFile(content);
-        setSelectedFileName(file.name);
-        setInspection(inspected);
+      // Pre-fill suggested columns
+      setDateCol(inspected.suggestedColumns.dateColumn || '');
+      setDescCol(
+        inspected.suggestedColumns.descriptionColumn ||
+          (inspected.headers.length > 0 ? inspected.headers[0] : '')
+      );
+      setAmountCol(inspected.suggestedColumns.amountColumn || '');
 
-        // Pre-fill suggested columns
-        setDateCol(inspected.suggestedColumns.dateColumn || '');
-        setDescCol(
-          inspected.suggestedColumns.descriptionColumn ||
-            (inspected.headers.length > 0 ? inspected.headers[0] : '')
-        );
-        setAmountCol(inspected.suggestedColumns.amountColumn || '');
+      setStep('map_columns');
+    } catch (err) {
+      console.error(err);
+      setErrorMsg((err as Error).message || 'Unable to parse file.');
+    }
+  };
 
-        setStep('map_columns');
-      } catch (err) {
-        console.error(err);
-        setErrorMsg((err as Error).message || 'Unable to parse CSV file.');
-      }
-    };
-    reader.onerror = () => {
-      setErrorMsg('Unable to read the selected file.');
-    };
-    reader.readAsText(file);
+  const handleSheetChange = (newSheet: string) => {
+    if (!inspection?.workbook) return;
+    try {
+      const updated = inspectXlsxWorkbook(inspection.workbook, newSheet);
+      setInspection(updated);
+      setDateCol(updated.suggestedColumns.dateColumn || '');
+      setDescCol(
+        updated.suggestedColumns.descriptionColumn ||
+          (updated.headers.length > 0 ? updated.headers[0] : '')
+      );
+      setAmountCol(updated.suggestedColumns.amountColumn || '');
+      setErrorMsg(null);
+    } catch (err) {
+      setErrorMsg((err as Error).message || 'Failed to switch sheet.');
+    }
+  };
+
+  const handleHeaderRowChange = (newIndex: number) => {
+    if (!inspection?.rawGrid) return;
+    const clamped = Math.max(0, Math.min(newIndex, inspection.rawGrid.length - 1));
+    const updated = buildInspectionFromGrid(inspection.rawGrid, clamped, {
+      sheets: inspection.sheets,
+      activeSheet: inspection.activeSheet,
+      workbook: inspection.workbook,
+    });
+    setInspection(updated);
+    setDateCol(updated.suggestedColumns.dateColumn || '');
+    setDescCol(
+      updated.suggestedColumns.descriptionColumn ||
+        (updated.headers.length > 0 ? updated.headers[0] : '')
+    );
+    setAmountCol(updated.suggestedColumns.amountColumn || '');
+    setErrorMsg(null);
   };
 
   // STEP 2 -> STEP 3: Analyze mapping and deduplicate
@@ -147,11 +203,15 @@ export const UploadView: React.FC<UploadViewProps> = ({
     }
 
     try {
-      const extracted = extractRowsWithMapping(inspection.rawPapaResult.data, {
-        dateColumn: dateCol || undefined,
-        descriptionColumn: descCol,
-        amountColumn: amountCol || undefined,
-      });
+      const extracted = extractRowsWithMapping(
+        inspection.rawPapaResult.data,
+        {
+          dateColumn: dateCol || undefined,
+          descriptionColumn: descCol,
+          amountColumn: amountCol || undefined,
+        },
+        dateFormat
+      );
 
       if (extracted.length === 0) {
         setErrorMsg('No valid rows could be extracted with the selected columns.');
@@ -221,7 +281,7 @@ export const UploadView: React.FC<UploadViewProps> = ({
             {step === 'review_merge' && 'Review & Merge Transactions'}
           </h2>
           <p className="upload-view-desc">
-            {step === 'select_file' && 'Select any bank CSV export. You will map columns in the next step.'}
+            {step === 'select_file' && 'Select any bank CSV or Excel export. You will map columns in the next step.'}
             {step === 'map_columns' && 'Confirm which columns correspond to date, description, and amount.'}
             {step === 'review_merge' && 'Compare transactions with database to prevent duplicates.'}
           </p>
@@ -247,7 +307,7 @@ export const UploadView: React.FC<UploadViewProps> = ({
               <input
                 ref={fileInputRef}
                 type="file"
-                accept=".csv,text/csv"
+                accept=".csv,text/csv,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.xls,application/vnd.ms-excel"
                 className="hidden-file-input"
                 onChange={handleFileInput}
                 disabled={disabled}
@@ -258,9 +318,9 @@ export const UploadView: React.FC<UploadViewProps> = ({
                   <UploadCloud size={32} className="text-primary" />
                 </div>
                 <div>
-                  <h4 className="dropzone-title-sm">Select or drag & drop a CSV statement</h4>
+                  <h4 className="dropzone-title-sm">Select or drag & drop a CSV or Excel statement</h4>
                   <p className="dropzone-desc-sm">
-                    Only CSV (.csv) format is supported. All data is processed 100% locally in your browser.
+                    Supports CSV (.csv) and Excel (.xlsx, .xls) formats. All data is processed 100% locally in your browser.
                   </p>
                 </div>
                 <button
@@ -273,7 +333,7 @@ export const UploadView: React.FC<UploadViewProps> = ({
                   disabled={disabled}
                 >
                   <UploadCloud size={15} />
-                  <span>Browse CSV from device</span>
+                  <span>Browse file from device</span>
                 </button>
               </div>
             </div>
@@ -291,23 +351,100 @@ export const UploadView: React.FC<UploadViewProps> = ({
         {/* STEP 2: Map Columns with 2-row Preview */}
         {step === 'map_columns' && inspection && (
           <div className="upload-step-body">
+            {inspection.sheets && inspection.sheets.length > 1 && (
+              <div className="uploader-info-banner mb-2">
+                <Layers size={14} className="text-primary shrink-0" />
+                <span className="text-xs">
+                  Workbook with multiple sheets ({inspection.sheets.join(', ')}). Currently viewing sheet: <strong>"{inspection.activeSheet}"</strong>.
+                </span>
+              </div>
+            )}
+
+            {!inspection.hasHeaders && (
+              <div className="uploader-info-banner mb-2">
+                <FileText size={14} className="text-primary shrink-0" />
+                <span className="text-xs">
+                  No header row detected in file. All rows (from the first one) are preserved as movements.
+                </span>
+              </div>
+            )}
+
             <div className="step-file-summary">
               <div className="flex items-center gap-2">
                 <FileSpreadsheet size={16} className="text-primary" />
                 <span className="font-semibold text-main text-xs">{selectedFileName}</span>
               </div>
-              <span className="badge-pill badge-primary font-mono text-xs">
-                {inspection.totalDataRows} rows detected
-              </span>
+              <div className="flex items-center gap-2">
+                {inspection.sheets && inspection.sheets.length > 1 && (
+                  <div className="flex items-center gap-1.5 mr-2">
+                    <span className="text-xs text-muted">Sheet:</span>
+                    <select
+                      value={inspection.activeSheet}
+                      onChange={(e) => handleSheetChange(e.target.value)}
+                      className="column-select text-xs py-0.5 px-2 h-auto"
+                      style={{ minWidth: '120px' }}
+                    >
+                      {inspection.sheets.map((s) => (
+                        <option key={s} value={s}>
+                          {s}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                <span className="badge-pill badge-primary font-mono text-xs">
+                  {inspection.totalDataRows} rows detected
+                </span>
+              </div>
             </div>
 
-            {/* 2-Row Preview Table */}
+            {/* Header Row Selector */}
+            <div className="header-row-nav-card">
+              <div className="header-row-info">
+                <span className="header-row-title">Header Row</span>
+                <span className="header-row-hint">
+                  Line containing column titles
+                </span>
+              </div>
+              <div className="header-row-controls">
+                <button
+                  type="button"
+                  className="btn-header-row-step"
+                  onClick={() => handleHeaderRowChange(inspection.headerRowIndex - 1)}
+                  disabled={inspection.headerRowIndex <= 0}
+                  title="Move header row up (previous line)"
+                >
+                  <ChevronUp size={15} />
+                  <span>Up</span>
+                </button>
+
+                <div className="header-row-badge">
+                  <span className="header-row-badge-label">Line</span>
+                  <span className="header-row-badge-value">{inspection.headerRowIndex + 1}</span>
+                  <span className="header-row-badge-total">/ {inspection.rawGrid.length}</span>
+                </div>
+
+                <button
+                  type="button"
+                  className="btn-header-row-step"
+                  onClick={() => handleHeaderRowChange(inspection.headerRowIndex + 1)}
+                  disabled={inspection.headerRowIndex >= inspection.rawGrid.length - 1}
+                  title="Move header row down (next line)"
+                >
+                  <span>Down</span>
+                  <ChevronDown size={15} />
+                </button>
+              </div>
+            </div>
+
+            {/* 3-Row Preview Table */}
             <div className="preview-section">
-              <span className="preview-label">File Preview (First 2 Rows):</span>
+              <span className="preview-label">File Preview (First 3 Data Rows):</span>
               <div className="preview-table-container">
                 <table className="preview-table">
                   <thead>
                     <tr>
+                      <th className="preview-th text-center" style={{ width: '40px' }}>#</th>
                       {inspection.headers.map((h) => {
                         const isDate = h === dateCol;
                         const isDesc = h === descCol;
@@ -330,18 +467,50 @@ export const UploadView: React.FC<UploadViewProps> = ({
                     </tr>
                   </thead>
                   <tbody>
-                    {inspection.previewRows.map((row, idx) => (
-                      <tr key={idx}>
-                        {inspection.headers.map((h) => (
-                          <td key={h} className="preview-td">
-                            {row[h] || '—'}
-                          </td>
-                        ))}
+                    {inspection.previewRows.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan={inspection.headers.length + 1}
+                          className="preview-td text-center text-muted py-3"
+                        >
+                          No data rows found below line {inspection.headerRowIndex + 1}. Move the header row up.
+                        </td>
                       </tr>
-                    ))}
+                    ) : (
+                      inspection.previewRows.map((row, idx) => (
+                        <tr key={idx}>
+                          <td className="preview-td text-muted text-center font-mono text-xs">
+                            {inspection.headerRowIndex + 2 + idx}
+                          </td>
+                          {inspection.headers.map((h) => {
+                            const val = row[h] || '—';
+                            const isDate = h === dateCol;
+                            const parsedIso = isDate && val !== '—' ? parseAndFormatToIso(val, dateFormat) : null;
+
+                            return (
+                              <td key={h} className="preview-td">
+                                <span className={parsedIso ? 'font-mono text-xs' : ''}>{val}</span>
+                                {parsedIso && (
+                                  <span className="preview-iso-pill" title={`Formato ISO finale: ${parsedIso}`}>
+                                    &rarr; {parsedIso}
+                                  </span>
+                                )}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
+            </div>
+
+            <div className="uploader-info-banner mb-1">
+              <CheckCircle2 size={14} className="text-emerald shrink-0" />
+              <span className="text-xs">
+                Non-transaction lines (preambles, footer summaries, empty lines) without valid dates or amounts will be automatically filtered out during import.
+              </span>
             </div>
 
             {/* Column Selectors */}
@@ -363,6 +532,54 @@ export const UploadView: React.FC<UploadViewProps> = ({
                     </option>
                   ))}
                 </select>
+
+                {/* Date Format Disambiguation if slashes/dashes are present */}
+                {dateCol && dateInspection.hasSlashOrDashDates && (
+                  <div className="date-disambiguation-box">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-semibold text-main flex items-center gap-1.5">
+                        <Calendar size={12} className="text-primary" />
+                        <span>Formato data nel file:</span>
+                      </span>
+                      {dateInspection.isAmbiguous ? (
+                        <span className="badge-pill badge-warning text-xs flex items-center gap-1">
+                          <AlertTriangle size={11} />
+                          Formato ambiguo (richiesta conferma)
+                        </span>
+                      ) : (
+                        <span className="badge-pill badge-primary text-xs">
+                          Rilevato: {dateFormat}
+                        </span>
+                      )}
+                    </div>
+
+                    {dateInspection.isAmbiguous && (
+                      <p className="text-xs text-muted mb-2">
+                        I valori come <code className="font-mono text-primary font-semibold">"{dateInspection.sampleValue}"</code> potrebbero essere Giorno/Mese o Mese/Giorno. Specifica quale parte viene prima:
+                      </p>
+                    )}
+
+                    <div className="date-format-toggle-group">
+                      <button
+                        type="button"
+                        className={`btn-date-format-toggle ${dateFormat === 'DD/MM/YYYY' ? 'active' : ''}`}
+                        onClick={() => setDateFormat('DD/MM/YYYY')}
+                      >
+                        <span className="toggle-main">DD/MM/YYYY</span>
+                        <span className="toggle-sub">Giorno prima (es. 28/09/2026)</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        className={`btn-date-format-toggle ${dateFormat === 'MM/DD/YYYY' ? 'active' : ''}`}
+                        onClick={() => setDateFormat('MM/DD/YYYY')}
+                      >
+                        <span className="toggle-main">MM/DD/YYYY</span>
+                        <span className="toggle-sub">Mese prima (es. 09/28/2026)</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="column-field">
@@ -461,6 +678,15 @@ export const UploadView: React.FC<UploadViewProps> = ({
                 <em>(date + description + amount)</em>.
               </span>
             </div>
+
+            {duplicateCount > 0 && (
+              <div className="uploader-info-banner mt-2">
+                <AlertTriangle size={14} className="text-warning shrink-0" />
+                <span className="text-xs">
+                  <strong>{duplicateCount}</strong> out of <strong>{totalInFile}</strong> transactions already exist in your local database from previous imports and were automatically skipped to avoid double-counting.
+                </span>
+              </div>
+            )}
 
             {newRowsToImport.length === 0 ? (
               <div className="merge-empty-alert">

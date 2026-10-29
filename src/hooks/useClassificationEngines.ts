@@ -265,24 +265,39 @@ export function useClassificationEngines(
             txInferenceTime = pred1.inferenceTimeMs;
           } else {
             // On-demand escalation to Tier 2 (Fallback)
-            if (!t2Engine) {
-              onProgressUpdate?.('Loading Tier 2 for low-confidence description...');
-              t2Engine = await ensureTier2Engine(onProgressUpdate);
-            }
-            const pred2 = await t2Engine.predict(row.description);
-            t2Result = {
-              category: pred2.category,
-              confidence: pred2.confidence,
-              probabilities: pred2.probabilities,
-              cosineSimilarities: pred2.cosineSimilarities,
-              inferenceTimeMs: pred2.inferenceTimeMs,
-            };
+            let tier2Success = false;
+            try {
+              if (!t2Engine) {
+                onProgressUpdate?.('Loading Tier 2 for low-confidence description...');
+                t2Engine = await ensureTier2Engine(onProgressUpdate);
+              }
+              const pred2 = await t2Engine.predict(row.description);
+              t2Result = {
+                category: pred2.category,
+                confidence: pred2.confidence,
+                probabilities: pred2.probabilities,
+                cosineSimilarities: pred2.cosineSimilarities,
+                inferenceTimeMs: pred2.inferenceTimeMs,
+              };
 
-            chosenCategory = pred2.category;
-            chosenConfidence = pred2.confidence;
-            chosenProbabilities = pred2.probabilities;
-            chosenSourceTier = 'Tier 2 (Fallback)';
-            txInferenceTime = pred1.inferenceTimeMs + pred2.inferenceTimeMs;
+              chosenCategory = pred2.category;
+              chosenConfidence = pred2.confidence;
+              chosenProbabilities = pred2.probabilities;
+              chosenSourceTier = 'Tier 2 (Fallback)';
+              txInferenceTime = pred1.inferenceTimeMs + pred2.inferenceTimeMs;
+              tier2Success = true;
+            } catch (escalateErr) {
+              console.warn('Tier 2 fallback escalation failed, using Tier 1 prediction:', escalateErr);
+            }
+
+            if (!tier2Success) {
+              // Graceful fallback to Tier 1 prediction if Tier 2 fails (e.g. offline, network error)
+              chosenCategory = pred1.category;
+              chosenConfidence = pred1.confidence;
+              chosenProbabilities = pred1.probabilities;
+              chosenSourceTier = 'Tier 1';
+              txInferenceTime = pred1.inferenceTimeMs;
+            }
           }
         } else if (t2Engine && t2Engine.isReady) {
           // Tier 1 is disabled -> Baseline only Tier 2

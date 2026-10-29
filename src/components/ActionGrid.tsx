@@ -54,7 +54,7 @@ export const ActionGrid: React.FC<ActionGridProps> = ({
           </div>
           <div className="action-card-text">
             <h4 className="action-title">Upload File</h4>
-            <p className="action-desc">Import CSV bank statement files</p>
+            <p className="action-desc">Import CSV or Excel bank statement files</p>
           </div>
         </button>
 

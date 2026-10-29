@@ -24,6 +24,7 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 .idea
+*.iml
 
 # Environment files
 .env

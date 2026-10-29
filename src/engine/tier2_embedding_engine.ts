@@ -132,10 +132,11 @@ function getIndexedDBCacheInstance(): IndexedDBCache {
 
 // Safely configure caching based on available APIs in the current environment
 function configureTransformersCache() {
-  // Allow loading model files directly from local origin (/models/) with remote fallback
-  env.allowLocalModels = true;
+  // Models are fetched from Hugging Face Hub CDN and cached in browser storage.
+  // Disable allowLocalModels in browser so it does not query non-existent local paths
+  // that return index.html on SPA servers (preventing JSON.parse '<!DOCTYPE' SyntaxError).
+  env.allowLocalModels = false;
   env.allowRemoteModels = true;
-  env.localModelPath = '/models/';
 
   const hasCacheStorage =
     typeof window !== 'undefined' &&
